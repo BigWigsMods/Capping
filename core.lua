@@ -1,7 +1,10 @@
+
+local _, addon = ...
+
 -- HEADER
 local Capping = CreateFrame("Button", "Capping", UIParent)
 local self = Capping
-local L = CappingLocale
+local L = addon.L
 
 -- LIBRARIES
 local media = LibStub("LibSharedMedia-3.0")

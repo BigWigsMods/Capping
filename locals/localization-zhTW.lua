@@ -1,15 +1,16 @@
 if GetLocale() ~= "zhTW" then return end
 
+local _, addon = ...
 --translate by BestSteve
-CappingLocale:CreateLocaleTable({
+addon.L = {
 	-- battlegrounds
-	["Alterac Valley"] = "奧特蘭克山谷", 
-	["Arathi Basin"] = "阿拉希盆地", 
+	["Alterac Valley"] = "奧特蘭克山谷",
+	["Arathi Basin"] = "阿拉希盆地",
 	["Warsong Gulch"] = "戰歌峽谷",
 	["Eye of the Storm"] = "暴風之眼",
 	["Wintergrasp"] = "冬握湖",
 	["Isle of Conquest"] = "征服之島",
-	
+
 	-- options menu
 	["Auto Quest Turnins"] = "自動回報任務",
 	["Bar"] = "狀態條",
@@ -39,7 +40,7 @@ CappingLocale:CreateLocaleTable({
 	["Cancel Timer"] = "取消計時條",
 	["Move Capture Bar"] = "復位計時條",
 	--["Move Vehicle Seat"] = true,
-	
+
 	-- etc timers
 	["Port: %s"] = "傳送: %s", -- bar text for time remaining to port into a bg
 	["Queue: %s"] = "佇列: %s",
@@ -54,8 +55,8 @@ CappingLocale:CreateLocaleTable({
 	["Fifteen seconds until"] = "十五秒",
 	--["has begun"] = true, -- start of arena key phrase
 	["%s: %s - %d:%02d"] = "%s: %s - 還有 %d:%02d", -- chat message after shift left-clicking a bar
-	
-	-- AB	
+
+	-- AB
 	["Bases: (%d+)  Resources: (%d+)/(%d+)"] = "基地:(%d+) 資源:(%d+)/(%d+)", -- arathi basin scoreboard
 	["has assaulted"] = "突襲了",
 	["claims the"] = "攻佔了",
@@ -63,7 +64,7 @@ CappingLocale:CreateLocaleTable({
 	["has defended the"] = "守住了",
 	["Final: %d - %d"] = "估計最終比數: %d - %d", -- final score text
 	["wins %d-%d"] = "勝利 (%d-%d)", -- final score chat message
-	
+
 	-- WSG
 	["was picked up by (.+)!"] = "被(.+)拔掉了!",
 	--["was picked up by (.+)!2"] = true,
@@ -71,7 +72,7 @@ CappingLocale:CreateLocaleTable({
 	["captured the"] = "佔據了",
 	["Flag respawns"] = "旗幟已重置",
 	["%s's flag carrier: %s (%s)"] = "%s的旗幟攜帶者: %s (%s)", -- chat message
-	
+
 	-- AV
 	 -- NPC
 	["Smith Regzar"] = "鐵匠雷格薩",
@@ -88,7 +89,7 @@ CappingLocale:CreateLocaleTable({
 	["WHO DARES SUMMON LOKHOLAR"] = "誰敢召喚冰雪之王洛克霍拉?", -- what Lok says after being summoned
 	["The Ice Lord has arrived!"] = "冰雪之王來了!",
 	["Lokholar begins moving"] = "洛克霍拉開始移動",
-	
+
 	-- EotS
 	["^(.+) has taken the flag!"] = "^(.+)已經奪走了旗幟!",
 	["Bases: (%d+)  Victory Points: (%d+)/(%d+)"] = "基地:(%d+) 勝利點數:(%d+)/(%d+)",
@@ -102,4 +103,5 @@ CappingLocale:CreateLocaleTable({
 	--["seaforium bombs"] = true,  -- start (after capturing the workshop)
 	--["It's broken"] = true,  -- start again (after engine is destroyed)
 	--["halfway"] = true,  -- middle
-})
+}
+

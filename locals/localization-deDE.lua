@@ -1,10 +1,11 @@
 if GetLocale() ~= "deDE" then return end
 
+local _, addon = ...
 -- de translations provided by Farook
-CappingLocale:CreateLocaleTable({
+addon.L = {
 	-- battlegrounds
-	["Alterac Valley"] = "Alteractal", 
-	["Arathi Basin"] = "Arathibecken", 
+	["Alterac Valley"] = "Alteractal",
+	["Arathi Basin"] = "Arathibecken",
 	["Warsong Gulch"] = "Kriegshymnenschlucht",
 	["Eye of the Storm"] = "Auge des Sturms",
 	["Wintergrasp"] = "Tausendwintersee",
@@ -78,8 +79,8 @@ CappingLocale:CreateLocaleTable({
 	["Murgot Deepforge"] = "Murgot Tiefenschmied",
 	-- ["Primalist Thurloga"] = "Primalistin Thurloga",  -- same as default
 	["Arch Druid Renferal"] = "Erzdruide Renferal",
-	["Stormpike Ram Rider Commander"] = "Kommandant der Sturmlanzenwidderreiter",		
-	["Frostwolf Wolf Rider Commander"] = "Wolfsreiterkommandant der Frostwölfe", 
+	["Stormpike Ram Rider Commander"] = "Kommandant der Sturmlanzenwidderreiter",
+	["Frostwolf Wolf Rider Commander"] = "Wolfsreiterkommandant der Frostwölfe",
 
 	 -- patterns
 	--["Upgrade to"] = "Upgrade", -- the option to upgrade units in AV	 === NEEDS TO BE CHECKED ===
@@ -92,7 +93,7 @@ CappingLocale:CreateLocaleTable({
 	-- EotS
 	["^(.+) has taken the flag!"] = "^(.+) hat die Fahne erobert!",
 	["Bases: (%d+)  Victory Points: (%d+)/(%d+)"] = "Basen: (%d+)  Siegespunkte: (%d+)/(%d+)",
-	
+
 	-- IoC    -- translated by yoshimo
 	 -- node keywords (text is also displayed on timer bar)
 	["Alliance Keep"] = "Allianzfestung",
@@ -102,4 +103,5 @@ CappingLocale:CreateLocaleTable({
 	["seaforium bombs"] = "diese Zephyriumbomben",  -- start (after capturing the workshop)
 	["It's broken"] = "kaputt",  -- start again (after engine is destroyed)
 	["halfway"] = "Haltet",  -- middle
-})
+}
+

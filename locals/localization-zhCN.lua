@@ -1,15 +1,16 @@
 if GetLocale() ~= "zhCN" then return end
 
+local _, addon = ...
 --translate by BestSteve
-CappingLocale:CreateLocaleTable({
+addon.L = {
 	-- battlegrounds
-	["Alterac Valley"] = "奥特兰克山谷", 
-	["Arathi Basin"] = "阿拉希盆地", 
+	["Alterac Valley"] = "奥特兰克山谷",
+	["Arathi Basin"] = "阿拉希盆地",
 	["Warsong Gulch"] = "战歌峡谷",
 	["Eye of the Storm"] = "风暴之眼",
 	["Wintergrasp"] = "冬拥湖",
 	["Isle of Conquest"] = "征服之岛",
-	
+
 	-- options menu
 	["Auto Quest Turnins"] = "自动完成任务",
 	["Bar"] = "计时条",
@@ -39,7 +40,7 @@ CappingLocale:CreateLocaleTable({
 	["Cancel Timer"] = "取消计时条",
 	["Move Capture Bar"] = "复位计时条",
 	--["Move Vehicle Seat"] = true,
-	
+
 	-- etc timers
 	["Port: %s"] = "传送：%s", -- bar text for time remaining to port into a bg
 	["Queue: %s"] = "队列中：%s",
@@ -54,8 +55,8 @@ CappingLocale:CreateLocaleTable({
 	["Fifteen seconds until"] = "十五秒",
 	--["has begun"] = true, -- start of arena key phrase
 	["%s: %s - %d:%02d"] = "%s:%s - 剩余 %d:%02d", -- chat message after shift left-clicking a bar
-	
-	-- AB	
+
+	-- AB
 	["Bases: (%d+)  Resources: (%d+)/(%d)"] = "基地：(%d+) 资源：(%d+)/(%d)", -- arathi basin scoreboard
 	["has assaulted"] = "突袭了",
 	["claims the"] = "攻占了",
@@ -63,14 +64,14 @@ CappingLocale:CreateLocaleTable({
 	["has defended the"] = "守住了",
 	["Final: %d - %d"] = "最终：%d - %d", -- final score text
 	["wins %d-%d"] = "胜利 %d - %d", -- final score chat message
-	
+
 	-- WSG
 	["was picked up by (.+)!"] = "旗帜被([^%s]+)拔起了！",
 	["dropped"] = "丢掉了",
 	["captured the"] = "夺取",
 	["Flag respawns"] = "旗帜即将刷新",
 	["%s's flag carrier: %s (%s)"] = "%s的旗子携带者：%s (%s)", -- chat message
-	
+
 	-- AV
 	 -- NPC
 	["Smith Regzar"] = "铁匠雷格萨",
@@ -87,7 +88,7 @@ CappingLocale:CreateLocaleTable({
 	["WHO DARES SUMMON LOKHOLAR"] = "谁敢召唤冰雪之王洛克霍拉？", -- what Lok says after being summoned
 	["The Ice Lord has arrived!"] = "冰雪之王到来！",
 	["Lokholar begins moving"] = "洛克霍拉开始移动",
-	
+
 	-- EotS
 	["^(.+) has taken the flag!"] = "^(.+)夺走了旗帜！",
 	["Bases: (%d+)  Victory Points: (%d+)/(%d)"] = "基地：(%d+) 胜利点数：(%d+)/(%d)",
@@ -101,4 +102,4 @@ CappingLocale:CreateLocaleTable({
 	--["seaforium bombs"] = true,  -- start (after capturing the workshop)
 	--["It's broken"] = true,  -- start again (after engine is destroyed)
 	--["halfway"] = true,  -- middle
-})
+}

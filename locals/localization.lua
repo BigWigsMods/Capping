@@ -1,4 +1,6 @@
-local L = {
+
+local _, addon = ...
+addon.L = {
 	-- battlegrounds
 	["Alterac Valley"] = true,
 	["Arathi Basin"] = true,
@@ -91,7 +93,7 @@ local L = {
 	-- EotS
 	["^(.+) has taken the flag!"] = true,
 	["Bases: (%d+)  Victory Points: (%d+)/(%d+)"] = true,
-	
+
 	-- IoC
 	 -- node keywords (text is also displayed on timer bar)
 	["Alliance Keep"] = true,
@@ -103,11 +105,3 @@ local L = {
 	["halfway"] = true,  -- middle
 }
 
-CappingLocale = L
-function L:CreateLocaleTable(t)
-	for k, v in pairs(t) do
-		self[k] = (v == true and k) or v
-	end
-end
-
-L:CreateLocaleTable(L)

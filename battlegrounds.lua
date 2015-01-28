@@ -1,7 +1,9 @@
+
+local _, addon = ...
+
 local Capping = Capping
 local self = Capping
-local L = CappingLocale
-CappingLocale = nil -- remove global reference
+local L = addon.L
 local _G = getfenv(0)
 
 local pname

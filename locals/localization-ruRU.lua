@@ -1,7 +1,8 @@
 if GetLocale() ~= "ruRU" then return end
 
+local _, addon = ...
 -- ru translations provided by McFLY aka mukha521
-CappingLocale:CreateLocaleTable({
+addon.L = {
 	-- battlegrounds
 	["Alterac Valley"] = "Альтеракская долина",
 	["Arathi Basin"] = "Низина Арати",
@@ -103,4 +104,5 @@ CappingLocale:CreateLocaleTable({
 	--["seaforium bombs"] = true,  -- start (after capturing the workshop)
 	--["It's broken"] = true,  -- start again (after engine is destroyed)
 	--["halfway"] = true,  -- middle
-})
+}
+

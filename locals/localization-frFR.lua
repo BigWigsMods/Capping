@@ -1,11 +1,12 @@
 if GetLocale() ~= "frFR" then return end
 
+local _, addon = ...
 -- fr translations provided by pingouin47
 -- Updated by Pettigrow
-CappingLocale:CreateLocaleTable({
+addon.L = {
 	-- battlegrounds
-	["Alterac Valley"] = "Vallée d'Alterac", 
-	["Arathi Basin"] = "Bassin d'Arathi", 
+	["Alterac Valley"] = "Vallée d'Alterac",
+	["Arathi Basin"] = "Bassin d'Arathi",
 	["Warsong Gulch"] = "Goulet des Chanteguerres",
 	["Eye of the Storm"] = "L'Œil du cyclone",
 	["Wintergrasp"] = "Joug-d'hiver",
@@ -103,4 +104,5 @@ CappingLocale:CreateLocaleTable({
 	["seaforium bombs"] = "bombes à l'hydroglycérine",  -- start (after capturing the workshop)
 	["It's broken"] = "Encore cassé",  -- start again (after engine is destroyed)
 	["halfway"] = "Je dois en être à la moitié",  -- middle
-})
+}
+
