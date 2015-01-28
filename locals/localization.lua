@@ -2,106 +2,106 @@
 local _, addon = ...
 addon.L = {
 	-- battlegrounds
-	["Alterac Valley"] = true,
-	["Arathi Basin"] = true,
-	["Warsong Gulch"] = true,
-	["Eye of the Storm"] = true,
-	["Wintergrasp"] = true,
-	["Isle of Conquest"] = true,
+	["Alterac Valley"] = "Alterac Valley",
+	["Arathi Basin"] = "Arathi Basin",
+	["Warsong Gulch"] = "Warsong Gulch",
+	["Eye of the Storm"] = "Eye of the Storm",
+	["Wintergrasp"] = "Wintergrasp",
+	["Isle of Conquest"] = "Isle of Conquest",
 
 	-- options menu
-	["Auto Quest Turnins"] = true,
+	["Auto Quest Turnins"] = "Auto Quest Turnins",
 	["Bar"] = "Timer Bar",
-	["Width"] = true,
-	["Height"] = true,
-	["Texture"] = true,
-	["Map Scale"] = true,
-	["Hide Border"] = true,
-	["Port Timer"] = true,
-	["Wait Timer"] = true,
-	["Show/Hide Anchor"] = true,
-	["Narrow Map Mode"] = true,
-	["Narrow Anchor Left"] = true,
-	["Test"] = true,
+	["Width"] = "Width",
+	["Height"] = "Height",
+	["Texture"] = "Texture",
+	["Map Scale"] = "Map Scale",
+	["Hide Border"] = "Hide Border",
+	["Port Timer"] = "Port Timer",
+	["Wait Timer"] = "Wait Timer",
+	["Show/Hide Anchor"] = "Show/Hide Anchor",
+	["Narrow Map Mode"] = "Narrow Map Mode",
+	["Narrow Anchor Left"] = "Narrow Anchor Left",
+	["Test"] = "Test",
 	["Flip Growth"] = "Flip Bar Stack",
-	["Single Group"] = true,
-	["Move Scoreboard"] = true,
-	["Spacing"] = true,
-	["Request Sync"] = true,
-	["Fill Grow"] = true,
-	["Fill Right"] = true,
-	["Font"] = true,
-	["Time Position"] = true,
-	["Border Width"] = true,
-	["Send to BG"] = true,
-	["Send to SAY"] = true,
-	["Cancel Timer"] = true,
-	["Move Capture Bar"] = true,
-	["Move Vehicle Seat"] = true,
-	["Hide Capping Start Time"] = true,
-	["Hide Blizzard Start Timer"] = true,
+	["Single Group"] = "Single Group",
+	["Move Scoreboard"] = "Move Scoreboard",
+	["Spacing"] = "Spacing",
+	["Request Sync"] = "Request Sync",
+	["Fill Grow"] = "Fill Grow",
+	["Fill Right"] = "Fill Right",
+	["Font"] = "Font",
+	["Time Position"] = "Time Position",
+	["Border Width"] = "Border Width",
+	["Send to BG"] = "Send to BG",
+	["Send to SAY"] = "Send to SAY",
+	["Cancel Timer"] = "Cancel Timer",
+	["Move Capture Bar"] = "Move Capture Bar",
+	["Move Vehicle Seat"] = "Move Vehicle Seat",
+	["Hide Capping Start Time"] = "Hide Capping Start Time",
+	["Hide Blizzard Start Timer"] = "Hide Blizzard Start Timer",
 
 	-- etc timers
-	["Port: %s"] = true, -- bar text for time remaining to port into a bg
-	["Queue: %s"] = true,
-	["Battle Begins"] = true, -- bar text for bg gates opening
-	["1 minute"] = true,
-	["60 seconds"] = true,
-	["30 seconds"] = true,
-	["15 seconds"] = true,
-	["One minute until"] = true,
-	["Forty five seconds"] = true,
-	["Thirty seconds until"] = true,
-	["Fifteen seconds until"] = true,
-	["has begun"] = true, -- start of arena key phrase
-	["%s: %s - %d:%02d"] = true, -- chat message after shift left-clicking a bar
+	["Port: %s"] = "Port: %s", -- bar text for time remaining to port into a bg
+	["Queue: %s"] = "Queue: %s",
+	["Battle Begins"] = "Battle Begins", -- bar text for bg gates opening
+	["1 minute"] = "1 minute",
+	["60 seconds"] = "60 seconds",
+	["30 seconds"] = "30 seconds",
+	["15 seconds"] = "15 seconds",
+	["One minute until"] = "One minute until",
+	["Forty five seconds"] = "Forty five seconds",
+	["Thirty seconds until"] = "Thirty seconds until",
+	["Fifteen seconds until"] = "Fifteen seconds until",
+	["has begun"] = "has begun", -- start of arena key phrase
+	["%s: %s - %d:%02d"] = "%s: %s - %d:%02d", -- chat message after shift left-clicking a bar
 
 	-- AB
-	["Bases: (%d+)  Resources: (%d+)/(%d+)"] = true, -- arathi basin scoreboard
-	["has assaulted"] = true,
-	["claims the"] = true,
-	["has taken the"] = true,
-	["has defended the"] = true,
-	["Final: %d - %d"] = true, -- final score text
-	["wins %d-%d"] = true, -- final score chat message
+	["Bases: (%d+)  Resources: (%d+)/(%d+)"] = "Bases: (%d+)  Resources: (%d+)/(%d+)", -- arathi basin scoreboard
+	["has assaulted"] = "has assaulted",
+	["claims the"] = "claims the",
+	["has taken the"] = "has taken the",
+	["has defended the"] = "has defended the",
+	["Final: %d - %d"] = "Final: %d - %d", -- final score text
+	["wins %d-%d"] = "wins %d-%d", -- final score chat message
 
 	-- WSG
-	["was picked up by (.+)!"] = true,
-	["was picked up by (.+)!2"] = true,
-	["dropped"] = true,
-	["captured the"] = true,
-	["Flag respawns"] = true,
-	["%s's flag carrier: %s (%s)"] = true, -- chat message
+	["was picked up by (.+)!"] = "was picked up by (.+)!",
+	["was picked up by (.+)!2"] = "was picked up by (.+)!2",
+	["dropped"] = "dropped",
+	["captured the"] = "captured the",
+	["Flag respawns"] = "Flag respawns",
+	["%s's flag carrier: %s (%s)"] = "%s's flag carrier: %s (%s)", -- chat message
 
 	-- AV
 	 -- NPC
-	["Smith Regzar"] = true,
-	["Murgot Deepforge"] = true,
-	["Primalist Thurloga"] = true,
-	["Arch Druid Renferal"] = true,
-	["Stormpike Ram Rider Commander"] = true,
-	["Frostwolf Wolf Rider Commander"] = true,
+	["Smith Regzar"] = "Smith Regzar",
+	["Murgot Deepforge"] = "Murgot Deepforge",
+	["Primalist Thurloga"] = "Primalist Thurloga",
+	["Arch Druid Renferal"] = "Arch Druid Renferal",
+	["Stormpike Ram Rider Commander"] = "Stormpike Ram Rider Commander",
+	["Frostwolf Wolf Rider Commander"] = "Frostwolf Wolf Rider Commander",
 
 	 -- patterns
-	["Upgrade to"] = true, -- the option to upgrade units in AV
-	["Wicked, wicked, mortals!"] = true, -- what Ivus says after being summoned
-	["Ivus begins moving"] = true,
-	["WHO DARES SUMMON LOKHOLAR"] = true, -- what Lok says after being summoned
-	["The Ice Lord has arrived!"] = true,
-	["Lokholar begins moving"] = true,
+	["Upgrade to"] = "Upgrade to", -- the option to upgrade units in AV
+	["Wicked, wicked, mortals!"] = "Wicked, wicked, mortals!", -- what Ivus says after being summoned
+	["Ivus begins moving"] = "Ivus begins moving",
+	["WHO DARES SUMMON LOKHOLAR"] = "WHO DARES SUMMON LOKHOLAR", -- what Lok says after being summoned
+	["The Ice Lord has arrived!"] = "The Ice Lord has arrived!",
+	["Lokholar begins moving"] = "Lokholar begins moving",
 
 	-- EotS
-	["^(.+) has taken the flag!"] = true,
-	["Bases: (%d+)  Victory Points: (%d+)/(%d+)"] = true,
+	["^(.+) has taken the flag!"] = "^(.+) has taken the flag!",
+	["Bases: (%d+)  Victory Points: (%d+)/(%d+)"] = "Bases: (%d+)  Victory Points: (%d+)/(%d+)",
 
 	-- IoC
 	 -- node keywords (text is also displayed on timer bar)
-	["Alliance Keep"] = true,
-	["Horde Keep"] = true,
+	["Alliance Keep"] = "Alliance Keep",
+	["Horde Keep"] = "Horde Keep",
 	 -- Siege Engine keyphrases
-	["Goblin"] = true,  -- Horde mechanic name keyword
-	["seaforium bombs"] = true,  -- start (after capturing the workshop)
-	["It's broken"] = true,  -- start again (after engine is destroyed)
-	["halfway"] = true,  -- middle
+	["Goblin"] = "Goblin",  -- Horde mechanic name keyword
+	["seaforium bombs"] = "seaforium bombs",  -- start (after capturing the workshop)
+	["It's broken"] = "It's broken",  -- start again (after engine is destroyed)
+	["halfway"] = "halfway",  -- middle
 }
 

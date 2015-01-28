@@ -9,7 +9,8 @@
 ## SavedVariablesPerCharacter: CappingCharDB
 
 ## X-Category: Battlegrounds/PvP
-## OptionalDeps: LibSharedMedia-3.0, LibCandyBar-3.0
+## OptionalDeps: LibSharedMedia-3.0, LibCandyBar-3.0, LibChatAnims
+## X-Embeds: LibSharedMedia-3.0, LibCandyBar-3.0, LibChatAnims
 
 embeds.xml
 
