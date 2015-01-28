@@ -1,7 +1,7 @@
 local Capping = Capping
 local self = Capping
 local L = CappingLocale
-CappingLocale = nil  -- remove global reference
+CappingLocale = nil -- remove global reference
 local _G = getfenv(0)
 
 local pname
@@ -13,7 +13,7 @@ local assaulted, claimed, defended, taken = L["has assaulted"], L["claims the"],
 local GetNumGroupMembers = GetNumGroupMembers
 
 local GetBattlefieldScore, GetNumBattlefieldScores = GetBattlefieldScore, GetNumBattlefieldScores
-local function GetClassByName(name, faction)  -- retrieves a player's class by name
+local function GetClassByName(name, faction) -- retrieves a player's class by name
 	for i = 1, GetNumBattlefieldScores(), 1 do
 		local iname, _, _, _, _, ifaction, _, _, iclass = GetBattlefieldScore(i)
 		if ifaction == faction and gsub(iname or "blah", "-(.+)", "") == name then
@@ -38,23 +38,23 @@ if CUSTOM_CLASS_COLORS then
 end
 
 local SetupAssault, GetIconData, nodestates
-do  -- POI handling
+do -- POI handling
 	local GetNumMapLandmarks, GetMapLandmarkInfo = GetNumMapLandmarks, GetMapLandmarkInfo
 	local ntime, skipkeep
-	local poicons = { -- textures used on worldmap { al, ar, at, ab,   hl, hr, ht, hb,   neutral, ally, ally half, horde, horde half
-		symbol = { 46, nil, nil, nil,   48, nil, nil, nil, },
-		flag = { 43, nil, nil, nil,   44, nil, nil, nil, },
-		graveyard = { 4, nil, nil, nil,  14, nil, nil, nil,   8, 15, 4, 13, 14, },
-		tower = { 9, nil, nil, nil,   12, nil, nil, nil,   6, 11, 9, 10, 12, },
-		farm = { 32, nil, nil, nil,   34, nil, nil, nil,   31, 33, 32, 35, 34, },
-		blacksmith = { 27, nil, nil, nil,   29, nil, nil, nil,   26, 28, 27, 30, 29, },
-		mine = { 17, nil, nil, nil,   19, nil, nil, nil,   16, 18, 17, 20, 19, },
-		stables = { 37, nil, nil, nil,   39, nil, nil, nil,   36, 38, 37, 40, 39, },
-		lumbermill = { 22, nil, nil, nil,   24, nil, nil, nil,   21, 23, 22, 25, 24, },
-		workshop = { 137, nil, nil, nil,   139, nil, nil, nil,   135, 136, 137, 138, 139, },
-		hangar = { 142, nil, nil, nil,   144, nil, nil, nil,   140, 141, 142, 143, 144, },
-		docks = { 147, nil, nil, nil,   149, nil, nil, nil,   145, 146, 147, 148, 149, },
-		refinery = { 152, nil, nil, nil,   154, nil, nil, nil,   150, 151, 152, 153, 154, },
+	local poicons = { -- textures used on worldmap { al, ar, at, ab, hl, hr, ht, hb, neutral, ally, ally half, horde, horde half
+		symbol = { 46, nil, nil, nil, 48, nil, nil, nil, },
+		flag = { 43, nil, nil, nil, 44, nil, nil, nil, },
+		graveyard = { 4, nil, nil, nil, 14, nil, nil, nil, 8, 15, 4, 13, 14, },
+		tower = { 9, nil, nil, nil, 12, nil, nil, nil, 6, 11, 9, 10, 12, },
+		farm = { 32, nil, nil, nil, 34, nil, nil, nil, 31, 33, 32, 35, 34, },
+		blacksmith = { 27, nil, nil, nil, 29, nil, nil, nil, 26, 28, 27, 30, 29, },
+		mine = { 17, nil, nil, nil, 19, nil, nil, nil, 16, 18, 17, 20, 19, },
+		stables = { 37, nil, nil, nil, 39, nil, nil, nil, 36, 38, 37, 40, 39, },
+		lumbermill = { 22, nil, nil, nil, 24, nil, nil, nil, 21, 23, 22, 25, 24, },
+		workshop = { 137, nil, nil, nil, 139, nil, nil, nil, 135, 136, 137, 138, 139, },
+		hangar = { 142, nil, nil, nil, 144, nil, nil, nil, 140, 141, 142, 143, 144, },
+		docks = { 147, nil, nil, nil, 149, nil, nil, nil, 145, 146, 147, 148, 149, },
+		refinery = { 152, nil, nil, nil, 154, nil, nil, nil, 150, 151, 152, 153, 154, },
 		path = { "Interface\\Minimap\\POIIcons", },
 	}
 	local WorldMap_GetPOITextureCoords = _G.GetPOITextureCoords or _G.WorldMap_GetPOITextureCoords
@@ -95,8 +95,8 @@ do  -- POI handling
 		return "none"
 	end
 	SetupAssault = function(bgcaptime, nokeep)
-		ntime = bgcaptime  -- cap time
-		skipkeep = nokeep  -- workaround for IoC keep
+		ntime = bgcaptime -- cap time
+		skipkeep = nokeep -- workaround for IoC keep
 		nodestates = { }
 		for i = 1, GetNumMapLandmarks(), 1 do
 			local name, _, ti = GetMapLandmarkInfo(i)
@@ -117,12 +117,12 @@ do  -- POI handling
 				if tonumber(prevstate) ~= ti then
 					if ti == poicons[nodetype][11] then
 						self:StartBar(name, ntime, ntime, GetIconData("alliance", nodetype), "alliance")
-						if nodetype == "workshop" then  -- reset siege engine timer
+						if nodetype == "workshop" then -- reset siege engine timer
 							self:StopBar(GetSpellInfo(56661), nil)
 						end
 					elseif ti == poicons[nodetype][13] then
 						self:StartBar(name, ntime, ntime, GetIconData("horde", nodetype), "horde")
-						if nodetype == "workshop" then  -- reset siege engine timer
+						if nodetype == "workshop" then -- reset siege engine timer
 							self:StopBar(GetSpellInfo(56661), nil)
 						end
 					else
@@ -139,7 +139,7 @@ do  -- POI handling
 end
 
 -----------------------------------------------------------
-function Capping:CreateCarrierButton(name, w, h, postclick)  -- create common secure button
+function Capping:CreateCarrierButton(name, w, h, postclick) -- create common secure button
 -----------------------------------------------------------
 	self.CarrierOnEnter = self.CarrierOnEnter or function(this)
 		if not this.car then return end
@@ -165,7 +165,7 @@ end
 local NewEstimator
 do
 	local ascore, atime, abases, hscore, htime, hbases, updatetime, currentbg
-	NewEstimator = function(bg)  -- resets estimator and sets new battleground
+	NewEstimator = function(bg) -- resets estimator and sets new battleground
 		if not Capping.UPDATE_WORLD_STATES then
 			local f2 = L["Final: %d - %d"]
 			local lookup = {
@@ -174,15 +174,15 @@ do
 				[3] = { [0] = 0, [1] = 1.1111, [2] = 3.3333, [3] = 30, }, -- gilneas
 			}
 			local scorestr = {
-				[1] = L["Bases: (%d+)  Resources: (%d+)/(%d+)"],  -- ab
-				[2] = L["Bases: (%d+)  Victory Points: (%d+)/(%d+)"],  -- eots
-				[3] = L["Bases: (%d+)  Resources: (%d+)/(%d+)"],  -- gilneas
+				[1] = L["Bases: (%d+)  Resources: (%d+)/(%d+)"], -- ab
+				[2] = L["Bases: (%d+)  Victory Points: (%d+)/(%d+)"], -- eots
+				[3] = L["Bases: (%d+)  Resources: (%d+)/(%d+)"], -- gilneas
 			}
-			local function getlscore(ltime, pps, currentscore, maxscore, awin)  -- estimate loser's final score
-				if currentbg == 2 then  -- EotS
+			local function getlscore(ltime, pps, currentscore, maxscore, awin) -- estimate loser's final score
+				if currentbg == 2 then -- EotS
 					ltime = floor(ltime * pps + currentscore + 0.5)
 					ltime = (ltime < maxscore and ltime) or (maxscore - 1)
-				else  -- AB or Gilneas
+				else -- AB or Gilneas
 					ltime = 10 * floor((ltime * pps + currentscore + 5) * 0.1)
 					ltime = (ltime < maxscore and ltime) or (maxscore - 10)
 				end
@@ -192,15 +192,15 @@ do
 			function Capping:UPDATE_WORLD_STATES()
 			--------------------------------------
 				local currenttime = GetTime()
-				
+
 				local _, _, text3, text4 = GetWorldStateUIInfo(currentbg == 2 and 2 or 1)
 				local base, score, smax = strmatch(stringcheck(text3, text4), scorestr[currentbg])
 				local ABases, AScore, MaxScore = tonumber(base), tonumber(score), tonumber(smax) or 2000
 				_, _, text3, text4 = GetWorldStateUIInfo(currentbg == 2 and 3 or 2)
-				
+
 				base, score, smax = strmatch(stringcheck(text3, text4), scorestr[currentbg])
 				local HBases, HScore = tonumber(base), tonumber(score)
-				
+
 				if ABases and HBases then
 					abases, hbases = ABases, HBases
 					if ascore ~= AScore then
@@ -210,7 +210,7 @@ do
 						hscore, htime, updatetime = HScore, currenttime, true
 					end
 				end
-				
+
 				if not updatetime then return end
 				updatetime = nil
 
@@ -218,12 +218,12 @@ do
 				-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
 				local ATime = ((MaxScore - ascore) / (apps > 0 and apps or 0.000001)) - (currenttime - atime)
 				local HTime = ((MaxScore - hscore) / (hpps > 0 and hpps or 0.000001)) - (currenttime - htime)
-				
+
 				local f = self:GetBar("EstFinal")
 				local elapsed = (f and f:IsShown() and (f.duration - f.remaining)) or 0
-				if HTime < ATime then  -- Horde is winning
+				if HTime < ATime then -- Horde is winning
 					self:StartBar("EstFinal", HTime + elapsed, HTime, GetIconData("horde", "symbol"), "horde", nil, nil, getlscore(HTime, apps, ascore, MaxScore))
-				else  -- Alliance is winning
+				else -- Alliance is winning
 					self:StartBar("EstFinal", ATime + elapsed, ATime, GetIconData("alliance", "symbol"), "alliance", nil, nil, getlscore(ATime, hpps, hscore, MaxScore, true))
 				end
 			end
@@ -335,7 +335,7 @@ function Capping:StartAV()
 			SendAddonMessage("cap", "r", "INSTANCE_CHAT")
 		end
 	end
-	
+
 	SetupAssault(245)
 	self:RegisterTempEvent("GOSSIP_SHOW", "AVQuests")
 	self:RegisterTempEvent("QUEST_PROGRESS", "AVQuests")
@@ -382,7 +382,7 @@ function Capping:StartEotS()
 		local function EotSFlag(a1, faction)
 			local name = strmatch(a1, L["^(.+) has taken the flag!"])
 			if name then
-				if name == "L'Alliance" then  -- frFR
+				if name == "L'Alliance" then -- frFR
 					ResetCarrier(true)
 				else
 					cclass = GetClassByName(name, faction)
@@ -409,21 +409,21 @@ function Capping:StartEotS()
 		--------------------------------
 			EotSFlag(a1, 1)
 		end
-		
+
 		ef = self:CreateCarrierButton("CappingEotSFrame", 132, 18, CarrierOnClick)
-		eficon = ef:CreateTexture(nil, "ARTWORK")  -- flag icon
+		eficon = ef:CreateTexture(nil, "ARTWORK") -- flag icon
 		eficon:SetPoint("TOPLEFT", ef, "TOPLEFT", 0, 1)
 		eficon:SetPoint("BOTTOMRIGHT", ef, "BOTTOMLEFT", 20, -1)
 
-		eftext = self:CreateText(ef, 13, "LEFT", eficon, 22, 0, ef, 0, 0)  -- carrier text
+		eftext = self:CreateText(ef, 13, "LEFT", eficon, 22, 0, ef, 0, 0) -- carrier text
 		ef.text = eftext
 
-		self:AddFrameToHide(ef)  -- add to the tohide list to hide when bg is over
+		self:AddFrameToHide(ef) -- add to the tohide list to hide when bg is over
 	end
-	
+
 	ef:Show()
 	ResetCarrier()
-	
+
 	-- setup for final score estimation (2 for EotS)
 	NewEstimator(2)
 	self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HFlagUpdate")
@@ -462,7 +462,7 @@ function Capping:StartIoC()
 			IoCAssault(a1, "alliance")
 		end
 		-------------------------------------------------------
-		function Capping:IoCSync(prefix, message, chan, sender)  -- only sync for siege engine timer
+		function Capping:IoCSync(prefix, message, chan, sender) -- only sync for siege engine timer
 		-------------------------------------------------------
 			if sender == pname then return end
 			if prefix == "cap" then
@@ -488,7 +488,7 @@ function Capping:StartIoC()
 		------------------------------------
 		function Capping:SiegeEngine(a1, a2)
 		------------------------------------
-			if a1 and a2 then  -- check npc yells
+			if a1 and a2 then -- check npc yells
 				if strmatch(a1, L["seaforium bombs"]) or strmatch(a1, L["It's broken"]) then
 					local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
 					self:StartBar(siege, 183, 183, siegeicon, faction)
@@ -512,14 +512,14 @@ end
 ------------------------------------------------ Warsong Gulch ----------------------------------------------------
 function Capping:StartWSG()
 ---------------------------
-	if not self.WSGBulk then  -- init some data and create carrier frames
+	if not self.WSGBulk then -- init some data and create carrier frames
 		local wsgicon, playerfaction, prevtime, togunit
 		local af, aftext, aftexthp, acarrier, aclass
 		local hf, hftext, hftexthp, hcarrier, hclass
 		local ahealth, hhealth = 0, 0
 		local elap = 0
 		local unknownhp = "|cff777777??%|r"
-		
+
 		-- props to "Fedos" and the ICU mod
 		-- updates a carrier's frame secure stuff, button will be slightly transparent if button cannot update (in combat)
 		local function SetWSGCarrierAttribute()
@@ -537,7 +537,7 @@ function Capping:StartWSG()
 			af:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame2:GetRight() + 38, AlwaysUpFrame2:GetTop())
 			hf:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame3:GetRight() + 38, AlwaysUpFrame3:GetTop())
 		end
-		local function SetCarrier(faction, carrier, class, u)  -- setup carrier frames
+		local function SetCarrier(faction, carrier, class, u) -- setup carrier frames
 			if faction == "Horde" then
 				hcarrier, hclass, hf.car = carrier, class, carrier
 				hftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
@@ -569,11 +569,11 @@ function Capping:StartWSG()
 			end
 			Capping:CheckCombat(SetWSGCarrierAttribute)
 		end
-		local function CarrierOnClick(this)  -- sends basic carrier info to battleground chat
+		local function CarrierOnClick(this) -- sends basic carrier info to battleground chat
 
 		end
-		local function CreateWSGFrame()  -- create all frames
-			local function CreateCarrierFrame(faction)  -- create carriers' frames
+		local function CreateWSGFrame() -- create all frames
+			local function CreateCarrierFrame(faction) -- create carriers' frames
 				local b = self:CreateCarrierButton("CappingTarget"..faction, 132, 18, CarrierOnClick)
 				local text = self:CreateText(b, 14, "LEFT", b, 29, 0, b, 0, 0)
 				local texthp = self:CreateText(b, 10, "RIGHT", b, -4, 0, b, 28 - b:GetWidth(), 0)
@@ -587,7 +587,7 @@ function Capping:StartWSG()
 
 			af:SetScript("OnUpdate", function(this, a1)
 				elap = elap + a1
-				if elap > 0.25 then  -- health check and display
+				if elap > 0.25 then -- health check and display
 					elap, togunit = 0, not togunit
 					if togunit then
 						if UnitExists("arena1") then
@@ -614,7 +614,7 @@ function Capping:StartWSG()
 			end)
 			CreateCarrierFrame, CreateWSGFrame = nil, nil
 		end
-		self.WSGBulk = function()  -- stuff to do at the beginning of every wsg, but after combat
+		self.WSGBulk = function() -- stuff to do at the beginning of every wsg, but after combat
 			af:Show()
 			hf:Show()
 			SetCarrier()
@@ -626,15 +626,15 @@ function Capping:StartWSG()
 			self:WSGEnd()
 		end
 		--------------------------------------------
-		function Capping:WSGFlagCarrier(a1)  -- carrier detection and setup
+		function Capping:WSGFlagCarrier(a1) -- carrier detection and setup
 		--------------------------------------------
-			if strmatch(a1, L["captured the"]) then  -- flag was captured, reset all carriers
+			if strmatch(a1, L["captured the"]) then -- flag was captured, reset all carriers
 				SetCarrier()
 				self:StartBar(L["Flag respawns"], 23, 23, GetIconData(wsgicon, "flag"), "info2")
 			end
 		end
 		-------------------------
-		function Capping:WSGEnd()  -- timer for last 3 minutes of WSG
+		function Capping:WSGEnd() -- timer for last 3 minutes of WSG
 		-------------------------
 			local _, _, timeremain1, timeremain2 = GetWorldStateUIInfo(1)
 			timeremain = tonumber(strmatch(stringcheck(timeremain1, timeremain2), "(%d+)") or 20) or 20
@@ -643,7 +643,7 @@ function Capping:StartWSG()
 			end
 			prevtime = timeremain
 		end
-	
+
 		playerfaction = UnitFactionGroup("player")
 		wsgicon = strlower(playerfaction)
 		self:CheckCombat(CreateWSGFrame)
@@ -658,7 +658,7 @@ local wallid, walls = nil, nil
 function Capping:StartWintergrasp()
 -----------------------------------
 	if not self.WinterAssault then
-		wallid = {  -- wall section locations
+		wallid = { -- wall section locations
 			["4308_1733"] = "NW ", ["4311_1940"] = "NW ", ["4481_2197"] = "NW ", ["4619_2206"] = "NW ",
 			["4689_2324"] = "SW ", ["4689_2523"] = "SW ", ["4861_2795"] = "S ",
 			["5144_2788"] = "S ", ["5314_2527"] = "SE ", ["5316_2320"] = "SE ",
@@ -666,9 +666,9 @@ function Capping:StartWintergrasp()
 			["4770_1664"] = "Inner W ", ["4773_1882"] = "Inner W ", ["4772_2098"] = "Inner W ",
 			["4860_2205"] = "Inner S ", ["5004_2197"] = "Inner S ", ["5144_2200"] = "Inner S ",
 			["5235_2090"] = "Inner E ", ["5237_1880"] = "Inner E ", ["5232_1675"] = "Inner E ",
-			["5001_2793"] =  "", ["5000_1623"] =  "",  -- front gate and fortress door
+			["5001_2793"] = "", ["5000_1623"] = "", -- front gate and fortress door
 		}
-		
+
 		-- POI icon texture id
 		local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
 		local damaged, destroyed, all = { }, { }, { }
@@ -677,15 +677,15 @@ function Capping:StartWintergrasp()
 			destroyed[k + 2] = true
 			all[k], all[k + 1], all[k + 2] = true, true, true
 		end
-		function Capping:WinterAssault()  -- scans POI landmarks for changes in wall textures
+		function Capping:WinterAssault() -- scans POI landmarks for changes in wall textures
 			for i = 1, GetNumMapLandmarks(), 1 do
 				local name, _, textureIndex, x, y = GetMapLandmarkInfo(i)
 				local tindex = floor(x * 10000).."_"..floor(y * 10000)
 				local ti = walls[tindex]
 				if (ti and ti ~= textureIndex) or (not ti and wallid[tindex]) then
-					if intact[ti] and damaged[textureIndex] then  -- intact before, damaged now
+					if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
 						RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[tindex], name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
-					elseif damaged[ti] and destroyed[textureIndex] then  -- damaged before, destroyed now
+					elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
 						RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[tindex], name, _G.ACTION_UNIT_DESTROYED))
 					end
 					walls[tindex] = all[textureIndex] and textureIndex or ti

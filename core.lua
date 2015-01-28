@@ -29,7 +29,7 @@ local nofunc = function() end
 local function ToggleAnchor()
 	if self:IsShown() then
 		self:Hide()
-	else 
+	else
 		self:Show()
 	end
 end
@@ -51,7 +51,7 @@ local function NewText(parent, font, fontsize, justifyH, justifyV, overlay)
 	else
 		t:SetFontObject(font)
 	end
-	t:SetJustifyH(justifyH) 
+	t:SetJustifyH(justifyH)
 	t:SetJustifyV(justifyV)
 	return t
 end
@@ -86,10 +86,10 @@ local function StartWorldTimers()
 						concol = "info1"
 					end
 					SetMapByID(currentmapid)
-					Capping:StartBar(localizedName, (startTime > 900 and 8400) or 900, startTime, 
+					Capping:StartBar(localizedName, (startTime > 900 and 8400) or 900, startTime,
 						"Interface\\Icons\\INV_EssenceOfWintergrasp", concol, true, true, nil, nil, WorldSoon)
 				else
-					Capping:StartBar(localizedName, (startTime > 900 and 8400) or 900, startTime, 
+					Capping:StartBar(localizedName, (startTime > 900 and 8400) or 900, startTime,
 						"Interface\\Icons\\INV_EssenceOfWintergrasp", "info1", true, true, nil, nil, WorldSoon)
 				end
 			end
@@ -115,7 +115,7 @@ local function CreateMover(oldframe, w, h, dragstopfunc)
 	SetWH(mover.close, 20, 20)
 	mover.close:SetPoint("TOPRIGHT", 5, 5)
 	return mover
-end 
+end
 hooksecurefunc(WorldStateAlwaysUpFrame, "SetPoint", function()
 	if not db or not db.sbx then return end
 	oSetPoint(WorldStateAlwaysUpFrame, "TOP", UIParent, "TOPLEFT", db.sbx, db.sby)
@@ -179,7 +179,7 @@ function Capping:RegisterTempEvent(event, other)
 	self:RegisterEvent(event)
 	elist[event] = other or event
 end
-function Capping:CheckCombat(func)  -- check combat for secure functions
+function Capping:CheckCombat(func) -- check combat for secure functions
 	if InCombatLockdown() then
 		self:RegisterEvent("PLAYER_REGEN_ENABLED")
 		tinsert(clist, func)
@@ -187,7 +187,7 @@ function Capping:CheckCombat(func)  -- check combat for secure functions
 		func(self)
 	end
 end
-function Capping:PLAYER_REGEN_ENABLED()  -- run queue when combat ends
+function Capping:PLAYER_REGEN_ENABLED() -- run queue when combat ends
 	for k, v in ipairs(clist) do
 		v(self)
 	end
@@ -201,12 +201,12 @@ Capping:RegisterEvent("ADDON_LOADED")
 function Capping:ADDON_LOADED(a1)
 ---------------------------------
 	if a1 ~= "Capping" then return end
-	
+
 	-- saved variables database setup
 	CappingDB = CappingDB or {}
 	db = CappingCharDB or (CappingDB.profiles and CappingDB.profiles.Default) or CappingDB
 	self.db = db
-	if db.dbinit ~= 7 then 
+	if db.dbinit ~= 7 then
 		db.dbinit = 7
 		db.winter = nil
 		local function SetDefaults(db, t)
@@ -238,17 +238,17 @@ function Capping:ADDON_LOADED(a1)
 		})
 	end
 	db.colors.spark = db.colors.spark or { r=1, g=1, b=1, a=1, }
-  	SlashCmdList.CAPPING = ShowOptions
-   	SLASH_CAPPING1 = "/capping"
+	SlashCmdList.CAPPING = ShowOptions
+	SLASH_CAPPING1 = "/capping"
 
-   	-- adds Capping config to default UI Interface Options
+	-- adds Capping config to default UI Interface Options
 	local panel = CreateFrame("Frame", "CappingOptionsPanel", UIParent)
 	panel.name = "Capping"
 	panel:SetScript("OnShow", function(this)
 		local t1 = NewText(this, GameFontNormalLarge, nil, "LEFT", "TOP", "ARTWORK")
 		t1:SetPoint("TOPLEFT", 16, -16)
 		t1:SetText(this.name)
-		
+
 		local t2 = NewText(this, GameFontHighlightSmall, nil, "LEFT", "TOP", "ARTWORK")
 		t2:SetHeight(43)
 		SetPoints(t2, "TOPLEFT", t1, "BOTTOMLEFT", 0, -8, "RIGHT", this, "RIGHT", -32, 0)
@@ -257,7 +257,7 @@ function Capping:ADDON_LOADED(a1)
 			return GetAddOnMetadata("Capping", field) or "N/A"
 		end
 		t2:SetFormattedText("Notes: %s\nAuthor: %s\nVersion: %s", GetInfo("Notes"), GetInfo("Author"), GetInfo("Version"))
-	
+
 		local b = CreateFrame("Button", nil, this, "UIPanelButtonTemplate")
 		SetWH(b, 120, 20)
 		b:SetText(_G.GAMEOPTIONS_MENU)
@@ -266,15 +266,15 @@ function Capping:ADDON_LOADED(a1)
 		this:SetScript("OnShow", nil)
 	end)
 	InterfaceOptions_AddCategory(panel)
-	
+
 	-- anchor frame
 	self:Hide()
 	if db.x then
-		self:SetPoint(db.p or "TOPLEFT", UIParent, db.rp or "TOPLEFT", db.x, db.y)	
+		self:SetPoint(db.p or "TOPLEFT", UIParent, db.rp or "TOPLEFT", db.x, db.y)
 	else
 		self:SetPoint("CENTER", UIParent, "CENTER", 200, -100)
 	end
-	CreateMover(self, db.width, 10, function(this) 
+	CreateMover(self, db.width, 10, function(this)
 		this:StopMovingOrSizing()
 		local a,b,c,d,e = this:GetPoint()
 		db.p, db.rp, db.x, db.y = a, c, floor(d + 0.5), floor(e + 0.5)
@@ -285,12 +285,12 @@ function Capping:ADDON_LOADED(a1)
 	self:SetText("Capping")
 
 
-	if db.sbx then WorldStateAlwaysUpFrame:SetPoint("TOP") end  -- world state info frame positioning
-	if db.cbx then wsaufu() end  -- capturebar position
-	if db.seatx then VehicleSeatIndicator:SetPoint("TOPRIGHT") end  -- vehicle seat position
-	
+	if db.sbx then WorldStateAlwaysUpFrame:SetPoint("TOP") end -- world state info frame positioning
+	if db.cbx then wsaufu() end -- capturebar position
+	if db.seatx then VehicleSeatIndicator:SetPoint("TOPRIGHT") end -- vehicle seat position
+
 	local regal = false
-	if BattlefieldMinimap then  -- battlefield minimap setup
+	if BattlefieldMinimap then -- battlefield minimap setup
 		self:InitBGMap()
 	else
 		regal = true
@@ -345,9 +345,9 @@ function Capping:PLAYER_ENTERING_WORLD()
 	self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
 	self:UPDATE_BATTLEFIELD_STATUS()
 	self:ZoneCheck()
-	
+
 	if RegisterAddonMessagePrefix then RegisterAddonMessagePrefix("cap") end
-	
+
 	self.PLAYER_ENTERING_WORLD = nil
 end
 
@@ -368,28 +368,28 @@ local function HideProtectedStuff()
 	end
 end
 --------------------------------------
-function Capping:AddFrameToHide(frame)  -- secure frames that are hidden upon zone change
+function Capping:AddFrameToHide(frame) -- secure frames that are hidden upon zone change
 --------------------------------------
 	tinsert(tohide, frame)
 end
 ---------------------------
-function Capping:ResetAll()  -- reset all timers and unregister temp events
+function Capping:ResetAll() -- reset all timers and unregister temp events
 ---------------------------
 	wasInBG = false
-	for event in pairs(elist) do  -- unregister all temp events
+	for event in pairs(elist) do -- unregister all temp events
 		elist[event] = nil
 		self:UnregisterEvent(event)
 	end
-	for value, _ in pairs(activebars) do  -- close all temp timerbars
+	for value, _ in pairs(activebars) do -- close all temp timerbars
 		self:StopBar(value)
 		activebars[value] = nil
 	end
-	self:CheckCombat(HideProtectedStuff)  -- hide secure frames
+	self:CheckCombat(HideProtectedStuff) -- hide secure frames
 	if ACountText then ACountText:SetText("") end
 	if HCountText then HCountText:SetText("") end
 end
 ----------------------------
-function Capping:ZoneCheck()  -- check if new zone is a battleground
+function Capping:ZoneCheck() -- check if new zone is a battleground
 ----------------------------
 	SetMapToCurrentZone()
 	_, instance = IsInInstance()
@@ -409,7 +409,7 @@ function Capping:ZoneCheck()  -- check if new zone is a battleground
 		elseif z == "GilneasBattleground2" and not db.nogil then
 			self:StartGil()
 		end
-		if not self.bgtotals then  -- frame to display roster count
+		if not self.bgtotals then -- frame to display roster count
 			self.bgtotals = CreateFrame("Frame", nil, AlwaysUpFrame1)
 			self.bgtotals:SetScript("OnUpdate", function(this, elapsed)
 				this.elapsed = (this.elapsed or 0) + elapsed
@@ -420,11 +420,11 @@ function Capping:ZoneCheck()  -- check if new zone is a battleground
 			self:AddFrameToHide(self.bgtotals)
 		end
 		self.bgtotals:Show()
-		
+
 		self:RegisterTempEvent("UPDATE_BATTLEFIELD_SCORE", "UpdateCountText")
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "CheckStartTimer")
 		RequestBattlefieldScoreData()
-		
+
 		UpdateZoneMapVisibility()
 	elseif GetMapInfo() == "LakeWintergrasp" then
 		StartWorldTimers()
@@ -450,13 +450,13 @@ function Capping:ZoneCheck()  -- check if new zone is a battleground
 end
 
 --------------------------------
-function Capping:ModMap(disable)  -- alter the default minimap
+function Capping:ModMap(disable) -- alter the default minimap
 --------------------------------
 	if not bgmap or db.disablemap then return end
 	bgmap:SetScale(db.mapscale)
 	disable = instance ~= "pvp" or disable
 
-	if db.narrow and not narrowed and not disable then  -- narrow setting
+	if db.narrow and not narrowed and not disable then -- narrow setting
 		BattlefieldMinimap1:Hide() BattlefieldMinimap4:Hide() BattlefieldMinimap5:Hide()
 		BattlefieldMinimap8:Hide() BattlefieldMinimap9:Hide() BattlefieldMinimap12:Hide()
 		BattlefieldMinimapBackground:SetWidth(256 / 2)
@@ -466,7 +466,7 @@ function Capping:ModMap(disable)  -- alter the default minimap
 		BattlefieldMinimapCloseButton:SetPoint("TOPRIGHT", bgmap, "TOPRIGHT", 2 - 53, 7)
 		SetWH(BattlefieldMinimapCloseButton, 24, 24)
 		narrowed = 1
-	elseif disable or (not db.narrow and narrowed) then  -- setting things back to blizz's default
+	elseif disable or (not db.narrow and narrowed) then -- setting things back to blizz's default
 		BattlefieldMinimap1:Show() BattlefieldMinimap4:Show() BattlefieldMinimap5:Show()
 		BattlefieldMinimap8:Show() BattlefieldMinimap9:Show() BattlefieldMinimap12:Show()
 		BattlefieldMinimapBackground:SetWidth(256)
@@ -478,14 +478,14 @@ function Capping:ModMap(disable)  -- alter the default minimap
 		narrowed = nil
 	end
 
-	if db.hidemapborder and not borderhidden then  -- Hide border
+	if db.hidemapborder and not borderhidden then -- Hide border
 		BattlefieldMinimapBackground:Hide()
 		BattlefieldMinimapCorner:Hide()
 		BattlefieldMinimapCloseButton:SetParent(bgtab)
 		BattlefieldMinimapCloseButton:SetScale(db.mapscale)
 		BattlefieldMinimapCloseButton:HookScript("OnClick", function() bgmap:Hide() end)
 		borderhidden = true
-	elseif not db.hidemapborder and borderhidden then  -- Show border
+	elseif not db.hidemapborder and borderhidden then -- Show border
 		BattlefieldMinimapBackground:Show()
 		BattlefieldMinimapCorner:Show()
 		BattlefieldMinimapCloseButton:SetParent(bgmap)
@@ -495,7 +495,7 @@ function Capping:ModMap(disable)  -- alter the default minimap
 	bgmap:SetPoint("TOPLEFT", bgtab, "BOTTOMLEFT", (narrowed and -64) or 0, (borderhidden and 0) or -5)
 end
 
-do  -- estimated wait timer and port timer
+do -- estimated wait timer and port timer
 	local q, p = L["Queue: %s"], L["Port: %s"]
 	local maxq = _G.MAX_WORLD_PVP_QUEUES or 3
 	local GetBattlefieldStatus = GetBattlefieldStatus
@@ -505,11 +505,11 @@ do  -- estimated wait timer and port timer
 	function Capping:UPDATE_BATTLEFIELD_STATUS()
 	--------------------------------------------
 		if not db.port and not db.wait then return end
-		
-		for map in pairs(currentq) do  -- tag each entry to see if it's changed after updating the list
+
+		for map in pairs(currentq) do -- tag each entry to see if it's changed after updating the list
 			currentq[map] = 0
 		end
-		for i = 1, maxq, 1 do  -- check the status of each queue
+		for i = 1, maxq, 1 do -- check the status of each queue
 			local status, map, _, _, _, teamsize, _ = GetBattlefieldStatus(i)
 			if map and teamsize == "BATTLEGROUND" then
 				map = format("%s", map)
@@ -529,7 +529,7 @@ do  -- estimated wait timer and port timer
 				currentq[map] = i
 			end
 		end
-		for map, flag in pairs(currentq) do  -- stop inactive bars
+		for map, flag in pairs(currentq) do -- stop inactive bars
 			if flag == 0 then
 				self:StopBar(format(p, map))
 				self:StopBar(format(q, map))
@@ -545,7 +545,7 @@ local function CheckActive(barid)
 	local f = bars[barid]
 	if f and f:IsShown() then return f end
 end
-local function DoReport(this, chan)  -- format chat reports
+local function DoReport(this, chan) -- format chat reports
 	if not activebars[this.name] then return end
 	local faction = (this.color == "horde" and _G.FACTION_HORDE) or (this.color == "alliance" and _G.FACTION_ALLIANCE) or ""
 	SendChatMessage(format(L["%s: %s - %d:%02d"], faction, this.displaytext:GetText(), this.remaining * stamin, this.remaining % 60), chan)
@@ -556,19 +556,19 @@ local function CheckQueue(name, join)
 		return true
 	end
 end
-local function ReportBG(barid)  -- report timer to /bg
+local function ReportBG(barid) -- report timer to /bg
 	local this = CheckActive(barid)
 	if not this then return end
 	if not CheckQueue(this.name, true) then
 		DoReport(this, "INSTANCE_CHAT")
 	end
 end
-local function ReportSAY(barid)  -- report timer to /s
+local function ReportSAY(barid) -- report timer to /s
 	local this = CheckActive(barid)
 	if not this then return end
 	DoReport(this, "SAY")
 end
-local function CancelBar(barid)  -- close bar, leave queue if a queue timer
+local function CancelBar(barid) -- close bar, leave queue if a queue timer
 	local this = CheckActive(barid)
 	if not this then return end
 	if not CheckQueue(this.name, nil) then
@@ -606,11 +606,11 @@ local function BarOnUpdate(this, a1)
 
 	local remain = this.endtime - GetTime()
 	this.remaining = remain
-	
+
 	this:SetValue(remain, this.duration)
 	this.pfunction(remain)
 	if remain < 60 then
-		if remain < 10 then  -- fade effects
+		if remain < 10 then -- fade effects
 			if remain > 0.5 then
 				this:SetAlpha(0.75 + 0.25 * math_sin(remain * math_pi))
 			elseif remain > -1.5 then
@@ -686,7 +686,7 @@ local function UpdateBarLayout(f)
 	timetext:SetTextColor(tc.r, tc.g, tc.b, tc.a)
 	displaytext:SetTextColor(tc.r, tc.g, tc.b, tc.a)
 	f.SetValue = db.fill and SetFillValue or SetDepleteValue
-	if db.iconpos == "X" then  -- icon position
+	if db.iconpos == "X" then -- icon position
 		icon:Hide()
 		barback:SetWidth(w)
 		SetPoints(barback, "BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
@@ -699,14 +699,14 @@ local function UpdateBarLayout(f)
 		SetPoints(icon, "LEFT", f, "LEFT", 0, 0)
 		SetPoints(barback, "BOTTOMLEFT", icon, "BOTTOMRIGHT", 0, 0)
 	end
-	if db.timepos == "->" then  -- time text placement
+	if db.timepos == "->" then -- time text placement
 		SetPoints(timetext, "RIGHT", barback, "RIGHT", -(4 + inset), db.altstyle and (0.5 * h) or 0)
 		SetPoints(displaytext, "LEFT", barback, "LEFT", (4 + inset), db.altstyle and (0.5 * h) or 0, "RIGHT", timetext, "LEFT", -(4 + inset), 0)
 	else
 		SetPoints(displaytext, "LEFT", barback, "LEFT", db.fontsize * 3, db.altstyle and (0.5 * h) or 0, "RIGHT", barback, "RIGHT", -(4 + inset), 0)
 		SetPoints(timetext, "RIGHT", displaytext, "LEFT", -db.fontsize / 2.2, 0)
 	end
-	if db.reverse then  -- horizontal flip of bar growth
+	if db.reverse then -- horizontal flip of bar growth
 		SetPoints(bar, "RIGHT", barback, "RIGHT", -inset, 0)
 		spark:SetPoint("CENTER", bar, "LEFT", 0, 0)
 		bar.SetValue = SetReverseValue
@@ -722,10 +722,10 @@ local function UpdateBarLayout(f)
 	end
 end
 -------------------------------------
-function Capping:GetBar(name, getone)  -- get active bar or unused/new one
+function Capping:GetBar(name, getone) -- get active bar or unused/new one
 -------------------------------------
 	local f, tf
-	for k, b in ipairs(bars) do  -- find already assigned bar
+	for k, b in ipairs(bars) do -- find already assigned bar
 		if b.name == name then
 			f = b
 		elseif getone and not tf and not b:IsShown() then
@@ -735,10 +735,10 @@ function Capping:GetBar(name, getone)  -- get active bar or unused/new one
 	if not getone then return f end -- don't assign a new bar
 
 	f = f or tf
-	if not f then  -- no available bar, create new one
+	if not f then -- no available bar, create new one
 		local texture = media:Fetch("statusbar", db.texture)
 		local font = media:Fetch("font", db.font)
-		
+
 		f = CreateFrame("Button", nil, UIParent)
 		f:Hide()
 		f:RegisterForClicks("LeftButtonUp", "RightButtonUp")
@@ -749,17 +749,17 @@ function Capping:GetBar(name, getone)  -- get active bar or unused/new one
 		f.barback:SetTexture(texture)
 		f.bar = f:CreateTexture(nil, "ARTWORK")
 		f.bar:SetTexture(texture)
-		
+
 		local spark = f:CreateTexture(nil, "OVERLAY")
 		spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
 		spark:SetBlendMode("ADD")
 		spark:SetAlpha(0.8)
 		spark:SetWidth(18)
 		f.spark = spark
-		
+
 		f.timetext = NewText(f, font, db.fontsize, "RIGHT", "CENTER")
 		f.displaytext = NewText(f, font, db.fontsize, "LEFT", "CENTER")
-		
+
 		UpdateBarLayout(f)
 		tinsert(bars, f)
 		f.id = #bars
@@ -780,11 +780,11 @@ function Capping:StartBar(name, duration, remaining, icondata, colorid, nonactiv
 	local c = db.colors[colorid or "info1"] or db.colors.info1
 	if db.onegroup then
 		separate = db.mainup
-	elseif db.mainup then 
-		separate = not separate 
+	elseif db.mainup then
+		separate = not separate
 	end
 	duration = (duration < remaining and remaining) or duration
-	
+
 	local f = self:GetBar(name, true)
 	f.name = name
 	f.color = colorid
@@ -797,14 +797,14 @@ function Capping:StartBar(name, duration, remaining, icondata, colorid, nonactiv
 	f.elapsed = f.throt - 0.01
 	f.endfunction = endfunction or nofunc
 	f.pfunction = periodicfunction or nofunc
-	
+
 	f.displaytext:SetText(specialText or name)
 	f.icon:SetTexture(icon)
 	f.icon:SetTexCoord(l or 0, r or 1, t or 0, b or 1)
 	f.bar:SetVertexColor(c.r, c.g, c.b, c.a or 0.9)
 	f.barback:SetVertexColor(c.r * 0.3, c.g * 0.3, c.b * 0.3, db.bgalpha or 0.7)
 	f:SetAlpha(1)
-	
+
 	activebars[name] = (not nonactive and colorid) or nil
 	f:Show()
 	SortBars()
@@ -821,7 +821,7 @@ function Capping:StopBar(name, this)
 end
 
 ------------------------------------
-function Capping:CheckStartTimer(a1)  -- timer for when a battleground begins
+function Capping:CheckStartTimer(a1) -- timer for when a battleground begins
 ------------------------------------
 	timetil = timetil or {
 		[strlower(L["1 minute"])] = 62,
@@ -842,7 +842,7 @@ function Capping:CheckStartTimer(a1)  -- timer for when a battleground begins
 			end
 		end
 	end
-	if instance == "arena" and strmatch(a1, strlower(L["has begun"])) then  -- Shadow Sight spawn timer
+	if instance == "arena" and strmatch(a1, strlower(L["has begun"])) then -- Shadow Sight spawn timer
 		local spell, _, icon = GetSpellInfo(34709)
 		self:StartBar(spell, 93, 93, icon, "info2")
 	end
@@ -850,7 +850,7 @@ end
 
 local GetBattlefieldScore, GetNumBattlefieldScores = GetBattlefieldScore, GetNumBattlefieldScores
 ----------------------------------
-function Capping:UpdateCountText()  -- roster counts
+function Capping:UpdateCountText() -- roster counts
 ----------------------------------
 	if not AlwaysUpFrame2 then return end
 	local na, nh
@@ -866,14 +866,14 @@ function Capping:UpdateCountText()  -- roster counts
 	HCountText = HCountText or self:CreateText(AlwaysUpFrame2, 10, "CENTER", AlwaysUpFrame2Icon, 3, 2, AlwaysUpFrame2Icon, -19, 16)
 	ACountText:SetText(na or "")
 	HCountText:SetText(nh or "")
-	
+
 	local offset = ((not AlwaysUpFrame1Icon:GetTexture() or AlwaysUpFrame1Icon:GetTexture() == "") and 1) or 0
 	SetPoints(ACountText, "TOPLEFT", _G["AlwaysUpFrame"..(1 + offset).."Icon"], "TOPLEFT", 3, 2, "BOTTOMRIGHT", _G["AlwaysUpFrame"..(1 + offset).."Icon"], "BOTTOMRIGHT", -19, 16)
 	SetPoints(HCountText, "TOPLEFT", _G["AlwaysUpFrame"..(2 + offset).."Icon"], "TOPLEFT", 3, 2, "BOTTOMRIGHT", _G["AlwaysUpFrame"..(2 + offset).."Icon"], "BOTTOMRIGHT", -19, 16)
 end
 
 ---------------------------------------------------------------------------------------
-function Capping:CreateText(parent, fontsize, justifyH, tlrp, tlx, tly, brrp, brx, bry)  -- create common text fontstring
+function Capping:CreateText(parent, fontsize, justifyH, tlrp, tlx, tly, brrp, brx, bry) -- create common text fontstring
 ---------------------------------------------------------------------------------------
 	local text = NewText(parent, GameFontNormal:GetFont(), fontsize, justifyH, "CENTER")
 	SetPoints(text, "TOPLEFT", tlrp, "TOPLEFT", tlx, tly, "BOTTOMRIGHT", brrp, "BOTTOMRIGHT", brx, bry)
@@ -920,7 +920,7 @@ function ShowOptions(a1, id)
 			_G[b:GetName().."Check"]:Hide()
 		end
 	end
-	local function CloseMenu(b) 
+	local function CloseMenu(b)
 		if not b or not b:GetParent() then return end
 		CloseDropDownMenus(b:GetParent():GetID())
 	end
@@ -987,7 +987,7 @@ function ShowOptions(a1, id)
 	local function Set(b, k)
 		if not k then return end
 		db[k] = not db[k]
-		if abbrv[k] then  -- enable/disable a battleground while in it
+		if abbrv[k] then -- enable/disable a battleground while in it
 			if GetRealZoneText() == abbrv[k] then
 				Capping:ZONE_CHANGED_NEW_AREA()
 			end
@@ -1000,7 +1000,7 @@ function ShowOptions(a1, id)
 			ReloadUI()
 		elseif k == "disablemap" then
 			ReloadUI()
-		else  -- update visual options
+		else -- update visual options
 			StartWorldTimers()
 			UpdateLook(k)
 		end
@@ -1139,7 +1139,7 @@ function ShowOptions(a1, id)
 					AddExecute(lvl, L["Send to SAY"], "reportsay", barid)
 					AddExecute(lvl, L["Cancel Timer"], "canceltimer", barid)
 				end
-				
+
 				info.isTitle = true
 				info.notCheckable = 1
 				AddButton(lvl, " ")
@@ -1241,6 +1241,6 @@ function ShowOptions(a1, id)
 			end
 		end
 	end
-	end  -- end if not CappingDD then
+	end -- end if not CappingDD then
 	ToggleDropDownMenu(1, nil, CappingDD, "cursor")
 end
