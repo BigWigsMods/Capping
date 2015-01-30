@@ -854,25 +854,6 @@ end)
 ------------------------------------
 function Capping:CheckStartTimer(a1) -- timer for when a battleground begins
 ------------------------------------
-	timetil = timetil or {
-		[strlower(L["1 minute"])] = 62,
-		[strlower(L["One minute until"])] = 62,
-		[strlower(L["60 seconds"])] = 62,
-		[strlower(L["30 seconds"])] = 31,
-		[strlower(L["15 seconds"])] = 16,
-		[strlower(L["Forty five seconds"])] = 46,
-		[strlower(L["Thirty seconds until"])] = 31,
-		[strlower(L["Fifteen seconds until"])] = 16,
-	}
-	a1 = strlower(a1)
-	if not db.hidecaptime then
-		for text, duration in pairs(timetil) do
-			if strmatch(a1, text) then
-				--self:StartBar(L["Battle Begins"], 123, duration, "Interface\\Icons\\Spell_Holy_PrayerOfHealing", "info2")
-				break
-			end
-		end
-	end
 	if instance == "arena" and strmatch(a1, strlower(L["has begun"])) then -- Shadow Sight spawn timer
 		local spell, _, icon = GetSpellInfo(34709)
 		self:StartBar(spell, 93, 93, icon, "info2")

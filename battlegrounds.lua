@@ -640,7 +640,7 @@ function Capping:StartWSG()
 		function Capping:WSGEnd() -- timer for last 3 minutes of WSG
 		-------------------------
 			local _, _, timeremain1, timeremain2 = GetWorldStateUIInfo(1)
-			timeremain = tonumber(strmatch(stringcheck(timeremain1, timeremain2), "(%d+)") or 20) or 20
+			local timeremain = tonumber(strmatch(stringcheck(timeremain1, timeremain2), "(%d+)") or 20) or 20
 			if timeremain < 4 and prevtime and prevtime ~= timeremain then
 				self:StartBar(gsub(_G.TIME_REMAINING or "Battle Ends", ":", ""), 3 * 61.5, timeremain * 61.5, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
 			end
