@@ -7,6 +7,7 @@ local self = Capping
 local L = addon.L
 
 -- LIBRARIES
+local candy = LibStub("LibCandyBar-3.0")
 local media = LibStub("LibSharedMedia-3.0")
 media:Register("statusbar", "BantoBarReverse", "Interface\\AddOns\\Capping\\BantoBarReverse")
 
@@ -67,7 +68,7 @@ local function WorldSoon(remain)
 end
 local function StartWorldTimers()
 	if IsInInstance() then return end
-	for i = 1, GetNumWorldPVPAreas(), 1 do
+	for i = 1, GetNumWorldPVPAreas() do
 		local _, localizedName, isActive, canQueue, startTime, canEnter = GetWorldPVPAreaInfo(i)
 		if localizedName then
 			db["worldname"..i] = localizedName
@@ -89,11 +90,14 @@ local function StartWorldTimers()
 						concol = "info1"
 					end
 					SetMapByID(currentmapid)
-					Capping:StartBar(localizedName, (startTime > 900 and 8400) or 900, startTime,
-						"Interface\\Icons\\INV_EssenceOfWintergrasp", concol, true, true, nil, nil, WorldSoon)
+					local bar = Capping:GetBar(localizedName)
+					if not bar or startTime > bar.remaining+10 or startTime < bar.remaining-10 then -- Don't restart bars for subtle changes +/- 10s
+						Capping:StartBar(localizedName, nil, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", concol, true, true, nil, nil, WorldSoon)
+					end
 				else
-					Capping:StartBar(localizedName, (startTime > 900 and 8400) or 900, startTime,
-						"Interface\\Icons\\INV_EssenceOfWintergrasp", "info1", true, true, nil, nil, WorldSoon)
+					-- Ashran?
+					--Capping:StartBar(localizedName, (startTime > 900 and 8400) or 900, startTime,
+					--	"Interface\\Icons\\INV_EssenceOfWintergrasp", "info1", true, true, nil, nil, WorldSoon)
 				end
 			end
 		else
@@ -500,7 +504,7 @@ end
 
 do -- estimated wait timer and port timer
 	local q, p = L["Queue: %s"], L["Port: %s"]
-	local maxq = _G.MAX_WORLD_PVP_QUEUES or 3
+	local maxq = _G.MAX_WORLD_PVP_QUEUES or 2
 	local GetBattlefieldStatus = GetBattlefieldStatus
 	local GetBattlefieldPortExpiration = GetBattlefieldPortExpiration
 	local GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited = GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited
@@ -512,7 +516,7 @@ do -- estimated wait timer and port timer
 		for map in pairs(currentq) do -- tag each entry to see if it's changed after updating the list
 			currentq[map] = 0
 		end
-		for i = 1, maxq, 1 do -- check the status of each queue
+		for i = 1, maxq do -- check the status of each queue
 			local status, map, _, _, _, teamsize, _ = GetBattlefieldStatus(i)
 			if map and teamsize == "BATTLEGROUND" then
 				map = format("%s", map)
@@ -521,15 +525,21 @@ do -- estimated wait timer and port timer
 			end
 			if status == "confirm" and db.port then
 				self:StopBar(format(q, map))
-				self:StartBar(format(p, map), instance == "pvp" and 20 or 40, GetBattlefieldPortExpiration(i), "Interface\\Icons\\Ability_TownWatch", "info2", true, true)
-				currentq[map] = i
-			elseif status == "queued" and db.wait then
-				local esttime = GetBattlefieldEstimatedWaitTime(i) * 0.001
-				local estremain = esttime - GetBattlefieldTimeWaited(i) * 0.001
-				if estremain > 0 or not self:GetBar(format(q, map)) then
-					self:StartBar(format(q, map), esttime > 1 and esttime or 1, estremain > 1 and estremain or 1, "Interface\\Icons\\INV_Misc_Note_03", "info1", 1500, true)
+				if not self:GetBar(format(p, map)) then
+					self:StartBar(format(p, map), nil, GetBattlefieldPortExpiration(i), "Interface\\Icons\\Ability_TownWatch", "info2", true, true)
 				end
 				currentq[map] = i
+			elseif status == "queued" and db.wait then
+				local esttime = GetBattlefieldEstimatedWaitTime(i) / 1000 -- 0 when queue is paused
+				local waited = GetBattlefieldTimeWaited(i) / 1000
+				local estremain = esttime - waited
+				if estremain > 1 then -- Paused queue (0) or negative queue (in queue longer than estimated time).
+					local bar = self:GetBar(format(q, map))
+					if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 then -- Don't restart bars for subtle changes +/- 10s
+						self:StartBar(format(q, map), nil, estremain, "Interface\\Icons\\INV_Misc_Note_03", "info1", nil, true)
+					end
+					currentq[map] = i
+				end
 			end
 		end
 		for map, flag in pairs(currentq) do -- stop inactive bars
@@ -543,7 +553,6 @@ do -- estimated wait timer and port timer
 end
 
 
-local temp = { }
 local function CheckActive(barid)
 	local f = bars[barid]
 	if f and f:IsShown() then return f end
@@ -602,226 +611,229 @@ end
 local function SetFillValue(this, remain, duration)
 	this.bar:SetValue( ((remain > 0 and duration - remain) or duration) / duration )
 end
-local function BarOnUpdate(this, a1)
-	this.elapsed = this.elapsed + a1
-	if this.elapsed < this.throt then return end
-	this.elapsed = 0
+--local function BarOnUpdate(this, a1)
+--	this.elapsed = this.elapsed + a1
+--	if this.elapsed < this.throt then return end
+--	this.elapsed = 0
+--
+--	local remain = this.endtime - GetTime()
+--	this.remaining = remain
+--
+--	this:SetValue(remain, this.duration)
+--	this.pfunction(remain)
+--	if remain < 60 then
+--		if remain < 10 then -- fade effects
+--			if remain > 0.5 then
+--				this:SetAlpha(0.75 + 0.25 * math_sin(remain * math_pi))
+--			elseif remain > -1.5 then
+--				this:SetAlpha((remain + 1.5) * 0.5)
+--			elseif this.noclose then
+--				if remain < -this.noclose then
+--					Capping:StopBar(nil, this)
+--				else
+--					this:SetAlpha(0.7)
+--					this.throt = 10
+--				end
+--				this.endfunction()
+--				return
+--			else
+--				this.endfunction()
+--				return Capping:StopBar(nil, this)
+--			end
+--			this.throt = 0.05
+--		end
+--		this.timetext:SetFormattedText("%d", remain < 0 and 0 or remain)
+--	elseif remain < 600 then
+--		this.timetext:SetFormattedText("%d:%02d", remain * stamin, remain % 60)
+--	elseif remain < 3600 then
+--		this.timetext:SetFormattedText("%dm", remain * stamin)
+--	else
+--		this.timetext:SetFormattedText("|cffaaaaaa%d:%02d|r", remain / 3600, remain % 3600 * stamin)
+--	end
+--end
 
-	local remain = this.endtime - GetTime()
-	this.remaining = remain
+--local function SetValue(this, frac)
+--	frac = (frac < 0.0001 and 0.0001) or (frac > 1 and 1) or frac
+--	this:SetWidth(frac * this.basevalue)
+--	this:SetTexCoord(0, frac, 0, 1)
+--end
+--local function SetReverseValue(this, frac)
+--	frac = (frac < 0.0001 and 0.0001) or (frac > 1 and 1) or frac
+--	this:SetWidth(frac * this.basevalue)
+--	this:SetTexCoord(frac, 0, 0, 1)
+--end
+--local function UpdateBarLayout(f)
+--	local inset, w, h, tc = db.inset or 0, db.width or 200, db.height or 12, db.colors.font
+--	local icon, bar, barback, spark, timetext, displaytext = f.icon, f.bar, f.barback, f.spark, f.timetext, f.displaytext
+--	local nh = h * (db.altstyle and 0.25 or 1)
+--	local ih = nh - 2 * inset
+--	ih = ih > 0 and ih or 0.5
+--	SetWH(f, w, h)
+--	SetWH(icon, h, h)
+--	SetWH(barback, w - h, nh)
+--	bar:SetHeight(ih)
+--	spark:SetHeight(2.35 * ih)
+--	spark:SetVertexColor(db.colors.spark.r, db.colors.spark.g, db.colors.spark.b, db.colors.spark.a)
+--	timetext:SetTextColor(tc.r, tc.g, tc.b, tc.a)
+--	displaytext:SetTextColor(tc.r, tc.g, tc.b, tc.a)
+--	f.SetValue = db.fill and SetFillValue or SetDepleteValue
+--	if db.iconpos == "X" then -- icon position
+--		icon:Hide()
+--		barback:SetWidth(w)
+--		SetPoints(barback, "BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
+--	elseif db.iconpos == "->" then
+--		icon:Show()
+--		SetPoints(icon, "RIGHT", f, "RIGHT", 0, 0)
+--		SetPoints(barback, "BOTTOMRIGHT", icon, "BOTTOMLEFT", 0, 0)
+--	else
+--		icon:Show()
+--		SetPoints(icon, "LEFT", f, "LEFT", 0, 0)
+--		SetPoints(barback, "BOTTOMLEFT", icon, "BOTTOMRIGHT", 0, 0)
+--	end
+--	if db.timepos == "->" then -- time text placement
+--		SetPoints(timetext, "RIGHT", barback, "RIGHT", -(4 + inset), db.altstyle and (0.5 * h) or 0)
+--		SetPoints(displaytext, "LEFT", barback, "LEFT", (4 + inset), db.altstyle and (0.5 * h) or 0, "RIGHT", timetext, "LEFT", -(4 + inset), 0)
+--	else
+--		SetPoints(displaytext, "LEFT", barback, "LEFT", db.fontsize * 3, db.altstyle and (0.5 * h) or 0, "RIGHT", barback, "RIGHT", -(4 + inset), 0)
+--		SetPoints(timetext, "RIGHT", displaytext, "LEFT", -db.fontsize / 2.2, 0)
+--	end
+--	if db.reverse then -- horizontal flip of bar growth
+--		SetPoints(bar, "RIGHT", barback, "RIGHT", -inset, 0)
+--		spark:SetPoint("CENTER", bar, "LEFT", 0, 0)
+--		bar.SetValue = SetReverseValue
+--	else
+--		SetPoints(bar, "LEFT", barback, "LEFT", inset, 0)
+--		spark:SetPoint("CENTER", bar, "RIGHT", 0, 0)
+--		bar.SetValue = SetValue
+--	end
+--	f:EnableMouse(not db.lockbar)
+--	bar.basevalue = (w - h) - (2 * inset)
+--	if f:IsShown() then
+--		BarOnUpdate(f, 11)
+--	end
+--end
 
-	this:SetValue(remain, this.duration)
-	this.pfunction(remain)
-	if remain < 60 then
-		if remain < 10 then -- fade effects
-			if remain > 0.5 then
-				this:SetAlpha(0.75 + 0.25 * math_sin(remain * math_pi))
-			elseif remain > -1.5 then
-				this:SetAlpha((remain + 1.5) * 0.5)
-			elseif this.noclose then
-				if remain < -this.noclose then
-					Capping:StopBar(nil, this)
-				else
-					this:SetAlpha(0.7)
-					this.throt = 10
-				end
-				this.endfunction()
-				return
-			else
-				this.endfunction()
-				return Capping:StopBar(nil, this)
-			end
-			this.throt = 0.05
-		end
-		this.timetext:SetFormattedText("%d", remain < 0 and 0 or remain)
-	elseif remain < 600 then
-		this.timetext:SetFormattedText("%d:%02d", remain * stamin, remain % 60)
-	elseif remain < 3600 then
-		this.timetext:SetFormattedText("%dm", remain * stamin)
-	else
-		this.timetext:SetFormattedText("|cffaaaaaa%d:%02d|r", remain / 3600, remain % 3600 * stamin)
-	end
-end
+
+local temp = { }
+local normalAnchor = {bars={}}
 local function lsort(a, b)
-	return bars[a].remaining < bars[b].remaining
+	return a.remaining < b.remaining
 end
 local function SortBars()
-	for i = 1, #bars, 1 do
-		temp[i] = i
+	wipe(temp)
+	for k in next, normalAnchor.bars do
+		temp[#temp+1] = k
 	end
 	sort(temp, lsort)
-	local pdown, pup = -1, -1
+	local pdown, pup = nil, nil
 	for _, k in ipairs(temp) do
-		local f = bars[k]
+		local f = k
 		if f:IsShown() then
 			if f.down then
-				SetPoints(f, "TOPLEFT", bars[pdown] or Capping, "BOTTOMLEFT", 0, -(db.spacing or 1))
+				SetPoints(f, "TOPLEFT", pdown or Capping, "BOTTOMLEFT", 0, -(db.spacing or 1))
 				pdown = k
 			else
-				SetPoints(f, "BOTTOMLEFT", bars[pup] or Capping, "TOPLEFT", 0, db.spacing or 1)
+				SetPoints(f, "BOTTOMLEFT", pup or Capping, "TOPLEFT", 0, db.spacing or 1)
 				pup = k
 			end
 		end
 	end
 end
-local function SetValue(this, frac)
-	frac = (frac < 0.0001 and 0.0001) or (frac > 1 and 1) or frac
-	this:SetWidth(frac * this.basevalue)
-	this:SetTexCoord(0, frac, 0, 1)
-end
-local function SetReverseValue(this, frac)
-	frac = (frac < 0.0001 and 0.0001) or (frac > 1 and 1) or frac
-	this:SetWidth(frac * this.basevalue)
-	this:SetTexCoord(frac, 0, 0, 1)
-end
-local function UpdateBarLayout(f)
-	local inset, w, h, tc = db.inset or 0, db.width or 200, db.height or 12, db.colors.font
-	local icon, bar, barback, spark, timetext, displaytext = f.icon, f.bar, f.barback, f.spark, f.timetext, f.displaytext
-	local nh = h * (db.altstyle and 0.25 or 1)
-	local ih = nh - 2 * inset
-	ih = ih > 0 and ih or 0.5
-	SetWH(f, w, h)
-	SetWH(icon, h, h)
-	SetWH(barback, w - h, nh)
-	bar:SetHeight(ih)
-	spark:SetHeight(2.35 * ih)
-	spark:SetVertexColor(db.colors.spark.r, db.colors.spark.g, db.colors.spark.b, db.colors.spark.a)
-	timetext:SetTextColor(tc.r, tc.g, tc.b, tc.a)
-	displaytext:SetTextColor(tc.r, tc.g, tc.b, tc.a)
-	f.SetValue = db.fill and SetFillValue or SetDepleteValue
-	if db.iconpos == "X" then -- icon position
-		icon:Hide()
-		barback:SetWidth(w)
-		SetPoints(barback, "BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
-	elseif db.iconpos == "->" then
-		icon:Show()
-		SetPoints(icon, "RIGHT", f, "RIGHT", 0, 0)
-		SetPoints(barback, "BOTTOMRIGHT", icon, "BOTTOMLEFT", 0, 0)
+function Capping:StartBar(name, duration, remaining, icon, colorid, nonactive, separate, specialText, endfunction, periodicfunction)
+	--if db.onegroup then
+	--	separate = db.mainup
+	--elseif db.mainup then
+	--	separate = not separate
+	--end
+	--duration = (duration < remaining and remaining) or duration
+	--
+	--local f = self:GetBar(name, true)
+	--f.name = name
+	--f.color = colorid
+	--f.endtime = GetTime() + remaining
+	--f.duration = duration
+	--f.remaining = remaining
+	--f.down = not separate
+	--f.noclose = type(nonactive) == "number" and nonactive
+	--f.throt = (duration < 300 and 0.1) or (duration < 600 and 0.25) or 0.5
+	--f.elapsed = f.throt - 0.01
+	--f.endfunction = endfunction or nofunc
+	--f.pfunction = periodicfunction or nofunc
+
+	--###--
+	--#################################################--
+
+	print("Capping:", tostringall(name, duration, remaining, icon, colorid, nonactive, separate, specialText, endfunction, periodicfunction))
+	self:StopBar(specialText or name)
+	local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
+	normalAnchor.bars[bar] = true
+	--bar:Set("capping:module", module)
+	bar:Set("capping:anchor", normalAnchor)
+	--bar:Set("capping:option", key)
+	local c = colorid and db.colors[colorid] or db.colors.info1
+	bar.candyBarBackground:SetVertexColor(c.r * 0.3, c.g * 0.3, c.b * 0.3, db.bgalpha or 0.7)
+	bar:SetColor(c.r, c.g, c.b, c.a or 0.9)
+	--bar.candyBarLabel:SetTextColor(colors:GetColor("barText", module, key))
+	--bar.candyBarDuration:SetTextColor(colors:GetColor("barText", module, key))
+	--bar.candyBarLabel:SetShadowColor(colors:GetColor("barTextShadow", module, key))
+	--bar.candyBarDuration:SetShadowColor(colors:GetColor("barTextShadow", module, key))
+	bar.candyBarLabel:SetJustifyH("LEFT")
+
+	--local flags = nil
+	--if db.monochrome and db.outline ~= "NONE" then
+	--	flags = "MONOCHROME," .. db.outline
+	--elseif db.monochrome then
+	--	flags = nil -- "MONOCHROME", XXX monochrome only is disabled for now as it causes a client crash
+	--elseif db.outline ~= "NONE" then
+	--	flags = db.outline
+	--end
+	local font = media:Fetch("font", db.font)
+	bar.candyBarLabel:SetFont(font, db.fontsize)
+	bar.candyBarDuration:SetFont(font, db.fontsize)
+
+	bar:SetLabel(specialText or name)
+	bar:SetDuration(remaining)
+	--bar:SetTimeVisibility(db.time)
+	if type(icon) == "table" then
+		bar:SetIcon(icon[1], icon[2], icon[3], icon[4], icon[5])
 	else
-		icon:Show()
-		SetPoints(icon, "LEFT", f, "LEFT", 0, 0)
-		SetPoints(barback, "BOTTOMLEFT", icon, "BOTTOMRIGHT", 0, 0)
+		bar:SetIcon(icon)
 	end
-	if db.timepos == "->" then -- time text placement
-		SetPoints(timetext, "RIGHT", barback, "RIGHT", -(4 + inset), db.altstyle and (0.5 * h) or 0)
-		SetPoints(displaytext, "LEFT", barback, "LEFT", (4 + inset), db.altstyle and (0.5 * h) or 0, "RIGHT", timetext, "LEFT", -(4 + inset), 0)
-	else
-		SetPoints(displaytext, "LEFT", barback, "LEFT", db.fontsize * 3, db.altstyle and (0.5 * h) or 0, "RIGHT", barback, "RIGHT", -(4 + inset), 0)
-		SetPoints(timetext, "RIGHT", displaytext, "LEFT", -db.fontsize / 2.2, 0)
-	end
-	if db.reverse then -- horizontal flip of bar growth
-		SetPoints(bar, "RIGHT", barback, "RIGHT", -inset, 0)
-		spark:SetPoint("CENTER", bar, "LEFT", 0, 0)
-		bar.SetValue = SetReverseValue
-	else
-		SetPoints(bar, "LEFT", barback, "LEFT", inset, 0)
-		spark:SetPoint("CENTER", bar, "RIGHT", 0, 0)
-		bar.SetValue = SetValue
-	end
-	f:EnableMouse(not db.lockbar)
-	bar.basevalue = (w - h) - (2 * inset)
-	if f:IsShown() then
-		BarOnUpdate(f, 11)
-	end
-end
--------------------------------------
-function Capping:GetBar(name, getone) -- get active bar or unused/new one
--------------------------------------
-	local f, tf
-	for k, b in ipairs(bars) do -- find already assigned bar
-		if b.name == name then
-			f = b
-		elseif getone and not tf and not b:IsShown() then
-			tf = b
-		end
-	end
-	if not getone then return f end -- don't assign a new bar
-
-	f = f or tf
-	if not f then -- no available bar, create new one
-		local texture = media:Fetch("statusbar", db.texture)
-		local font = media:Fetch("font", db.font)
-
-		f = CreateFrame("Button", nil, UIParent)
-		f:Hide()
-		f:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-		f:SetScript("OnClick", BarOnClick)
-		f:SetScript("OnUpdate", BarOnUpdate)
-		f.icon = f:CreateTexture(nil, "ARTWORK")
-		f.barback = f:CreateTexture(nil, "BACKGROUND")
-		f.barback:SetTexture(texture)
-		f.bar = f:CreateTexture(nil, "ARTWORK")
-		f.bar:SetTexture(texture)
-
-		local spark = f:CreateTexture(nil, "OVERLAY")
-		spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
-		spark:SetBlendMode("ADD")
-		spark:SetAlpha(0.8)
-		spark:SetWidth(18)
-		f.spark = spark
-
-		f.timetext = NewText(f, font, db.fontsize, "RIGHT", "CENTER")
-		f.displaytext = NewText(f, font, db.fontsize, "LEFT", "CENTER")
-
-		UpdateBarLayout(f)
-		tinsert(bars, f)
-		f.id = #bars
-	end
-	return f
-end
-
-----------------------------------------------------------------------------------------------------------------------------------------
-function Capping:StartBar(name, duration, remaining, icondata, colorid, nonactive, separate, specialText, endfunction, periodicfunction)
-----------------------------------------------------------------------------------------------------------------------------------------
-	if not duration or not remaining then return end
-	local icon, l, r, t, b
-	if icondata == self.iconpath then
-		icon, l, r, t, b = icondata[1], icondata[2], icondata[3], icondata[4], icondata[5]
-	else
-		icon, l, r, t, b = icondata, 0.07, 0.93, 0.07, 0.93
-	end
-	local c = db.colors[colorid or "info1"] or db.colors.info1
-	if db.onegroup then
-		separate = db.mainup
-	elseif db.mainup then
-		separate = not separate
-	end
-	duration = (duration < remaining and remaining) or duration
-
-	local f = self:GetBar(name, true)
-	f.name = name
-	f.color = colorid
-	f.endtime = GetTime() + remaining
-	f.duration = duration
-	f.remaining = remaining
-	f.down = not separate
-	f.noclose = type(nonactive) == "number" and nonactive
-	f.throt = (duration < 300 and 0.1) or (duration < 600 and 0.25) or 0.5
-	f.elapsed = f.throt - 0.01
-	f.endfunction = endfunction or nofunc
-	f.pfunction = periodicfunction or nofunc
-
-	f.displaytext:SetText(specialText or name)
-	f.icon:SetTexture(icon)
-	f.icon:SetTexCoord(l or 0, r or 1, t or 0, b or 1)
-	f.bar:SetVertexColor(c.r, c.g, c.b, c.a or 0.9)
-	f.barback:SetVertexColor(c.r * 0.3, c.g * 0.3, c.b * 0.3, db.bgalpha or 0.7)
-	f:SetAlpha(1)
-
-	activebars[name] = (not nonactive and colorid) or nil
-	f:Show()
+	bar:SetScript("OnMouseUp", BarOnClick)
+	--bar:SetScale(db.scale)
+	bar:SetFill(db.fill)
+	bar:Start()
 	SortBars()
 end
-------------------------------------
-function Capping:StopBar(name, this)
-------------------------------------
-	local f = this or self:GetBar(name)
-	if f then
-		f.name = ""
-		f:Hide()
-		SortBars()
+
+function Capping:GetBar(text)
+	for k in next, normalAnchor.bars do
+		if k.candyBarLabel:GetText() == text then
+			return k
+		end
 	end
 end
+
+function Capping:StopBar(text)
+	--if not normalAnchor then return end
+	local dirty = nil
+	for k in next, normalAnchor.bars do
+		if k.candyBarLabel:GetText() == text then
+			k:Stop()
+			dirty = true
+		end
+	end
+	if dirty then SortBars() end
+end
+
+candy.RegisterCallback(Capping, "LibCandyBar_Stop", function(event, bar)
+	local a = bar:Get("capping:anchor")
+	if a and a.bars and a.bars[bar] then
+		--currentBarStyler.BarStopped(bar)
+		a.bars[bar] = nil
+		SortBars()
+	end
+end)
 
 ------------------------------------
 function Capping:CheckStartTimer(a1) -- timer for when a battleground begins
@@ -900,20 +912,19 @@ function ShowOptions(a1, id)
 		local font = media:Fetch("font", db.font)
 		local fc = db.colors.font
 		Capping:SetWidth(db.width)
-		for index, f in pairs(bars) do
-			f.bar:SetTexture(texture)
-			f.barback:SetTexture(texture)
-			f.timetext:SetFont(font, db.fontsize-1)
-			f.displaytext:SetFont(font, db.fontsize)
-			f:SetHeight(db.height)
-			if k == "colors" or k == "bgalpha" then
-				local bc = db.colors[f.color]
-				f.bar:SetVertexColor(bc.r, bc.g, bc.b, bc.a or 1)
-				f.barback:SetVertexColor(bc.r * 0.3, bc.g * 0.3, bc.b * 0.3, db.bgalpha or 0.7)
-			end
-			if k == "mainup" then f.down = not f.down end
-			if k == "onegroup" and db.onegroup then f.down = not db.mainup end
-			UpdateBarLayout(f)
+		for bar in pairs(normalAnchor.bars) do
+			bar:SetTexture(texture)
+			bar.candyBarLabel:SetFont(font, db.fontsize)
+			bar.candyBarDuration:SetFont(font, db.fontsize-1)
+			bar:SetHeight(db.height)
+			--if k == "colors" or k == "bgalpha" then
+			--	local bc = db.colors[f.color]
+			--	bar:SetVertexColor(bc.r, bc.g, bc.b, bc.a or 1)
+				--f.barback:SetVertexColor(bc.r * 0.3, bc.g * 0.3, bc.b * 0.3, db.bgalpha or 0.7)
+			--end
+			--if k == "mainup" then f.down = not f.down end
+			--if k == "onegroup" and db.onegroup then f.down = not db.mainup end
+			--UpdateBarLayout(f)
 		end
 		SortBars()
 		Capping:ModMap()
