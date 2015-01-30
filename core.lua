@@ -156,25 +156,41 @@ end
 --		UpdateZoneMapVisibility()
 --	end
 --end)
-TimerTracker:HookScript("OnEvent", function(this, event, timerType, timeSeconds, totalTime)
-	if not db or not wasInBG then return end
-	if db.hideblizztime then
-		for a, timer in pairs(this.timerList) do
-			timer.time = nil
-			timer.type = nil
-			timer.isFree = nil
-			timer:SetScript("OnUpdate", nil)
-			timer.fadeBarOut:Stop()
-			timer.fadeBarIn:Stop()
-			timer.startNumbers:Stop()
-			timer.bar:SetAlpha(0)
+--TimerTracker:HookScript("OnEvent", function(this, event, timerType, timeSeconds, totalTime)
+--	if not db or not wasInBG then return end
+--	if db.hideblizztime then
+--		for a, timer in pairs(this.timerList) do
+--			timer.time = nil
+--			timer.type = nil
+--			timer.isFree = nil
+--			timer:SetScript("OnUpdate", nil)
+--			timer.fadeBarOut:Stop()
+--			timer.fadeBarIn:Stop()
+--			timer.startNumbers:Stop()
+--			timer.bar:SetAlpha(0)
+--		end
+--	end
+--	if not db.hidecaptime and event == "START_TIMER" then
+--		Capping:StartBar(L["Battle Begins"], totalTime, timeSeconds+3, "Interface\\Icons\\Spell_Holy_PrayerOfHealing", "info2")
+--	end
+--end)
+function Capping:START_TIMER(timerType, timeSeconds, totalTime)
+	local _, t = GetInstanceInfo()
+	if t == "pvp" then
+		if db.hideblizztime then
+			for a, timer in pairs(TimerTracker.timerList) do
+				timer:Hide()
+			end
+		end
+		local faction = GetPlayerFactionGroup()
+		if faction and faction ~= "Neutral" then
+			if not self:GetBar(L["Battle Begins"]) then
+				Capping:StartBar(L["Battle Begins"], nil, timeSeconds, "Interface\\Timer\\"..faction.."-Logo", "info2")
+			end
 		end
 	end
-	if not db.hidecaptime and event == "START_TIMER" then
-		Capping:StartBar(L["Battle Begins"], totalTime, timeSeconds+3, "Interface\\Icons\\Spell_Holy_PrayerOfHealing", "info2")
-	end
-end)
-
+end
+Capping:RegisterEvent("START_TIMER")
 
 -- EVENT HANDLERS
 local elist, clist = {}, {}
@@ -852,7 +868,7 @@ function Capping:CheckStartTimer(a1) -- timer for when a battleground begins
 	if not db.hidecaptime then
 		for text, duration in pairs(timetil) do
 			if strmatch(a1, text) then
-				self:StartBar(L["Battle Begins"], 123, duration, "Interface\\Icons\\Spell_Holy_PrayerOfHealing", "info2")
+				--self:StartBar(L["Battle Begins"], 123, duration, "Interface\\Icons\\Spell_Holy_PrayerOfHealing", "info2")
 				break
 			end
 		end
