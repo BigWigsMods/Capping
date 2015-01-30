@@ -119,12 +119,12 @@ do -- POI handling
 				local nodetype, prevstate = strmatch(ns, "(%a+)(%d+)")
 				if tonumber(prevstate) ~= ti then
 					if ti == poicons[nodetype][11] then
-						self:StartBar(name, ntime, ntime, GetIconData("alliance", nodetype), "alliance")
+						self:StartBar(name, ntime, GetIconData("alliance", nodetype), "alliance")
 						if nodetype == "workshop" then -- reset siege engine timer
 							self:StopBar(GetSpellInfo(56661), nil)
 						end
 					elseif ti == poicons[nodetype][13] then
-						self:StartBar(name, ntime, ntime, GetIconData("horde", nodetype), "horde")
+						self:StartBar(name, ntime, GetIconData("horde", nodetype), "horde")
 						if nodetype == "workshop" then -- reset siege engine timer
 							self:StopBar(GetSpellInfo(56661), nil)
 						end
@@ -137,7 +137,7 @@ do -- POI handling
 		end
 	end
 	function Capping:TestNode(ntype, faction)
-		self:StartBar("Test", 20, 20, GetIconData(faction, ntype), faction)
+		self:StartBar("Test", 20, GetIconData(faction, ntype), faction)
 	end
 end
 
@@ -225,9 +225,9 @@ do
 				local f = self:GetBar("EstFinal")
 				local elapsed = (f and f:IsShown() and (f.duration - f.remaining)) or 0
 				if HTime < ATime then -- Horde is winning
-					self:StartBar("EstFinal", HTime + elapsed, HTime, GetIconData("horde", "symbol"), "horde", nil, nil, getlscore(HTime, apps, ascore, MaxScore))
+					self:StartBar("EstFinal", HTime, GetIconData("horde", "symbol"), "horde", nil, nil, getlscore(HTime, apps, ascore, MaxScore))
 				else -- Alliance is winning
-					self:StartBar("EstFinal", ATime + elapsed, ATime, GetIconData("alliance", "symbol"), "alliance", nil, nil, getlscore(ATime, hpps, hscore, MaxScore, true))
+					self:StartBar("EstFinal", ATime, GetIconData("alliance", "symbol"), "alliance", nil, nil, getlscore(ATime, hpps, hscore, MaxScore, true))
 				end
 			end
 		end
@@ -328,7 +328,7 @@ function Capping:StartAV()
 						icon = GetIconData(color, strmatch(nodestates[name] or "symbol0", "(%a+)(%d+)") or "symbol")
 					end
 					duration = tonumber(duration) or 245
-					self:StartBar(name, duration, duration - (tonumber(elapsed) or 245), icon, color or "info2")
+					self:StartBar(name, duration - (tonumber(elapsed) or 245), icon, color or "info2")
 				end
 			end
 		end
@@ -372,7 +372,7 @@ function Capping:StartEotS()
 			eftext:SetText("")
 			eficon:Hide()
 			if captured then
-				self:StartBar(L["Flag respawns"], nil, 12, GetIconData(strlower(UnitFactionGroup("player")), "flag"), "info2")
+				self:StartBar(L["Flag respawns"], 12, GetIconData(strlower(UnitFactionGroup("player")), "flag"), "info2")
 			end
 			self:CheckCombat(SetEotSCarrierAttribute)
 		end
@@ -447,7 +447,7 @@ function Capping:StartIoC()
 			for _, value in ipairs(nodes) do
 				if strmatch(text, strlower(value)) then
 					if strmatch(text, assaulted) then
-						return self:StartBar(value, 62, 62, GetIconData(faction, "tower"), faction)
+						return self:StartBar(value, 62, GetIconData(faction, "tower"), faction)
 					elseif strmatch(text, defended) or strmatch(text, taken) or strmatch(text, claimed) then
 						return self:StopBar(value)
 					end
@@ -475,7 +475,7 @@ function Capping:StartIoC()
 					faction = (faction == "a" and "alliance") or (faction == "h" and "horde")
 					remain = (remain == "1" and 183) or (remain == "2" and 92) or tonumber(remain or 0) or 0
 					if faction and remain > 0 then
-						self:StartBar(siege, 183, remain, siegeicon, faction)
+						self:StartBar(siege, remain, siegeicon, faction)
 					end
 				end
 			elseif prefix == "DBMv4-Mod" then
@@ -483,7 +483,7 @@ function Capping:StartIoC()
 				if isle == "IsleofConquest" then
 					remain = (remain == "SEStart" and 183) or (remain == "SEHalfway" and 92) or nil
 					if remain and faction then
-						self:StartBar(siege, 183, remain, siegeicon, strlower(faction))
+						self:StartBar(siege, remain, siegeicon, strlower(faction))
 					end
 				end
 			end
@@ -494,11 +494,11 @@ function Capping:StartIoC()
 			if a1 and a2 then -- check npc yells
 				if strmatch(a1, L["seaforium bombs"]) or strmatch(a1, L["It's broken"]) then
 					local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
-					self:StartBar(siege, 183, 183, siegeicon, faction)
+					self:StartBar(siege, 183, siegeicon, faction)
 					SendAddonMessage("cap", faction == "alliance" and "a1" or "h1", "INSTANCE_CHAT")
 				elseif strmatch(a1, L["halfway"]) then
 					local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
-					self:StartBar(siege, 183, 92, siegeicon, faction)
+					self:StartBar(siege, 92, siegeicon, faction)
 					SendAddonMessage("cap", faction == "alliance" and "a2" or "h2", "INSTANCE_CHAT")
 				end
 			end
@@ -633,7 +633,7 @@ function Capping:StartWSG()
 		--------------------------------------------
 			if strmatch(a1, L["captured the"]) then -- flag was captured, reset all carriers
 				SetCarrier()
-				self:StartBar(L["Flag respawns"], nil, 12, GetIconData(wsgicon, "flag"), "info2")
+				self:StartBar(L["Flag respawns"], 12, GetIconData(wsgicon, "flag"), "info2")
 			end
 		end
 		-------------------------
@@ -642,7 +642,7 @@ function Capping:StartWSG()
 			local _, _, timeremain1, timeremain2 = GetWorldStateUIInfo(1)
 			local timeremain = tonumber(strmatch(stringcheck(timeremain1, timeremain2), "(%d+)") or 20) or 20
 			if timeremain < 4 and prevtime and prevtime ~= timeremain then
-				self:StartBar(gsub(_G.TIME_REMAINING or "Battle Ends", ":", ""), 3 * 61.5, timeremain * 61.5, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
+				self:StartBar(gsub(_G.TIME_REMAINING or "Battle Ends", ":", ""), timeremain * 61.5, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
 			end
 			prevtime = timeremain
 		end

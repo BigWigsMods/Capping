@@ -92,12 +92,11 @@ local function StartWorldTimers()
 					SetMapByID(currentmapid)
 					local bar = Capping:GetBar(localizedName)
 					if not bar or startTime > bar.remaining+10 or startTime < bar.remaining-10 then -- Don't restart bars for subtle changes +/- 10s
-						Capping:StartBar(localizedName, nil, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", concol, true, true, nil, nil, WorldSoon)
+						Capping:StartBar(localizedName, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", concol, true, true, nil, nil, WorldSoon)
 					end
 				else
 					-- Ashran?
-					--Capping:StartBar(localizedName, (startTime > 900 and 8400) or 900, startTime,
-					--	"Interface\\Icons\\INV_EssenceOfWintergrasp", "info1", true, true, nil, nil, WorldSoon)
+					--Capping:StartBar(localizedName, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", "info1", true, true, nil, nil, WorldSoon)
 				end
 			end
 		else
@@ -171,7 +170,7 @@ end
 --		end
 --	end
 --	if not db.hidecaptime and event == "START_TIMER" then
---		Capping:StartBar(L["Battle Begins"], totalTime, timeSeconds+3, "Interface\\Icons\\Spell_Holy_PrayerOfHealing", "info2")
+--		Capping:StartBar(L["Battle Begins"], timeSeconds+3, "Interface\\Icons\\Spell_Holy_PrayerOfHealing", "info2")
 --	end
 --end)
 function Capping:START_TIMER(timerType, timeSeconds, totalTime)
@@ -185,7 +184,7 @@ function Capping:START_TIMER(timerType, timeSeconds, totalTime)
 		local faction = GetPlayerFactionGroup()
 		if faction and faction ~= "Neutral" then
 			if not self:GetBar(L["Battle Begins"]) then
-				Capping:StartBar(L["Battle Begins"], nil, timeSeconds, "Interface\\Timer\\"..faction.."-Logo", "info2")
+				Capping:StartBar(L["Battle Begins"], timeSeconds, "Interface\\Timer\\"..faction.."-Logo", "info2")
 			end
 		end
 	end
@@ -542,7 +541,7 @@ do -- estimated wait timer and port timer
 			if status == "confirm" and db.port then
 				self:StopBar(format(q, map))
 				if not self:GetBar(format(p, map)) then
-					self:StartBar(format(p, map), nil, GetBattlefieldPortExpiration(i), "Interface\\Icons\\Ability_TownWatch", "info2", true, true)
+					self:StartBar(format(p, map), GetBattlefieldPortExpiration(i), "Interface\\Icons\\Ability_TownWatch", "info2", true, true)
 				end
 				currentq[map] = i
 			elseif status == "queued" and db.wait then
@@ -552,7 +551,7 @@ do -- estimated wait timer and port timer
 				if estremain > 1 then -- Paused queue (0) or negative queue (in queue longer than estimated time).
 					local bar = self:GetBar(format(q, map))
 					if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 then -- Don't restart bars for subtle changes +/- 10s
-						self:StartBar(format(q, map), nil, estremain, "Interface\\Icons\\INV_Misc_Note_03", "info1", nil, true)
+						self:StartBar(format(q, map), estremain, "Interface\\Icons\\INV_Misc_Note_03", "info1", nil, true)
 					end
 					currentq[map] = i
 				end
@@ -755,7 +754,7 @@ local function SortBars()
 		end
 	end
 end
-function Capping:StartBar(name, duration, remaining, icon, colorid, nonactive, separate, specialText, endfunction, periodicfunction)
+function Capping:StartBar(name, remaining, icon, colorid, nonactive, separate, specialText, endfunction, periodicfunction)
 	--if db.onegroup then
 	--	separate = db.mainup
 	--elseif db.mainup then
@@ -856,7 +855,7 @@ function Capping:CheckStartTimer(a1) -- timer for when a battleground begins
 ------------------------------------
 	if instance == "arena" and strmatch(a1, strlower(L["has begun"])) then -- Shadow Sight spawn timer
 		local spell, _, icon = GetSpellInfo(34709)
-		self:StartBar(spell, 93, 93, icon, "info2")
+		self:StartBar(spell, 93, icon, "info2")
 	end
 end
 
@@ -957,11 +956,11 @@ function ShowOptions(a1, id)
 			ToggleDropDownMenu(b:GetParent():GetID(), tb.value, nil, nil, nil, nil, tb.menuList, tb)
 		elseif k == "test" then
 			local testicon = "Interface\\Icons\\Ability_ThunderBolt"
-			Capping:StartBar(L["Test"].." - ".._G.OTHER.."1", 100, 100, testicon, "info1", true, true)
-			Capping:StartBar(L["Test"].." - ".._G.OTHER.."2", 75, 75, testicon, "info2", true, true)
-			Capping:StartBar(L["Test"].." - ".._G.FACTION_ALLIANCE, 45, 45, testicon, "alliance", true)
-			Capping:StartBar(L["Test"].." - ".._G.FACTION_HORDE, 100, 100, testicon, "horde", true)
-			Capping:StartBar(L["Test"], 75, 75, testicon, "info2", true)
+			Capping:StartBar(L["Test"].." - ".._G.OTHER.."1", 100, testicon, "info1", true, true)
+			Capping:StartBar(L["Test"].." - ".._G.OTHER.."2", 75, testicon, "info2", true, true)
+			Capping:StartBar(L["Test"].." - ".._G.FACTION_ALLIANCE, 45, testicon, "alliance", true)
+			Capping:StartBar(L["Test"].." - ".._G.FACTION_HORDE, 100, testicon, "horde", true)
+			Capping:StartBar(L["Test"], 75, testicon, "info2", true)
 		elseif k == "movesb" then
 			sbmover = sbmover or CreateMover(nil, 220, 48, function(this)
 				this:StopMovingOrSizing()
