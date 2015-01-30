@@ -372,7 +372,7 @@ function Capping:StartEotS()
 			eftext:SetText("")
 			eficon:Hide()
 			if captured then
-				self:StartBar(L["Flag respawns"], 9, 9, GetIconData(strlower(UnitFactionGroup("player")), "flag"), "info2")
+				self:StartBar(L["Flag respawns"], nil, 12, GetIconData(strlower(UnitFactionGroup("player")), "flag"), "info2")
 			end
 			self:CheckCombat(SetEotSCarrierAttribute)
 		end
