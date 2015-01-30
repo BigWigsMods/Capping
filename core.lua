@@ -763,7 +763,7 @@ function Capping:StartBar(name, duration, remaining, icon, colorid, nonactive, s
 	--###--
 	--#################################################--
 
-	print("Capping:", tostringall(name, duration, remaining, icon, colorid, nonactive, separate, specialText, endfunction, periodicfunction))
+	--print("Capping:", tostringall(name, duration, remaining, icon, colorid, nonactive, separate, specialText, endfunction, periodicfunction))
 	self:StopBar(specialText or name)
 	local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
 	normalAnchor.bars[bar] = true

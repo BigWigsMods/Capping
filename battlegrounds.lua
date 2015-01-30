@@ -109,7 +109,8 @@ do -- POI handling
 	-----------------------------------
 	function Capping:WORLD_MAP_UPDATE()
 	-----------------------------------
-		for i = 1, GetNumMapLandmarks(), 1 do
+		if C_Garrison.IsOnGarrisonMap() then return end -- Don't run in Garrison
+		for i = 1, GetNumMapLandmarks() do
 			local name, _, ti = GetMapLandmarkInfo(i)
 			local ns = nodestates[name]
 			if not ns then
