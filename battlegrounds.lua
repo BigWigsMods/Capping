@@ -537,8 +537,8 @@ function Capping:StartWSG()
 				UnregisterUnitWatch(af)
 				UnregisterUnitWatch(hf)
 			end
-			af:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame2:GetRight() + 38, AlwaysUpFrame2:GetTop())
-			hf:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame3:GetRight() + 38, AlwaysUpFrame3:GetTop())
+			af:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() + 38, AlwaysUpFrame1:GetTop())
+			hf:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame2:GetRight() + 38, AlwaysUpFrame2:GetTop())
 		end
 		local function SetCarrier(faction, carrier, class, u) -- setup carrier frames
 			if faction == "Horde" then
@@ -633,7 +633,7 @@ function Capping:StartWSG()
 		--------------------------------------------
 			if strmatch(a1, L["captured the"]) then -- flag was captured, reset all carriers
 				SetCarrier()
-				self:StartBar(L["Flag respawns"], 23, 23, GetIconData(wsgicon, "flag"), "info2")
+				self:StartBar(L["Flag respawns"], nil, 12, GetIconData(wsgicon, "flag"), "info2")
 			end
 		end
 		-------------------------
