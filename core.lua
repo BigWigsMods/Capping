@@ -92,11 +92,11 @@ local function StartWorldTimers()
 					SetMapByID(currentmapid)
 					local bar = Capping:GetBar(localizedName)
 					if not bar or startTime > bar.remaining+5 or startTime < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
-						Capping:StartBar(localizedName, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", concol, true, true, nil, nil, WorldSoon)
+						Capping:StartBar(localizedName, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", concol, true) --WorldSoon
 					end
 				else
 					-- Ashran?
-					--Capping:StartBar(localizedName, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", "info1", true, true, nil, nil, WorldSoon)
+					--Capping:StartBar(localizedName, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", "info1", true) --WorldSoon
 				end
 			end
 		else
@@ -542,7 +542,7 @@ do -- estimated wait timer and port timer
 			if status == "confirm" and db.port then
 				self:StopBar(format(q, map))
 				if not self:GetBar(format(p, map)) then
-					self:StartBar(format(p, map), GetBattlefieldPortExpiration(i), "Interface\\Icons\\Ability_TownWatch", "info2", true, true)
+					self:StartBar(format(p, map), GetBattlefieldPortExpiration(i), "Interface\\Icons\\Ability_TownWatch", "info2", true)
 				end
 				currentq[map] = i
 			elseif status == "queued" and db.wait then
@@ -552,7 +552,7 @@ do -- estimated wait timer and port timer
 				if estremain > 1 then -- Paused queue (0) or negative queue (in queue longer than estimated time).
 					local bar = self:GetBar(format(q, map))
 					if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 then -- Don't restart bars for subtle changes +/- 10s
-						self:StartBar(format(q, map), estremain, "Interface\\Icons\\INV_Misc_Note_03", "info1", nil, true)
+						self:StartBar(format(q, map), estremain, "Interface\\Icons\\INV_Misc_Note_03", "info1", true)
 					end
 					currentq[map] = i
 				end
@@ -742,50 +742,26 @@ local function SortBars()
 	end
 	sort(temp, lsort)
 	local pdown, pup = nil, nil
-	for _, k in ipairs(temp) do
-		local f = k
-		if f:IsShown() then
-			if f.down then
-				SetPoints(f, "TOPLEFT", pdown or Capping, "BOTTOMLEFT", 0, -(db.spacing or 1))
-				pdown = k
-			else
-				SetPoints(f, "BOTTOMLEFT", pup or Capping, "TOPLEFT", 0, db.spacing or 1)
-				pup = k
-			end
+	for i = 1, #temp do
+		local bar = temp[i]
+		local separate = bar:Get("capping:separate")
+		bar:ClearAllPoints()
+		if separate then
+			bar:SetPoint("BOTTOMLEFT", pup or Capping, "TOPLEFT", 0, db.spacing or 1)
+			pup = bar
+		else
+			bar:SetPoint("TOPLEFT", pdown or Capping, "BOTTOMLEFT", 0, -(db.spacing or 1))
+			pdown = bar
 		end
 	end
 end
-function Capping:StartBar(name, remaining, icon, colorid, nonactive, separate, specialText, endfunction, periodicfunction)
-	--if db.onegroup then
-	--	separate = db.mainup
-	--elseif db.mainup then
-	--	separate = not separate
-	--end
-	--duration = (duration < remaining and remaining) or duration
-	--
-	--local f = self:GetBar(name, true)
-	--f.name = name
-	--f.color = colorid
-	--f.endtime = GetTime() + remaining
-	--f.duration = duration
-	--f.remaining = remaining
-	--f.down = not separate
-	--f.noclose = type(nonactive) == "number" and nonactive
-	--f.throt = (duration < 300 and 0.1) or (duration < 600 and 0.25) or 0.5
-	--f.elapsed = f.throt - 0.01
-	--f.endfunction = endfunction or nofunc
-	--f.pfunction = periodicfunction or nofunc
-
-	--###--
-	--#################################################--
-
-	--print("Capping:", tostringall(name, remaining, icon, colorid, nonactive, separate, specialText, endfunction, periodicfunction))
+function Capping:StartBar(name, remaining, icon, colorid, separate)
+	--print("Capping:", tostringall(name, remaining, icon, colorid, separate))
 	self:StopBar(specialText or name)
 	local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
 	normalAnchor.bars[bar] = true
-	--bar:Set("capping:module", module)
 	bar:Set("capping:anchor", normalAnchor)
-	--bar:Set("capping:option", key)
+	bar:Set("capping:separate", not db.onegroup and separate)
 	local c = colorid and db.colors[colorid] or db.colors.info1
 	bar.candyBarBackground:SetVertexColor(c.r * 0.3, c.g * 0.3, c.b * 0.3, db.bgalpha or 0.7)
 	bar:SetColor(c.r, c.g, c.b, c.a or 0.9)
@@ -957,11 +933,11 @@ function ShowOptions(a1, id)
 			ToggleDropDownMenu(b:GetParent():GetID(), tb.value, nil, nil, nil, nil, tb.menuList, tb)
 		elseif k == "test" then
 			local testicon = "Interface\\Icons\\Ability_ThunderBolt"
-			Capping:StartBar(L["Test"].." - ".._G.OTHER.."1", 100, testicon, "info1", true, true)
-			Capping:StartBar(L["Test"].." - ".._G.OTHER.."2", 75, testicon, "info2", true, true)
-			Capping:StartBar(L["Test"].." - ".._G.FACTION_ALLIANCE, 45, testicon, "alliance", true)
-			Capping:StartBar(L["Test"].." - ".._G.FACTION_HORDE, 100, testicon, "horde", true)
-			Capping:StartBar(L["Test"], 75, testicon, "info2", true)
+			Capping:StartBar(L["Test"].." - ".._G.OTHER.."1", 100, testicon, "info1", true)
+			Capping:StartBar(L["Test"].." - ".._G.OTHER.."2", 75, testicon, "info2", true)
+			Capping:StartBar(L["Test"].." - ".._G.FACTION_ALLIANCE, 45, testicon, "alliance")
+			Capping:StartBar(L["Test"].." - ".._G.FACTION_HORDE, 100, testicon, "horde")
+			Capping:StartBar(L["Test"], 75, testicon, "info2")
 		elseif k == "movesb" then
 			sbmover = sbmover or CreateMover(nil, 220, 48, function(this)
 				this:StopMovingOrSizing()
