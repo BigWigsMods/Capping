@@ -183,7 +183,8 @@ function Capping:START_TIMER(timerType, timeSeconds, totalTime)
 		end
 		local faction = GetPlayerFactionGroup()
 		if faction and faction ~= "Neutral" then
-			if not self:GetBar(L["Battle Begins"]) then
+			local bar = self:GetBar(L["Battle Begins"])
+			if not bar or timeSeconds > bar.remaining+3 or timeSeconds < bar.remaining-3 then -- Don't restart bars for subtle changes +/- 3s
 				Capping:StartBar(L["Battle Begins"], timeSeconds, "Interface\\Timer\\"..faction.."-Logo", "info2")
 			end
 		end
@@ -778,7 +779,7 @@ function Capping:StartBar(name, remaining, icon, colorid, nonactive, separate, s
 	--###--
 	--#################################################--
 
-	--print("Capping:", tostringall(name, duration, remaining, icon, colorid, nonactive, separate, specialText, endfunction, periodicfunction))
+	--print("Capping:", tostringall(name, remaining, icon, colorid, nonactive, separate, specialText, endfunction, periodicfunction))
 	self:StopBar(specialText or name)
 	local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
 	normalAnchor.bars[bar] = true
