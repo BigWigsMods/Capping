@@ -167,7 +167,7 @@ end
 -- initialize or update a final score estimation bar (AB and EotS uses this)
 local NewEstimator
 do
-	local ascore, atime, abases, hscore, htime, hbases, updatetime, currentbg
+	local ascore, atime, abases, hscore, htime, hbases, updatetime, currentbg, prevText
 	NewEstimator = function(bg) -- resets estimator and sets new battleground
 		if not Capping.UPDATE_WORLD_STATES then
 			local f2 = L["Final: %d - %d"]
@@ -196,10 +196,10 @@ do
 			--------------------------------------
 				local currenttime = GetTime()
 
-				local _, _, text3, text4 = GetWorldStateUIInfo(currentbg == 2 and 2 or 1)
+				local _, _, text3, text4 = GetWorldStateUIInfo(2)
 				local base, score, smax = strmatch(stringcheck(text3, text4), scorestr[currentbg])
 				local ABases, AScore, MaxScore = tonumber(base), tonumber(score), tonumber(smax) or 2000
-				_, _, text3, text4 = GetWorldStateUIInfo(currentbg == 2 and 3 or 2)
+				_, _, text3, text4 = GetWorldStateUIInfo(3)
 
 				base, score, smax = strmatch(stringcheck(text3, text4), scorestr[currentbg])
 				local HBases, HScore = tonumber(base), tonumber(score)
@@ -222,16 +222,24 @@ do
 				local ATime = ((MaxScore - ascore) / (apps > 0 and apps or 0.000001)) - (currenttime - atime)
 				local HTime = ((MaxScore - hscore) / (hpps > 0 and hpps or 0.000001)) - (currenttime - htime)
 
-				local f = self:GetBar("EstFinal")
-				local elapsed = (f and f:IsShown() and (f.duration - f.remaining)) or 0
 				if HTime < ATime then -- Horde is winning
-					self:StartBar("EstFinal", HTime, GetIconData("horde", "symbol"), "horde", nil, nil, getlscore(HTime, apps, ascore, MaxScore))
+					local newText = getlscore(HTime, apps, ascore, MaxScore)
+					if newText ~= prevText then
+						self:StopBar(prevText)
+						self:StartBar(newText, HTime, GetIconData("horde", "symbol"), "horde")
+						prevText = newText
+					end
 				else -- Alliance is winning
-					self:StartBar("EstFinal", ATime, GetIconData("alliance", "symbol"), "alliance", nil, nil, getlscore(ATime, hpps, hscore, MaxScore, true))
+					local newText = getlscore(ATime, hpps, hscore, MaxScore, true)
+					if newText ~= prevText then
+						self:StopBar(prevText)
+						self:StartBar(newText, ATime, GetIconData("alliance", "symbol"), "alliance")
+						prevText = newText
+					end
 				end
 			end
 		end
-		currentbg, updatetime, ascore, atime, abases, hscore, htime, hbases = bg, nil, 0, 0, 0, 0, 0, 0
+		currentbg, updatetime, ascore, atime, abases, hscore, htime, hbases, prevText = bg, nil, 0, 0, 0, 0, 0, 0, ""
 		Capping:RegisterTempEvent("UPDATE_WORLD_STATES")
 	end
 end
@@ -240,7 +248,7 @@ end
 ------------------------------------------------ Arathi Basin -----------------------------------------------------
 function Capping:StartAB()
 --------------------------
-	SetupAssault(62)
+	SetupAssault(60)
 	NewEstimator(1)
 end
 
@@ -637,14 +645,24 @@ function Capping:StartWSG()
 			end
 		end
 		-------------------------
-		function Capping:WSGEnd() -- timer for last 3 minutes of WSG
+		function Capping:WSGEnd() -- timer for last 5 minutes of WSG
 		-------------------------
-			local _, _, timeremain1, timeremain2 = GetWorldStateUIInfo(1)
-			local timeremain = tonumber(strmatch(stringcheck(timeremain1, timeremain2), "(%d+)") or 20) or 20
-			if timeremain < 4 and prevtime and prevtime ~= timeremain then
-				self:StartBar(gsub(_G.TIME_REMAINING or "Battle Ends", ":", ""), timeremain * 61.5, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
+			local _, _, _, timeString = GetWorldStateUIInfo(4)
+			if timeString then
+				local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
+				minutes = tonumber(minutes)
+				seconds = tonumber(seconds)
+				if minutes and seconds then
+					local remaining = seconds + (minutes*60) + 1
+					print(remaining)
+					local text = gsub(_G.TIME_REMAINING, ":", "")
+					local bar = self:GetBar(text)
+					if remaining < 301 and (not bar or bar.remaining < remaining+5) then -- Don't restart bars for subtle changes +/- 5s
+						self:StartBar(text, remaining, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
+					end
+					prevtime = remaining
+				end
 			end
-			prevtime = timeremain
 		end
 
 		playerfaction = UnitFactionGroup("player")
