@@ -91,7 +91,7 @@ local function StartWorldTimers()
 					end
 					SetMapByID(currentmapid)
 					local bar = Capping:GetBar(localizedName)
-					if not bar or startTime > bar.remaining+10 or startTime < bar.remaining-10 then -- Don't restart bars for subtle changes +/- 10s
+					if not bar or startTime > bar.remaining+5 or startTime < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
 						Capping:StartBar(localizedName, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", concol, true, true, nil, nil, WorldSoon)
 					end
 				else
