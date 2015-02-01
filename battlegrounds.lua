@@ -1,9 +1,7 @@
 
-local _, addon = ...
+local _, Capping = ...
 
-local Capping = Capping
-local self = Capping
-local L = addon.L
+local L = Capping.L
 local _G = getfenv(0)
 
 local pname
@@ -186,6 +184,9 @@ do
 			--------------------------------------
 			function Capping:UPDATE_WORLD_STATES()
 			--------------------------------------
+				local _, zType = GetInstanceInfo()
+				if zType ~= "pvp" then return end
+
 				local currenttime = GetTime()
 
 				local _, _, _, scoreStringA = GetWorldStateUIInfo(currentbg == 2 and 3 or 2) -- 2/3 for AB and Gil, 3/4 for EotS

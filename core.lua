@@ -1,10 +1,9 @@
 
-local _, addon = ...
+local _, Capping = ...
 
 -- HEADER
-local Capping = CreateFrame("Button", "Capping", UIParent)
-local self = Capping
-local L = addon.L
+local anchor = CreateFrame("Button", "CappingAnchor", UIParent)
+local L = Capping.L
 
 -- LIBRARIES
 local candy = LibStub("LibCandyBar-3.0")
@@ -31,10 +30,10 @@ local ShowOptions
 local oSetPoint = Capping.SetPoint
 local nofunc = function() end
 local function ToggleAnchor()
-	if self:IsShown() then
-		self:Hide()
+	if anchor:IsShown() then
+		anchor:Hide()
 	else
-		self:Show()
+		anchor:Show()
 	end
 end
 local function SetPoints(this, lp, lrt, lrp, lx, ly, rp, rrt, rrp, rx, ry)
@@ -194,13 +193,18 @@ Capping:RegisterEvent("START_TIMER")
 
 -- EVENT HANDLERS
 local elist, clist = {}, {}
-Capping:SetScript("OnEvent", function(this, event, ...)
-	this.ev = event
-	this[elist[event] or event](this, ...)
+anchor:SetScript("OnEvent", function(frame, event, ...)
+	Capping[elist[event] or event](Capping, ...)
 end)
 function Capping:RegisterTempEvent(event, other)
 	self:RegisterEvent(event)
 	elist[event] = other or event
+end
+function Capping:RegisterEvent(event)
+	anchor:RegisterEvent(event)
+end
+function Capping:UnregisterEvent(event)
+	anchor:UnregisterEvent(event)
 end
 function Capping:CheckCombat(func) -- check combat for secure functions
 	if InCombatLockdown() then
@@ -265,30 +269,30 @@ function Capping:ADDON_LOADED(a1)
 	SLASH_CAPPING1 = "/capping"
 
 	-- adds Capping config to default UI Interface Options
-	local panel = CreateFrame("Frame", "CappingOptionsPanel", UIParent)
-	panel.name = "Capping"
-	panel:SetScript("OnShow", function(this)
-		local t1 = NewText(this, GameFontNormalLarge, nil, "LEFT", "TOP", "ARTWORK")
-		t1:SetPoint("TOPLEFT", 16, -16)
-		t1:SetText(this.name)
-
-		local t2 = NewText(this, GameFontHighlightSmall, nil, "LEFT", "TOP", "ARTWORK")
-		t2:SetHeight(43)
-		SetPoints(t2, "TOPLEFT", t1, "BOTTOMLEFT", 0, -8, "RIGHT", this, "RIGHT", -32, 0)
-		t2:SetNonSpaceWrap(true)
-		local function GetInfo(field)
-			return GetAddOnMetadata("Capping", field) or "N/A"
-		end
-		t2:SetFormattedText("Notes: %s\nAuthor: %s\nVersion: %s", GetInfo("Notes"), GetInfo("Author"), GetInfo("Version"))
-
-		local b = CreateFrame("Button", nil, this, "UIPanelButtonTemplate")
-		SetWH(b, 120, 20)
-		b:SetText(_G.GAMEOPTIONS_MENU)
-		b:SetScript("OnClick", ShowOptions)
-		b:SetPoint("TOPLEFT", t2, "BOTTOMLEFT", -2, -8)
-		this:SetScript("OnShow", nil)
-	end)
-	InterfaceOptions_AddCategory(panel)
+	--local panel = CreateFrame("Frame", "CappingOptionsPanel", UIParent)
+	--panel.name = "Capping"
+	--panel:SetScript("OnShow", function(this)
+	--	local t1 = NewText(this, GameFontNormalLarge, nil, "LEFT", "TOP", "ARTWORK")
+	--	t1:SetPoint("TOPLEFT", 16, -16)
+	--	t1:SetText(this.name)
+    --
+	--	local t2 = NewText(this, GameFontHighlightSmall, nil, "LEFT", "TOP", "ARTWORK")
+	--	t2:SetHeight(43)
+	--	SetPoints(t2, "TOPLEFT", t1, "BOTTOMLEFT", 0, -8, "RIGHT", this, "RIGHT", -32, 0)
+	--	t2:SetNonSpaceWrap(true)
+	--	local function GetInfo(field)
+	--		return GetAddOnMetadata("Capping", field) or "N/A"
+	--	end
+	--	t2:SetFormattedText("Notes: %s\nAuthor: %s\nVersion: %s", GetInfo("Notes"), GetInfo("Author"), GetInfo("Version"))
+    --
+	--	local b = CreateFrame("Button", nil, this, "UIPanelButtonTemplate")
+	--	SetWH(b, 120, 20)
+	--	b:SetText(_G.GAMEOPTIONS_MENU)
+	--	b:SetScript("OnClick", ShowOptions)
+	--	b:SetPoint("TOPLEFT", t2, "BOTTOMLEFT", -2, -8)
+	--	this:SetScript("OnShow", nil)
+	--end)
+	--InterfaceOptions_AddCategory(panel)
 
 	-- anchor frame
 	self:Hide()
@@ -897,7 +901,7 @@ function ShowOptions(a1, id)
 		local texture = media:Fetch("statusbar", db.texture)
 		local font = media:Fetch("font", db.font)
 		local fc = db.colors.font
-		Capping:SetWidth(db.width)
+		anchor:SetWidth(db.width)
 		for bar in pairs(normalAnchor.bars) do
 			bar:SetTexture(texture)
 			bar.candyBarLabel:SetFont(font, db.fontsize)
@@ -924,7 +928,7 @@ function ShowOptions(a1, id)
 		if not b or not b:GetParent() then return end
 		CloseDropDownMenus(b:GetParent():GetID())
 	end
-	hooksecurefunc("ToggleDropDownMenu", function(...) lastb = select(8, ...) end)
+	hooksecurefunc("ToggleDropDownMenu", function(_, _, _, _, _, _, _, prev) lastb = prev end)
 	Exec = function(b, k, value)
 		if b then HideCheck(b) end
 		if k == "showoptions" then CloseMenu(b) ShowOptions()
