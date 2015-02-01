@@ -35,8 +35,6 @@ addon.L = {
 	["Move Vehicle Seat"] = "Repositionner le véhicule de siège",
 
 	-- etc timers
-	["Port: %s"] = "Port : %s", -- bar text for time remaining to port into a bg
-	["Queue: %s"] = "File : %s",
 	["Battle Begins"] = "Début de la bataille", -- bar text for bg gates opening (why can't they all be the same?)
 	["1 minute"] = "1 minute",
 	["60 seconds"] = "60 secondes",

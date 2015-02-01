@@ -34,8 +34,6 @@ addon.L = {
 	--["Move Vehicle Seat"] = true,
 
 	-- etc timers
-	["Port: %s"] = "传送：%s", -- bar text for time remaining to port into a bg
-	["Queue: %s"] = "队列中：%s",
 	["Battle Begins"] = "战斗即将开始", -- bar text for bg gates opening
 	["1 minute"] = "1分钟",
 	["60 seconds"] = "60秒",

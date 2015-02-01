@@ -34,8 +34,6 @@ addon.L = {
 	["Move Vehicle Seat"] = "탑승 차량",
 
 	-- etc timers
-	["Port: %s"] = "입장: %s", -- bar text for time remaining to port into a bg
-	["Queue: %s"] = "대기: %s",
 	["Battle Begins"] = "전투 개시", -- bar text for bg gates opening
 	["1 minute"] = "1분",
 	["60 seconds"] = "60초",

@@ -524,7 +524,7 @@ function Capping:ModMap(disable) -- alter the default minimap
 end
 
 do -- estimated wait timer and port timer
-	local q, p = L["Queue: %s"], L["Port: %s"]
+	local port = _G.READY.."-%s"
 	local GetBattlefieldStatus = GetBattlefieldStatus
 	local GetBattlefieldPortExpiration = GetBattlefieldPortExpiration
 	local GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited = GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited
@@ -539,9 +539,9 @@ do -- estimated wait timer and port timer
 		for i = 1, 2 do -- Check the status of each queue, 2 is the maximum according to MAX_WORLD_PVP_QUEUES
 			local status, map = GetBattlefieldStatus(i)
 			if status == "confirm" and db.port then
-				self:StopBar(format(q, map))
-				if not self:GetBar(format(p, map)) then
-					self:StartBar(format(p, map), GetBattlefieldPortExpiration(i), "Interface\\Icons\\Ability_TownWatch", "info2", true)
+				self:StopBar(map)
+				if not self:GetBar(format(port, map)) then
+					self:StartBar(format(port, map), GetBattlefieldPortExpiration(i), "Interface\\Icons\\Ability_TownWatch", "info2", true)
 				end
 				currentq[map] = i
 			elseif status == "queued" and db.wait then
@@ -577,7 +577,7 @@ do -- estimated wait timer and port timer
 		end
 		for map, flag in pairs(currentq) do -- stop inactive bars
 			if flag == 0 then
-				self:StopBar(format(p, map))
+				self:StopBar(format(port, map))
 				self:StopBar(map)
 				currentq[map] = nil
 			end

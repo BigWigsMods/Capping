@@ -34,8 +34,6 @@ addon.L = {
 	["Hide Blizzard Start Timer"] = "Hide Blizzard Start Timer",
 
 	-- etc timers
-	["Port: %s"] = "Port: %s", -- bar text for time remaining to port into a bg
-	["Queue: %s"] = "Queue: %s",
 	["Battle Begins"] = "Battle Begins", -- bar text for bg gates opening
 	["1 minute"] = "1 minute",
 	["60 seconds"] = "60 seconds",
