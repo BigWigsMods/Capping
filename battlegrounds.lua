@@ -23,9 +23,6 @@ local function GetClassByName(name, faction) -- retrieves a player's class by na
 		end
 	end
 end
-local function stringcheck(text1, text2)
-	return (type(text1) == "string" and text1) or (type(text2) == "string" and text2) or ""
-end
 
 local classcolor = { }
 for class, color in pairs(CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS) do
@@ -176,11 +173,6 @@ do
 				[2] = { [0] = 0, [1] = 0.5, [2] = 1, [3] = 2.5, [4] = 5, }, -- eots
 				[3] = { [0] = 0, [1] = 1.1111, [2] = 3.3333, [3] = 30, }, -- gilneas
 			}
-			local scorestr = {
-				[1] = L["Bases: (%d+)  Resources: (%d+)/(%d+)"], -- ab
-				[2] = L["Bases: (%d+)  Victory Points: (%d+)/(%d+)"], -- eots
-				[3] = L["Bases: (%d+)  Resources: (%d+)/(%d+)"], -- gilneas
-			}
 			local function getlscore(ltime, pps, currentscore, maxscore, awin) -- estimate loser's final score
 				if currentbg == 2 then -- EotS
 					ltime = floor(ltime * pps + currentscore + 0.5)
@@ -196,12 +188,12 @@ do
 			--------------------------------------
 				local currenttime = GetTime()
 
-				local _, _, text3, text4 = GetWorldStateUIInfo(currentbg == 2 and 3 or 2)
-				local base, score, smax = strmatch(stringcheck(text3, text4), scorestr[currentbg])
+				local _, _, _, scoreStringA = GetWorldStateUIInfo(currentbg == 2 and 3 or 2) -- 2/3 for AB and Gil, 3/4 for EotS
+				local base, score, smax = strmatch(scoreStringA, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
 				local ABases, AScore, MaxScore = tonumber(base), tonumber(score), tonumber(smax) or 2000
-				_, _, text3, text4 = GetWorldStateUIInfo(currentbg == 2 and 4 or 3)
+				local _, _, _, scoreStringH = GetWorldStateUIInfo(currentbg == 2 and 4 or 3) -- 2/3 for AB and Gil, 3/4 for EotS
 
-				base, score, smax = strmatch(stringcheck(text3, text4), scorestr[currentbg])
+				base, score = strmatch(scoreStringH, "[^%d]+(%d+)[^%d]+(%d+)/") -- Bases: %d  Resources: %d/%d
 				local HBases, HScore = tonumber(base), tonumber(score)
 
 				if ABases and HBases then
