@@ -374,7 +374,7 @@ function Capping:PLAYER_ENTERING_WORLD()
 	self:UPDATE_BATTLEFIELD_STATUS()
 	self:ZoneCheck()
 
-	if RegisterAddonMessagePrefix then RegisterAddonMessagePrefix("cap") end
+	--RegisterAddonMessagePrefix("cap")
 
 	self.PLAYER_ENTERING_WORLD = nil
 end
@@ -551,25 +551,29 @@ do -- estimated wait timer and port timer
 				if estremain > 1 then -- Not a paused queue (0) and not a negative queue (in queue longer than estimated time).
 					local bar = self:GetBar(map)
 					if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 then -- Don't restart bars for subtle changes +/- 10s
+						local icon
 						for j = 1, GetNumBattlegroundTypes() do
-							local name,_,_,_,_,_,_,_,_,icon = GetBattlegroundInfo(j)
+							local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(j)
 							if name == map then
-								self:StartBar(map, estremain, icon, "info1", true)
+								icon = bgIcon
 								break
 							end
 						end
+						self:StartBar(map, estremain, icon or "Interface\\Icons\\inv_misc_questionmark", "info1", true) -- Question mark icon for random battleground
 					end
 					currentq[map] = i
 				elseif esttime ~= 0 then -- Negative queue (in queue longer than estimated time) but not paused.
 					local oldBar = self:GetBar(map)
 					if not oldBar or oldBar.remaining ~= 1 then
+						local icon
 						for j = 1, GetNumBattlegroundTypes() do
-							local name,_,_,_,_,_,_,_,_,icon = GetBattlegroundInfo(j)
+							local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(j)
 							if name == map then
-								self:StartBar(map, 1, icon, "info1", true, true)
+								icon = bgIcon
 								break
 							end
 						end
+						self:StartBar(map, 1, icon or "Interface\\Icons\\inv_misc_questionmark", "info1", true, true) -- Question mark icon for random battleground
 					end
 					currentq[map] = i
 				end
