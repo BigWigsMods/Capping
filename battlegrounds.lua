@@ -196,10 +196,10 @@ do
 			--------------------------------------
 				local currenttime = GetTime()
 
-				local _, _, text3, text4 = GetWorldStateUIInfo(2)
+				local _, _, text3, text4 = GetWorldStateUIInfo(currentbg == 2 and 3 or 2)
 				local base, score, smax = strmatch(stringcheck(text3, text4), scorestr[currentbg])
 				local ABases, AScore, MaxScore = tonumber(base), tonumber(score), tonumber(smax) or 2000
-				_, _, text3, text4 = GetWorldStateUIInfo(3)
+				_, _, text3, text4 = GetWorldStateUIInfo(currentbg == 2 and 4 or 3)
 
 				base, score, smax = strmatch(stringcheck(text3, text4), scorestr[currentbg])
 				local HBases, HScore = tonumber(base), tonumber(score)
