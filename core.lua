@@ -25,6 +25,13 @@ local narrowed, borderhidden, ACountText, HCountText
 Capping.backdrop = { bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", }
 Capping.activebars = activebars
 
+function Capping:RegisterEvent(event)
+	anchor:RegisterEvent(event)
+end
+function Capping:UnregisterEvent(event)
+	anchor:UnregisterEvent(event)
+end
+
 -- LOCAL FUNCS
 local ShowOptions
 local oSetPoint = Capping.SetPoint
@@ -200,12 +207,6 @@ function Capping:RegisterTempEvent(event, other)
 	self:RegisterEvent(event)
 	elist[event] = other or event
 end
-function Capping:RegisterEvent(event)
-	anchor:RegisterEvent(event)
-end
-function Capping:UnregisterEvent(event)
-	anchor:UnregisterEvent(event)
-end
 function Capping:CheckCombat(func) -- check combat for secure functions
 	if InCombatLockdown() then
 		self:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -295,21 +296,21 @@ function Capping:ADDON_LOADED(a1)
 	--InterfaceOptions_AddCategory(panel)
 
 	-- anchor frame
-	self:Hide()
+	anchor:Hide()
 	if db.x then
-		self:SetPoint(db.p or "TOPLEFT", UIParent, db.rp or "TOPLEFT", db.x, db.y)
+		anchor:SetPoint(db.p or "TOPLEFT", UIParent, db.rp or "TOPLEFT", db.x, db.y)
 	else
-		self:SetPoint("CENTER", UIParent, "CENTER", 200, -100)
+		anchor:SetPoint("CENTER", UIParent, "CENTER", 200, -100)
 	end
-	CreateMover(self, db.width, 10, function(this)
+	CreateMover(anchor, db.width, 10, function(this)
 		this:StopMovingOrSizing()
 		local a,b,c,d,e = this:GetPoint()
 		db.p, db.rp, db.x, db.y = a, c, floor(d + 0.5), floor(e + 0.5)
 	end)
-	self:RegisterForClicks("RightButtonUp")
-	self:SetScript("OnClick", ShowOptions)
-	self:SetNormalFontObject(GameFontHighlightSmall)
-	self:SetText("Capping")
+	anchor:RegisterForClicks("RightButtonUp")
+	anchor:SetScript("OnClick", ShowOptions)
+	anchor:SetNormalFontObject(GameFontHighlightSmall)
+	anchor:SetText("Capping")
 
 
 	if db.sbx then WorldStateAlwaysUpFrame:SetPoint("TOP") end -- world state info frame positioning
@@ -763,10 +764,10 @@ local function SortBars()
 		local separate = bar:Get("capping:separate")
 		bar:ClearAllPoints()
 		if separate then
-			bar:SetPoint("BOTTOMLEFT", pup or Capping, "TOPLEFT", 0, db.spacing or 1)
+			bar:SetPoint("BOTTOMLEFT", pup or anchor, "TOPLEFT", 0, db.spacing or 1)
 			pup = bar
 		else
-			bar:SetPoint("TOPLEFT", pdown or Capping, "BOTTOMLEFT", 0, -(db.spacing or 1))
+			bar:SetPoint("TOPLEFT", pdown or anchor, "BOTTOMLEFT", 0, -(db.spacing or 1))
 			pdown = bar
 		end
 	end
@@ -891,360 +892,360 @@ local CappingDD, barid, Exec
 function ShowOptions(a1, id)
 	barid = type(id) == "number" and id
 	if not CappingDD then
-	CappingDD = CreateFrame("Frame", "CappingDD", Capping)
-	CappingDD.displayMode = "MENU"
-	local info = { }
-	local abbrv = { av = av, ab = ab, eots = eots, wsg = wsg, winter = winter, ioc = ioc, }
-	local offsetvalue, offsetcount, lastb
-	local sbmover, cbmover, seatmover
-	local function UpdateLook(k)
-		local texture = media:Fetch("statusbar", db.texture)
-		local font = media:Fetch("font", db.font)
-		local fc = db.colors.font
-		anchor:SetWidth(db.width)
-		for bar in pairs(normalAnchor.bars) do
-			bar:SetTexture(texture)
-			bar.candyBarLabel:SetFont(font, db.fontsize)
-			bar.candyBarDuration:SetFont(font, db.fontsize-1)
-			bar:SetHeight(db.height)
-			--if k == "colors" or k == "bgalpha" then
-			--	local bc = db.colors[f.color]
-			--	bar:SetVertexColor(bc.r, bc.g, bc.b, bc.a or 1)
-				--f.barback:SetVertexColor(bc.r * 0.3, bc.g * 0.3, bc.b * 0.3, db.bgalpha or 0.7)
-			--end
-			--if k == "mainup" then f.down = not f.down end
-			--if k == "onegroup" and db.onegroup then f.down = not db.mainup end
-			--UpdateBarLayout(f)
-		end
-		SortBars()
-		Capping:ModMap()
-	end
-	local function HideCheck(b)
-		if b and b.GetName and _G[b:GetName().."Check"] then
-			_G[b:GetName().."Check"]:Hide()
-		end
-	end
-	local function CloseMenu(b)
-		if not b or not b:GetParent() then return end
-		CloseDropDownMenus(b:GetParent():GetID())
-	end
-	hooksecurefunc("ToggleDropDownMenu", function(_, _, _, _, _, _, _, prev) lastb = prev end)
-	Exec = function(b, k, value)
-		if b then HideCheck(b) end
-		if k == "showoptions" then CloseMenu(b) ShowOptions()
-		elseif k == "anchor" then ToggleAnchor()
-		elseif k == "syncav" and GetRealZoneText() == av then Capping:SyncAV()
-		elseif k == "reportbg" then CloseMenu(b) ReportBG(value)
-		elseif k == "reportsay" then CloseMenu(b) ReportSAY(value)
-		elseif k == "enterbattle" then
-		elseif k == "canceltimer" then CloseMenu(b) CancelBar(value)
-		elseif (k == "less" or k == "more") and lastb then
-			local off = (k == "less" and -8) or 8
-			if offsetvalue == value then
-				offsetcount = offsetcount + off
-			else
-				offsetvalue, offsetcount = value, off
+		CappingDD = CreateFrame("Frame", "CappingDD", CappingAnchor)
+		CappingDD.displayMode = "MENU"
+		local info = { }
+		local abbrv = { av = av, ab = ab, eots = eots, wsg = wsg, winter = winter, ioc = ioc, }
+		local offsetvalue, offsetcount, lastb
+		local sbmover, cbmover, seatmover
+		local function UpdateLook(k)
+			local texture = media:Fetch("statusbar", db.texture)
+			local font = media:Fetch("font", db.font)
+			local fc = db.colors.font
+			anchor:SetWidth(db.width)
+			for bar in pairs(normalAnchor.bars) do
+				bar:SetTexture(texture)
+				bar.candyBarLabel:SetFont(font, db.fontsize)
+				bar.candyBarDuration:SetFont(font, db.fontsize-1)
+				bar:SetHeight(db.height)
+				--if k == "colors" or k == "bgalpha" then
+				--	local bc = db.colors[f.color]
+				--	bar:SetVertexColor(bc.r, bc.g, bc.b, bc.a or 1)
+					--f.barback:SetVertexColor(bc.r * 0.3, bc.g * 0.3, bc.b * 0.3, db.bgalpha or 0.7)
+				--end
+				--if k == "mainup" then f.down = not f.down end
+				--if k == "onegroup" and db.onegroup then f.down = not db.mainup end
+				--UpdateBarLayout(f)
 			end
-			local tb = _G[gsub(lastb:GetName(), "ExpandArrow", "")]
-			CloseMenu(b)
-			ToggleDropDownMenu(b:GetParent():GetID(), tb.value, nil, nil, nil, nil, tb.menuList, tb)
-		elseif k == "test" then
-			local testicon = "Interface\\Icons\\Ability_ThunderBolt"
-			Capping:StartBar(L["Test"].." - ".._G.OTHER.."1", 100, testicon, "info1", true)
-			Capping:StartBar(L["Test"].." - ".._G.OTHER.."2", 75, testicon, "info2", true)
-			Capping:StartBar(L["Test"].." - ".._G.FACTION_ALLIANCE, 45, testicon, "alliance")
-			Capping:StartBar(L["Test"].." - ".._G.FACTION_HORDE, 100, testicon, "horde")
-			Capping:StartBar(L["Test"], 75, testicon, "info2")
-		elseif k == "movesb" then
-			sbmover = sbmover or CreateMover(nil, 220, 48, function(this)
-				this:StopMovingOrSizing()
-				db.sbx, db.sby = floor(this:GetLeft() + 50.5), floor(this:GetTop() - GetScreenHeight() + 10.5)
-				WorldStateAlwaysUpFrame:SetPoint("TOP")
-			end)
-			sbmover:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", WorldStateAlwaysUpFrame:GetLeft() - 50, WorldStateAlwaysUpFrame:GetTop() - 10)
-			sbmover:Show()
-		elseif k == "movecb" then
-			cbmover = cbmover or CreateMover(nil, 173, 27, function(this)
-				this:StopMovingOrSizing()
-				db.cbx, db.cby = floor(this:GetRight() + 0.5), floor(this:GetTop() + 0.5)
-				wsaufu()
-			end)
-			local x, y = db.cbx or max(0, MinimapCluster:GetRight() - CONTAINER_OFFSET_X), db.cby or max(20, MinimapCluster:GetBottom())
-			cbmover:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", x, y)
-			cbmover:Show()
-		elseif k == "moveseat" then
-			seatmover = seatmover or CreateMover(nil, 128, 128, function(this)
-				this:StopMovingOrSizing()
-				db.seatx, db.seaty = floor(this:GetRight() + 0.5), floor(this:GetTop() + 0.5)
-				VehicleSeatIndicator:SetPoint("TOPRIGHT")
-			end)
-			seatmover:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", VehicleSeatIndicator:GetRight(), VehicleSeatIndicator:GetTop())
-			seatmover:Show()
-		elseif k == "resetmap" and bgtab then
-			bgtab:ClearAllPoints()
-			bgtab:SetPoint("CENTER")
-		elseif k == "resetall" and IsShiftKeyDown() then
-			CappingDB = nil
-			ReloadUI()
+			SortBars()
+			Capping:ModMap()
 		end
-	end
-	local function Set(b, k)
-		if not k then return end
-		db[k] = not db[k]
-		if abbrv[k] then -- enable/disable a battleground while in it
-			if GetRealZoneText() == abbrv[k] then
-				Capping:ZONE_CHANGED_NEW_AREA()
-			end
-		elseif k == "perchar" then
-			if CappingCharDB then
-				CappingCharDB = nil
-			else
-				CappingCharDB = db
-			end
-			ReloadUI()
-		elseif k == "disablemap" then
-			ReloadUI()
-		else -- update visual options
-			StartWorldTimers()
-			UpdateLook(k)
-		end
-	end
-	local function SetSelect(b, a1)
-		db[a1] = tonumber(b.value) or b.value
-		local level, num = strmatch(b:GetName(), "DropDownList(%d+)Button(%d+)")
-		level, num = tonumber(level) or 0, tonumber(num) or 0
-		for i = 1, UIDROPDOWNMENU_MAXBUTTONS, 1 do
-			local b = _G["DropDownList"..level.."Button"..i.."Check"]
-			if b then
-				b[i == num and "Show" or "Hide"](b)
+		local function HideCheck(b)
+			if b and b.GetName and _G[b:GetName().."Check"] then
+				_G[b:GetName().."Check"]:Hide()
 			end
 		end
-		UpdateLook(a1)
-	end
-	local function SetColor(a1)
-		local dbc = db.colors[UIDROPDOWNMENU_MENU_VALUE]
-		if not dbc then return end
-		if a1 then
-			local pv = ColorPickerFrame.previousValues
-			dbc.r, dbc.g, dbc.b, dbc.a = pv.r, pv.g, pv.b, 1 - pv.opacity
-		else
-			dbc.r, dbc.g, dbc.b = ColorPickerFrame:GetColorRGB()
-			dbc.a = 1 - OpacitySliderFrame:GetValue()
+		local function CloseMenu(b)
+			if not b or not b:GetParent() then return end
+			CloseDropDownMenus(b:GetParent():GetID())
 		end
-		UpdateLook("colors")
-	end
-	local function AddButton(lvl, text, keepshown)
-		info.text = text
-		info.keepShownOnClick = keepshown
-		UIDropDownMenu_AddButton(info, lvl)
-		wipe(info)
-	end
-	local function AddToggle(lvl, text, value)
-		info.arg1 = value
-		info.func = Set
-		if value == "perchar" then
-			info.checked = CappingCharDB and true
-		else
-			info.checked = db[value]
-		end
-		info.isNotRadio = true
-		AddButton(lvl, text, 1)
-	end
-	local function AddExecute(lvl, text, arg1, arg2)
-		info.arg1 = arg1
-		info.arg2 = arg2
-		info.func = Exec
-		info.notCheckable = 1
-		AddButton(lvl, text, 1)
-	end
-	local function AddColor(lvl, text, value)
-		local dbc = db.colors[value]
-		if not dbc then return end
-		info.hasColorSwatch = true
-		info.hasOpacity = 1
-		info.r, info.g, info.b, info.opacity = dbc.r, dbc.g, dbc.b, 1 - dbc.a
-		info.swatchFunc, info.opacityFunc, info.cancelFunc = SetColor, SetColor, SetColor
-		info.value = value
-		info.notCheckable = 1
-		info.func = UIDropDownMenuButton_OpenColorPicker
-		AddButton(lvl, text, nil)
-	end
-	local function AddList(lvl, text, value)
-		info.value = value
-		info.hasArrow = true
-		info.func = HideCheck
-		info.notCheckable = 1
-		AddButton(lvl, text, 1)
-	end
-	local function AddSelect(lvl, text, arg1, value)
-		info.arg1 = arg1
-		info.func = SetSelect
-		info.value = value
-		if tonumber(value) and tonumber(db[arg1] or "blah") then
-			if floor(100 * tonumber(value)) == floor(100 * tonumber(db[arg1])) then
-				info.checked = true
-			end
-		else
-			info.checked = (db[arg1] == value)
-		end
-		AddButton(lvl, text, 1)
-	end
-	local function AddFakeSlider(lvl, value, minv, maxv, step, tbl)
-		local cvalue = 0
-		local dbv = db[value]
-		if type(dbv) == "string" and tbl then
-			for i, v in ipairs(tbl) do
-				if dbv == v then
-					cvalue = i
-					break
-				end
-			end
-		else
-			cvalue = dbv or ((maxv - minv) / 2)
-		end
-		local adj = (offsetvalue == value and offsetcount) or 0
-		local starti = max(minv, cvalue - (7 - adj) * step)
-		local endi = min(maxv, cvalue + (8 + adj) * step)
-		if starti == minv then
-			endi = min(maxv, starti + 16 * step)
-		elseif endi == maxv then
-			starti = max(minv, endi - 16 * step)
-		end
-		if starti > minv then
-			AddExecute(lvl, "--", "less", value)
-		end
-		if tbl then
-			for i = starti, endi, step do
-				AddSelect(lvl, tbl[i], value, tbl[i])
-			end
-		else
-			local fstring = (step >= 1 and "%d") or (step >= 0.1 and "%.1f") or "%.2f"
-			for i = starti, endi, step do
-				AddSelect(lvl, format(fstring, i), value, i)
-			end
-		end
-		if endi < maxv then
-			AddExecute(lvl, "++", "more", value)
-		end
-	end
-	CappingDD.initialize = function(this, lvl)
-		if lvl == 1 then
-			if type(barid) == "number" then
-				local bname = bars[barid].name
-				info.isTitle = true
-				info.notCheckable = 1
-				AddButton(lvl, bname)
-				if bname == winter then
-					AddExecute(lvl, L["Cancel Timer"], "canceltimer", barid)
-				elseif not activebars[bname] then
-
+		hooksecurefunc("ToggleDropDownMenu", function(_, _, _, _, _, _, _, prev) lastb = prev end)
+		Exec = function(b, k, value)
+			if b then HideCheck(b) end
+			if k == "showoptions" then CloseMenu(b) ShowOptions()
+			elseif k == "anchor" then ToggleAnchor()
+			elseif k == "syncav" and GetRealZoneText() == av then Capping:SyncAV()
+			elseif k == "reportbg" then CloseMenu(b) ReportBG(value)
+			elseif k == "reportsay" then CloseMenu(b) ReportSAY(value)
+			elseif k == "enterbattle" then
+			elseif k == "canceltimer" then CloseMenu(b) CancelBar(value)
+			elseif (k == "less" or k == "more") and lastb then
+				local off = (k == "less" and -8) or 8
+				if offsetvalue == value then
+					offsetcount = offsetcount + off
 				else
-					AddExecute(lvl, L["Send to BG"], "reportbg", barid)
-					AddExecute(lvl, L["Send to SAY"], "reportsay", barid)
-					AddExecute(lvl, L["Cancel Timer"], "canceltimer", barid)
+					offsetvalue, offsetcount = value, off
 				end
-
-				info.isTitle = true
-				info.notCheckable = 1
-				AddButton(lvl, " ")
-				AddExecute(lvl, _G.GAMEOPTIONS_MENU, "showoptions")
-			else
-				info.isTitle = true
-				info.notCheckable = 1
-				AddButton(lvl, "|cff5555ffCapping|r")
-				AddList(lvl, _G.BATTLEFIELDS, "battlegrounds")
-				AddList(lvl, L["Bar"], "bars")
-				AddList(lvl, _G.BATTLEFIELD_MINIMAP, "bgmap")
-				AddList(lvl, _G.OTHER, "other")
-				AddExecute(lvl, L["Show/Hide Anchor"], "anchor")
-			end
-		elseif lvl == 2 then
-			local sub = UIDROPDOWNMENU_MENU_VALUE
-			if sub == "battlegrounds" then
-				AddToggle(lvl, av, "av")
-				AddToggle(lvl, " -"..L["Auto Quest Turnins"], "avquest")
-				AddExecute(lvl, " -"..L["Request Sync"], "syncav")
-				AddToggle(lvl, ab, "ab")
-				AddToggle(lvl, eots, "eots")
-				AddToggle(lvl, ioc, "ioc")
-				AddToggle(lvl, wsg, "wsg")
-				AddToggle(lvl, db.worldname1 or (_G.CHANNEL_CATEGORY_WORLD.." 1"), "world1")
-				AddToggle(lvl, db.worldname2 or (_G.CHANNEL_CATEGORY_WORLD.." 2"), "world2")
-				AddToggle(lvl, db.worldname3 or (_G.CHANNEL_CATEGORY_WORLD.." 3"), "world3")
-			elseif sub == "bars" then
-				AddList(lvl, L["Texture"], "texture")
-				AddList(lvl, L["Width"], "width")
-				AddList(lvl, L["Height"], "height")
-				AddList(lvl, L["Border Width"], "inset")
-				AddList(lvl, L["Spacing"], "spacing")
-				AddList(lvl, _G.EMBLEM_SYMBOL or "Icon", "iconpos")
-				AddList(lvl, L["Font"], "font")
-				AddList(lvl, _G.FONT_SIZE, "fontsize")
-				AddList(lvl, L["Time Position"], "timepos")
-				AddList(lvl, _G.COLORS, "color")
-				AddList(lvl, _G.BACKGROUND.." ".._G.OPACITY, "bgalpha")
-				AddList(lvl, _G.OTHER, "more")
-				AddExecute(lvl, L["Test"], "test")
-			elseif sub == "bgmap" then
-				AddToggle(lvl, (_G.DISABLE or "Disable").." "..(_G.ACHIEVEMENTFRAME_FILTER_ALL or "All"), "disablemap")
-				AddToggle(lvl, L["Narrow Map Mode"], "narrow")
-				AddToggle(lvl, L["Hide Border"], "hidemapborder")
-				AddList(lvl, L["Map Scale"], "mapscale")
-				AddExecute(lvl, _G.RESET or "Reset", "resetmap")
-			elseif sub == "other" then
-				AddToggle(lvl, L["Port Timer"], "port")
-				AddToggle(lvl, L["Wait Timer"], "wait")
-				AddExecute(lvl, L["Move Scoreboard"], "movesb")
-				AddExecute(lvl, L["Move Capture Bar"], "movecb")
-				AddExecute(lvl, L["Move Vehicle Seat"], "moveseat")
-				AddToggle(lvl, L["Hide Capping Start Time"], "hidecaptime")
-				AddToggle(lvl, L["Hide Blizzard Start Timer"], "hideblizztime")
-				AddToggle(lvl, _G.CHARACTER.." ".._G.SAVE, "perchar")
-				AddExecute(lvl, _G.RESET_TO_DEFAULT.." (".._G.SHIFT_KEY_TEXT..")", "resetall")
-			end
-		elseif lvl == 3 then
-			local sub = UIDROPDOWNMENU_MENU_VALUE
-			if sub == "texture" or sub == "font" then
-				local t = media:List(sub == "texture" and "statusbar" or sub)
-				AddFakeSlider(lvl, sub, 1, #t, 1, t)
-			elseif sub == "more" then
-				AddToggle(lvl, _G.OTHER.." "..L["Bar"], "altstyle")
-				AddToggle(lvl, L["Fill Grow"], "fill")
-				AddToggle(lvl, L["Fill Right"], "reverse")
-				AddToggle(lvl, L["Flip Growth"], "mainup")
-				AddToggle(lvl, L["Single Group"], "onegroup")
-				AddToggle(lvl, _G.MAKE_UNINTERACTABLE or _G.LOCK, "lockbar")
-			elseif sub == "width" then
-				AddFakeSlider(lvl, sub, 20, 600, 2, nil)
-			elseif sub == "height" then
-				AddFakeSlider(lvl, sub, 2, 100, 1, nil)
-			elseif sub == "inset" then
-				AddFakeSlider(lvl, sub, 0, 8, 1, nil)
-			elseif sub == "iconpos" then
-				AddSelect(lvl, "<-", sub, "<-")
-				AddSelect(lvl, "->", sub, "->")
-				AddSelect(lvl, "X", sub, "X")
-			elseif sub == "spacing" then
-				AddFakeSlider(lvl, sub, 0, 10, 1, nil)
-			elseif sub == "fontsize" then
-				AddFakeSlider(lvl, sub, 4, 28, 1, nil)
-			elseif sub == "timepos" then
-				AddSelect(lvl, "<-", sub, "<-")
-				AddSelect(lvl, "->", sub, "->")
-			elseif sub == "color" then
-				AddColor(lvl, _G.FACTION_ALLIANCE, "alliance")
-				AddColor(lvl, _G.FACTION_HORDE, "horde")
-				AddColor(lvl, _G.OTHER.."1", "info1")
-				AddColor(lvl, _G.OTHER.."2", "info2")
-				AddColor(lvl, L["Font"], "font")
-				AddColor(lvl, "Spark", "spark")
-			elseif sub == "bgalpha" then
-				AddFakeSlider(lvl, sub, 0, 1, 0.1, nil)
-			elseif sub == "mapscale" then
-				AddFakeSlider(lvl, sub, 0.2, 5, 0.05, nil)
+				local tb = _G[gsub(lastb:GetName(), "ExpandArrow", "")]
+				CloseMenu(b)
+				ToggleDropDownMenu(b:GetParent():GetID(), tb.value, nil, nil, nil, nil, tb.menuList, tb)
+			elseif k == "test" then
+				local testicon = "Interface\\Icons\\Ability_ThunderBolt"
+				Capping:StartBar(L["Test"].." - ".._G.OTHER.."1", 100, testicon, "info1", true)
+				Capping:StartBar(L["Test"].." - ".._G.OTHER.."2", 75, testicon, "info2", true)
+				Capping:StartBar(L["Test"].." - ".._G.FACTION_ALLIANCE, 45, testicon, "alliance")
+				Capping:StartBar(L["Test"].." - ".._G.FACTION_HORDE, 100, testicon, "horde")
+				Capping:StartBar(L["Test"], 75, testicon, "info2")
+			elseif k == "movesb" then
+				sbmover = sbmover or CreateMover(nil, 220, 48, function(this)
+					this:StopMovingOrSizing()
+					db.sbx, db.sby = floor(this:GetLeft() + 50.5), floor(this:GetTop() - GetScreenHeight() + 10.5)
+					WorldStateAlwaysUpFrame:SetPoint("TOP")
+				end)
+				sbmover:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", WorldStateAlwaysUpFrame:GetLeft() - 50, WorldStateAlwaysUpFrame:GetTop() - 10)
+				sbmover:Show()
+			elseif k == "movecb" then
+				cbmover = cbmover or CreateMover(nil, 173, 27, function(this)
+					this:StopMovingOrSizing()
+					db.cbx, db.cby = floor(this:GetRight() + 0.5), floor(this:GetTop() + 0.5)
+					wsaufu()
+				end)
+				local x, y = db.cbx or max(0, MinimapCluster:GetRight() - CONTAINER_OFFSET_X), db.cby or max(20, MinimapCluster:GetBottom())
+				cbmover:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", x, y)
+				cbmover:Show()
+			elseif k == "moveseat" then
+				seatmover = seatmover or CreateMover(nil, 128, 128, function(this)
+					this:StopMovingOrSizing()
+					db.seatx, db.seaty = floor(this:GetRight() + 0.5), floor(this:GetTop() + 0.5)
+					VehicleSeatIndicator:SetPoint("TOPRIGHT")
+				end)
+				seatmover:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", VehicleSeatIndicator:GetRight(), VehicleSeatIndicator:GetTop())
+				seatmover:Show()
+			elseif k == "resetmap" and bgtab then
+				bgtab:ClearAllPoints()
+				bgtab:SetPoint("CENTER")
+			elseif k == "resetall" and IsShiftKeyDown() then
+				CappingDB = nil
+				ReloadUI()
 			end
 		end
-	end
+		local function Set(b, k)
+			if not k then return end
+			db[k] = not db[k]
+			if abbrv[k] then -- enable/disable a battleground while in it
+				if GetRealZoneText() == abbrv[k] then
+					Capping:ZONE_CHANGED_NEW_AREA()
+				end
+			elseif k == "perchar" then
+				if CappingCharDB then
+					CappingCharDB = nil
+				else
+					CappingCharDB = db
+				end
+				ReloadUI()
+			elseif k == "disablemap" then
+				ReloadUI()
+			else -- update visual options
+				StartWorldTimers()
+				UpdateLook(k)
+			end
+		end
+		local function SetSelect(b, a1)
+			db[a1] = tonumber(b.value) or b.value
+			local level, num = strmatch(b:GetName(), "DropDownList(%d+)Button(%d+)")
+			level, num = tonumber(level) or 0, tonumber(num) or 0
+			for i = 1, UIDROPDOWNMENU_MAXBUTTONS, 1 do
+				local b = _G["DropDownList"..level.."Button"..i.."Check"]
+				if b then
+					b[i == num and "Show" or "Hide"](b)
+				end
+			end
+			UpdateLook(a1)
+		end
+		local function SetColor(a1)
+			local dbc = db.colors[UIDROPDOWNMENU_MENU_VALUE]
+			if not dbc then return end
+			if a1 then
+				local pv = ColorPickerFrame.previousValues
+				dbc.r, dbc.g, dbc.b, dbc.a = pv.r, pv.g, pv.b, 1 - pv.opacity
+			else
+				dbc.r, dbc.g, dbc.b = ColorPickerFrame:GetColorRGB()
+				dbc.a = 1 - OpacitySliderFrame:GetValue()
+			end
+			UpdateLook("colors")
+		end
+		local function AddButton(lvl, text, keepshown)
+			info.text = text
+			info.keepShownOnClick = keepshown
+			UIDropDownMenu_AddButton(info, lvl)
+			wipe(info)
+		end
+		local function AddToggle(lvl, text, value)
+			info.arg1 = value
+			info.func = Set
+			if value == "perchar" then
+				info.checked = CappingCharDB and true
+			else
+				info.checked = db[value]
+			end
+			info.isNotRadio = true
+			AddButton(lvl, text, 1)
+		end
+		local function AddExecute(lvl, text, arg1, arg2)
+			info.arg1 = arg1
+			info.arg2 = arg2
+			info.func = Exec
+			info.notCheckable = 1
+			AddButton(lvl, text, 1)
+		end
+		local function AddColor(lvl, text, value)
+			local dbc = db.colors[value]
+			if not dbc then return end
+			info.hasColorSwatch = true
+			info.hasOpacity = 1
+			info.r, info.g, info.b, info.opacity = dbc.r, dbc.g, dbc.b, 1 - dbc.a
+			info.swatchFunc, info.opacityFunc, info.cancelFunc = SetColor, SetColor, SetColor
+			info.value = value
+			info.notCheckable = 1
+			info.func = UIDropDownMenuButton_OpenColorPicker
+			AddButton(lvl, text, nil)
+		end
+		local function AddList(lvl, text, value)
+			info.value = value
+			info.hasArrow = true
+			info.func = HideCheck
+			info.notCheckable = 1
+			AddButton(lvl, text, 1)
+		end
+		local function AddSelect(lvl, text, arg1, value)
+			info.arg1 = arg1
+			info.func = SetSelect
+			info.value = value
+			if tonumber(value) and tonumber(db[arg1] or "blah") then
+				if floor(100 * tonumber(value)) == floor(100 * tonumber(db[arg1])) then
+					info.checked = true
+				end
+			else
+				info.checked = (db[arg1] == value)
+			end
+			AddButton(lvl, text, 1)
+		end
+		local function AddFakeSlider(lvl, value, minv, maxv, step, tbl)
+			local cvalue = 0
+			local dbv = db[value]
+			if type(dbv) == "string" and tbl then
+				for i, v in ipairs(tbl) do
+					if dbv == v then
+						cvalue = i
+						break
+					end
+				end
+			else
+				cvalue = dbv or ((maxv - minv) / 2)
+			end
+			local adj = (offsetvalue == value and offsetcount) or 0
+			local starti = max(minv, cvalue - (7 - adj) * step)
+			local endi = min(maxv, cvalue + (8 + adj) * step)
+			if starti == minv then
+				endi = min(maxv, starti + 16 * step)
+			elseif endi == maxv then
+				starti = max(minv, endi - 16 * step)
+			end
+			if starti > minv then
+				AddExecute(lvl, "--", "less", value)
+			end
+			if tbl then
+				for i = starti, endi, step do
+					AddSelect(lvl, tbl[i], value, tbl[i])
+				end
+			else
+				local fstring = (step >= 1 and "%d") or (step >= 0.1 and "%.1f") or "%.2f"
+				for i = starti, endi, step do
+					AddSelect(lvl, format(fstring, i), value, i)
+				end
+			end
+			if endi < maxv then
+				AddExecute(lvl, "++", "more", value)
+			end
+		end
+		CappingDD.initialize = function(this, lvl)
+			if lvl == 1 then
+				if type(barid) == "number" then
+					local bname = bars[barid].name
+					info.isTitle = true
+					info.notCheckable = 1
+					AddButton(lvl, bname)
+					if bname == winter then
+						AddExecute(lvl, L["Cancel Timer"], "canceltimer", barid)
+					elseif not activebars[bname] then
+	
+					else
+						AddExecute(lvl, L["Send to BG"], "reportbg", barid)
+						AddExecute(lvl, L["Send to SAY"], "reportsay", barid)
+						AddExecute(lvl, L["Cancel Timer"], "canceltimer", barid)
+					end
+	
+					info.isTitle = true
+					info.notCheckable = 1
+					AddButton(lvl, " ")
+					AddExecute(lvl, _G.GAMEOPTIONS_MENU, "showoptions")
+				else
+					info.isTitle = true
+					info.notCheckable = 1
+					AddButton(lvl, "|cff5555ffCapping|r")
+					AddList(lvl, _G.BATTLEFIELDS, "battlegrounds")
+					AddList(lvl, L["Bar"], "bars")
+					AddList(lvl, _G.BATTLEFIELD_MINIMAP, "bgmap")
+					AddList(lvl, _G.OTHER, "other")
+					AddExecute(lvl, L["Show/Hide Anchor"], "anchor")
+				end
+			elseif lvl == 2 then
+				local sub = UIDROPDOWNMENU_MENU_VALUE
+				if sub == "battlegrounds" then
+					AddToggle(lvl, av, "av")
+					AddToggle(lvl, " -"..L["Auto Quest Turnins"], "avquest")
+					AddExecute(lvl, " -"..L["Request Sync"], "syncav")
+					AddToggle(lvl, ab, "ab")
+					AddToggle(lvl, eots, "eots")
+					AddToggle(lvl, ioc, "ioc")
+					AddToggle(lvl, wsg, "wsg")
+					AddToggle(lvl, db.worldname1 or (_G.CHANNEL_CATEGORY_WORLD.." 1"), "world1")
+					AddToggle(lvl, db.worldname2 or (_G.CHANNEL_CATEGORY_WORLD.." 2"), "world2")
+					AddToggle(lvl, db.worldname3 or (_G.CHANNEL_CATEGORY_WORLD.." 3"), "world3")
+				elseif sub == "bars" then
+					AddList(lvl, L["Texture"], "texture")
+					AddList(lvl, L["Width"], "width")
+					AddList(lvl, L["Height"], "height")
+					AddList(lvl, L["Border Width"], "inset")
+					AddList(lvl, L["Spacing"], "spacing")
+					AddList(lvl, _G.EMBLEM_SYMBOL or "Icon", "iconpos")
+					AddList(lvl, L["Font"], "font")
+					AddList(lvl, _G.FONT_SIZE, "fontsize")
+					AddList(lvl, L["Time Position"], "timepos")
+					AddList(lvl, _G.COLORS, "color")
+					AddList(lvl, _G.BACKGROUND.." ".._G.OPACITY, "bgalpha")
+					AddList(lvl, _G.OTHER, "more")
+					AddExecute(lvl, L["Test"], "test")
+				elseif sub == "bgmap" then
+					AddToggle(lvl, (_G.DISABLE or "Disable").." "..(_G.ACHIEVEMENTFRAME_FILTER_ALL or "All"), "disablemap")
+					AddToggle(lvl, L["Narrow Map Mode"], "narrow")
+					AddToggle(lvl, L["Hide Border"], "hidemapborder")
+					AddList(lvl, L["Map Scale"], "mapscale")
+					AddExecute(lvl, _G.RESET or "Reset", "resetmap")
+				elseif sub == "other" then
+					AddToggle(lvl, L["Port Timer"], "port")
+					AddToggle(lvl, L["Wait Timer"], "wait")
+					AddExecute(lvl, L["Move Scoreboard"], "movesb")
+					AddExecute(lvl, L["Move Capture Bar"], "movecb")
+					AddExecute(lvl, L["Move Vehicle Seat"], "moveseat")
+					AddToggle(lvl, L["Hide Capping Start Time"], "hidecaptime")
+					AddToggle(lvl, L["Hide Blizzard Start Timer"], "hideblizztime")
+					AddToggle(lvl, _G.CHARACTER.." ".._G.SAVE, "perchar")
+					AddExecute(lvl, _G.RESET_TO_DEFAULT.." (".._G.SHIFT_KEY_TEXT..")", "resetall")
+				end
+			elseif lvl == 3 then
+				local sub = UIDROPDOWNMENU_MENU_VALUE
+				if sub == "texture" or sub == "font" then
+					local t = media:List(sub == "texture" and "statusbar" or sub)
+					AddFakeSlider(lvl, sub, 1, #t, 1, t)
+				elseif sub == "more" then
+					AddToggle(lvl, _G.OTHER.." "..L["Bar"], "altstyle")
+					AddToggle(lvl, L["Fill Grow"], "fill")
+					AddToggle(lvl, L["Fill Right"], "reverse")
+					AddToggle(lvl, L["Flip Growth"], "mainup")
+					AddToggle(lvl, L["Single Group"], "onegroup")
+					AddToggle(lvl, _G.MAKE_UNINTERACTABLE or _G.LOCK, "lockbar")
+				elseif sub == "width" then
+					AddFakeSlider(lvl, sub, 20, 600, 2, nil)
+				elseif sub == "height" then
+					AddFakeSlider(lvl, sub, 2, 100, 1, nil)
+				elseif sub == "inset" then
+					AddFakeSlider(lvl, sub, 0, 8, 1, nil)
+				elseif sub == "iconpos" then
+					AddSelect(lvl, "<-", sub, "<-")
+					AddSelect(lvl, "->", sub, "->")
+					AddSelect(lvl, "X", sub, "X")
+				elseif sub == "spacing" then
+					AddFakeSlider(lvl, sub, 0, 10, 1, nil)
+				elseif sub == "fontsize" then
+					AddFakeSlider(lvl, sub, 4, 28, 1, nil)
+				elseif sub == "timepos" then
+					AddSelect(lvl, "<-", sub, "<-")
+					AddSelect(lvl, "->", sub, "->")
+				elseif sub == "color" then
+					AddColor(lvl, _G.FACTION_ALLIANCE, "alliance")
+					AddColor(lvl, _G.FACTION_HORDE, "horde")
+					AddColor(lvl, _G.OTHER.."1", "info1")
+					AddColor(lvl, _G.OTHER.."2", "info2")
+					AddColor(lvl, L["Font"], "font")
+					AddColor(lvl, "Spark", "spark")
+				elseif sub == "bgalpha" then
+					AddFakeSlider(lvl, sub, 0, 1, 0.1, nil)
+				elseif sub == "mapscale" then
+					AddFakeSlider(lvl, sub, 0.2, 5, 0.05, nil)
+				end
+			end
+		end
 	end -- end if not CappingDD then
 	ToggleDropDownMenu(1, nil, CappingDD, "cursor")
 end
