@@ -259,11 +259,9 @@ function Capping:StartAV()
 --------------------------
 	if not self.AVAssaults then
 		pname = pname or UnitName("player")
-		---------------------------
-		function Capping:AVQuests()
-		---------------------------
-			if not self.db.avquest then return end
-			if self.ev == "GOSSIP_SHOW" or self.ev == "QUEST_PROGRESS" then
+
+		function Capping:GOSSIP_SHOW()
+			if self.db.avquest then
 				local target = UnitGUID("target")
 				if target then
 					local _, _, _, _, _, id = strsplit("-", target)
@@ -274,6 +272,10 @@ function Capping:StartAV()
 							SelectGossipOption(1)
 						elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
 							SelectGossipAvailableQuest(1)
+						end
+					elseif mobId == 13617 or mobId == 13616 then -- Stormpike Stable Master, Frostwolf Stable Master
+						if GetGossipOptions() then
+							SelectGossipOption(1)
 						end
 					elseif mobId == 13236 then -- Primalist Thurloga
 						local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
@@ -300,11 +302,17 @@ function Capping:StartAV()
 					end
 				end
 			end
-			if self.ev == "QUEST_PROGRESS" then
+		end
+		function Capping:QUEST_PROGRESS()
+			if self.db.avquest then
+				self:GOSSIP_SHOW()
 				if IsQuestCompletable() then
 					CompleteQuest()
 				end
-			elseif self.ev == "QUEST_COMPLETE" then
+			end
+		end
+		function Capping:QUEST_COMPLETE()
+			if self.db.avquest then
 				GetQuestReward(0)
 			end
 		end
@@ -345,9 +353,9 @@ function Capping:StartAV()
 	end
 
 	SetupAssault(245)
-	self:RegisterTempEvent("GOSSIP_SHOW", "AVQuests")
-	self:RegisterTempEvent("QUEST_PROGRESS", "AVQuests")
-	self:RegisterTempEvent("QUEST_COMPLETE", "AVQuests")
+	self:RegisterTempEvent("GOSSIP_SHOW")
+	self:RegisterTempEvent("QUEST_PROGRESS")
+	self:RegisterTempEvent("QUEST_COMPLETE")
 
 	--self:RegisterTempEvent("CHAT_MSG_ADDON", "AVSync")
 	--self:SyncAV()
@@ -469,30 +477,30 @@ function Capping:StartIoC()
 		--------------------------------
 			IoCAssault(a1, "alliance")
 		end
-		-------------------------------------------------------
-		function Capping:IoCSync(prefix, message, chan, sender) -- only sync for siege engine timer
-		-------------------------------------------------------
-			if sender == pname then return end
-			if prefix == "cap" then
-				local f = self:GetBar(siege)
-				if (not f or not f:IsShown()) and message then
-					local faction, remain = strmatch(message, "(%a)(%d+)")
-					faction = (faction == "a" and "alliance") or (faction == "h" and "horde")
-					remain = (remain == "1" and 183) or (remain == "2" and 92) or tonumber(remain or 0) or 0
-					if faction and remain > 0 then
-						self:StartBar(siege, remain, siegeicon, faction)
-					end
-				end
-			elseif prefix == "DBMv4-Mod" then
-				local isle, _, remain, faction = strsplit("\t", message)
-				if isle == "IsleofConquest" then
-					remain = (remain == "SEStart" and 183) or (remain == "SEHalfway" and 92) or nil
-					if remain and faction then
-						self:StartBar(siege, remain, siegeicon, strlower(faction))
-					end
-				end
-			end
-		end
+		---------------------------------------------------------
+		--function Capping:IoCSync(event, prefix, message, chan, sender) -- only sync for siege engine timer
+		---------------------------------------------------------
+		--	if sender == pname then return end
+		--	if prefix == "cap" then
+		--		local f = self:GetBar(siege)
+		--		if (not f or not f:IsShown()) and message then
+		--			local faction, remain = strmatch(message, "(%a)(%d+)")
+		--			faction = (faction == "a" and "alliance") or (faction == "h" and "horde")
+		--			remain = (remain == "1" and 183) or (remain == "2" and 92) or tonumber(remain or 0) or 0
+		--			if faction and remain > 0 then
+		--				self:StartBar(siege, remain, siegeicon, faction)
+		--			end
+		--		end
+		--	elseif prefix == "DBMv4-Mod" then
+		--		local isle, _, remain, faction = strsplit("\t", message)
+		--		if isle == "IsleofConquest" then
+		--			remain = (remain == "SEStart" and 183) or (remain == "SEHalfway" and 92) or nil
+		--			if remain and faction then
+		--				self:StartBar(siege, remain, siegeicon, strlower(faction))
+		--			end
+		--		end
+		--	end
+		--end
 		------------------------------------
 		function Capping:SiegeEngine(a1, a2)
 		------------------------------------
@@ -500,11 +508,11 @@ function Capping:StartIoC()
 				if strmatch(a1, L["seaforium bombs"]) or strmatch(a1, L["It's broken"]) then
 					local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
 					self:StartBar(siege, 183, siegeicon, faction)
-					SendAddonMessage("cap", faction == "alliance" and "a1" or "h1", "INSTANCE_CHAT")
+					--SendAddonMessage("cap", faction == "alliance" and "a1" or "h1", "INSTANCE_CHAT")
 				elseif strmatch(a1, L["halfway"]) then
 					local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
 					self:StartBar(siege, 92, siegeicon, faction)
-					SendAddonMessage("cap", faction == "alliance" and "a2" or "h2", "INSTANCE_CHAT")
+					--SendAddonMessage("cap", faction == "alliance" and "a2" or "h2", "INSTANCE_CHAT")
 				end
 			end
 		end
@@ -513,7 +521,7 @@ function Capping:StartIoC()
 	self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HIoCAssault")
 	self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AIoCAssault")
 	self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "SiegeEngine")
-	self:RegisterTempEvent("CHAT_MSG_ADDON", "IoCSync")
+	--self:RegisterTempEvent("CHAT_MSG_ADDON", "IoCSync")
 end
 
 
