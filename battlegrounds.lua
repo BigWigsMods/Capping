@@ -658,7 +658,6 @@ function Capping:StartWSG()
 				seconds = tonumber(seconds)
 				if minutes and seconds then
 					local remaining = seconds + (minutes*60) + 1
-					print(remaining)
 					local text = gsub(_G.TIME_REMAINING, ":", "")
 					local bar = self:GetBar(text)
 					if remaining < 301 and (not bar or bar.remaining < remaining+5) then -- Don't restart bars for subtle changes +/- 5s
