@@ -142,7 +142,7 @@ do -- POI handling
 end
 
 -----------------------------------------------------------
-function Capping:CreateCarrierButton(name, w, h, postclick) -- create common secure button
+function Capping:CreateCarrierButton(name, postclick) -- create common secure button
 -----------------------------------------------------------
 	self.CarrierOnEnter = self.CarrierOnEnter or function(this)
 		if not this.car then return end
@@ -153,8 +153,8 @@ function Capping:CreateCarrierButton(name, w, h, postclick) -- create common sec
 		this:SetBackdropColor(0, 0, 0, 0)
 	end
 	local b = CreateFrame("Button", name, UIParent, "SecureUnitButtonTemplate")
-	b:SetWidth(w)
-	b:SetHeight(h)
+	b:SetWidth(200)
+	b:SetHeight(20)
 	b:RegisterForClicks("AnyUp")
 	b:SetBackdrop(self.backdrop)
 	b:SetBackdropColor(0, 0, 0, 0)
@@ -256,7 +256,7 @@ end
 ------------------------------------------------ Gilneas -----------------------------------------------------
 function Capping:StartGil()
 --------------------------
-	SetupAssault(62)
+	SetupAssault(60)
 	NewEstimator(3)
 end
 
@@ -425,7 +425,7 @@ function Capping:StartEotS()
 			EotSFlag(a1, 1)
 		end
 
-		ef = self:CreateCarrierButton("CappingEotSFrame", 132, 18, CarrierOnClick)
+		ef = self:CreateCarrierButton("CappingEotSFrame", CarrierOnClick)
 		eficon = ef:CreateTexture(nil, "ARTWORK") -- flag icon
 		eficon:SetPoint("TOPLEFT", ef, "TOPLEFT", 0, 1)
 		eficon:SetPoint("BOTTOMRIGHT", ef, "BOTTOMLEFT", 20, -1)
@@ -589,7 +589,7 @@ function Capping:StartWSG()
 		end
 		local function CreateWSGFrame() -- create all frames
 			local function CreateCarrierFrame(faction) -- create carriers' frames
-				local b = self:CreateCarrierButton("CappingTarget"..faction, 132, 18, CarrierOnClick)
+				local b = self:CreateCarrierButton("CappingTarget"..faction, CarrierOnClick)
 				local text = self:CreateText(b, 14, "LEFT", b, 29, 0, b, 0, 0)
 				local texthp = self:CreateText(b, 10, "RIGHT", b, -4, 0, b, 28 - b:GetWidth(), 0)
 				b.faction = (faction == "Alliance" and _G.FACTION_ALLIANCE) or _G.FACTION_HORDE
