@@ -520,7 +520,6 @@ end
 
 do -- estimated wait timer and port timer
 	local q, p = L["Queue: %s"], L["Port: %s"]
-	local maxq = _G.MAX_WORLD_PVP_QUEUES or 2
 	local GetBattlefieldStatus = GetBattlefieldStatus
 	local GetBattlefieldPortExpiration = GetBattlefieldPortExpiration
 	local GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited = GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited
@@ -532,13 +531,8 @@ do -- estimated wait timer and port timer
 		for map in pairs(currentq) do -- tag each entry to see if it's changed after updating the list
 			currentq[map] = 0
 		end
-		for i = 1, maxq do -- check the status of each queue
-			local status, map, _, _, _, teamsize, _ = GetBattlefieldStatus(i)
-			if map and teamsize == "BATTLEGROUND" then
-				map = format("%s", map)
-			elseif map and teamsize == "ARENA" then -- arena
-				map = format("%s (Arena)", map)
-			end
+		for i = 1, 2 do -- Check the status of each queue, 2 is the maximum according to MAX_WORLD_PVP_QUEUES
+			local status, map = GetBattlefieldStatus(i)
 			if status == "confirm" and db.port then
 				self:StopBar(format(q, map))
 				if not self:GetBar(format(p, map)) then
@@ -549,10 +543,28 @@ do -- estimated wait timer and port timer
 				local esttime = GetBattlefieldEstimatedWaitTime(i) / 1000 -- 0 when queue is paused
 				local waited = GetBattlefieldTimeWaited(i) / 1000
 				local estremain = esttime - waited
-				if estremain > 1 then -- Paused queue (0) or negative queue (in queue longer than estimated time).
-					local bar = self:GetBar(format(q, map))
+				if estremain > 1 then -- Not a paused queue (0) and not a negative queue (in queue longer than estimated time).
+					local bar = self:GetBar(map)
 					if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 then -- Don't restart bars for subtle changes +/- 10s
-						self:StartBar(format(q, map), estremain, "Interface\\Icons\\INV_Misc_Note_03", "info1", true)
+						for j = 1, GetNumBattlegroundTypes() do
+							local name,_,_,_,_,_,_,_,_,icon = GetBattlegroundInfo(j)
+							if name == map then
+								self:StartBar(map, estremain, icon, "info1", true)
+								break
+							end
+						end
+					end
+					currentq[map] = i
+				elseif esttime ~= 0 then -- Negative queue (in queue longer than estimated time) but not paused.
+					local oldBar = self:GetBar(map)
+					if not oldBar or oldBar.remaining ~= 1 then
+						for j = 1, GetNumBattlegroundTypes() do
+							local name,_,_,_,_,_,_,_,_,icon = GetBattlegroundInfo(j)
+							if name == map then
+								self:StartBar(map, 1, icon, "info1", true, true)
+								break
+							end
+						end
 					end
 					currentq[map] = i
 				end
@@ -755,7 +767,7 @@ local function SortBars()
 		end
 	end
 end
-function Capping:StartBar(name, remaining, icon, colorid, separate)
+function Capping:StartBar(name, remaining, icon, colorid, separate, paused)
 	--print("Capping:", tostringall(name, remaining, icon, colorid, separate))
 	self:StopBar(specialText or name)
 	local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
@@ -795,6 +807,7 @@ function Capping:StartBar(name, remaining, icon, colorid, separate)
 	--bar:SetScale(db.scale)
 	bar:SetFill(db.fill)
 	bar:Start()
+	if paused then bar:Pause() end
 	SortBars()
 end
 
