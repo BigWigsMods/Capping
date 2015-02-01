@@ -3,14 +3,6 @@ if GetLocale() ~= "deDE" then return end
 local _, addon = ...
 -- de translations provided by Farook
 addon.L = {
-	-- battlegrounds
-	["Alterac Valley"] = "Alteractal",
-	["Arathi Basin"] = "Arathibecken",
-	["Warsong Gulch"] = "Kriegshymnenschlucht",
-	["Eye of the Storm"] = "Auge des Sturms",
-	["Wintergrasp"] = "Tausendwintersee",
-	["Isle of Conquest"] = "Insel der Eroberung",
-
 	-- options menu
 	["Auto Quest Turnins"] = "Autom. Questabgabe",
 	["Bar"] = "Leiste",

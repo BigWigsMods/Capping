@@ -1,5 +1,5 @@
 
-local _, Capping = ...
+local addonName, Capping = ...
 
 local L = Capping.L
 local _G = getfenv(0)

@@ -4,14 +4,6 @@ local _, addon = ...
 -- fr translations provided by pingouin47
 -- Updated by Pettigrow
 addon.L = {
-	-- battlegrounds
-	["Alterac Valley"] = "Vallée d'Alterac",
-	["Arathi Basin"] = "Bassin d'Arathi",
-	["Warsong Gulch"] = "Goulet des Chanteguerres",
-	["Eye of the Storm"] = "L'Œil du cyclone",
-	["Wintergrasp"] = "Joug-d'hiver",
-	["Isle of Conquest"] = "Île des Conquérants",
-
 	-- options menu
 	["Auto Quest Turnins"] = "Rendre auto. les quêtes",
 	["Bar"] = "Barres",

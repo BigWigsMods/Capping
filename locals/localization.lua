@@ -1,14 +1,6 @@
 
 local _, addon = ...
 addon.L = {
-	-- battlegrounds
-	["Alterac Valley"] = "Alterac Valley",
-	["Arathi Basin"] = "Arathi Basin",
-	["Warsong Gulch"] = "Warsong Gulch",
-	["Eye of the Storm"] = "Eye of the Storm",
-	["Wintergrasp"] = "Wintergrasp",
-	["Isle of Conquest"] = "Isle of Conquest",
-
 	-- options menu
 	["Auto Quest Turnins"] = "Auto Quest Turnins",
 	["Bar"] = "Timer Bar",

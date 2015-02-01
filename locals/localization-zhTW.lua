@@ -3,14 +3,6 @@ if GetLocale() ~= "zhTW" then return end
 local _, addon = ...
 --translate by BestSteve
 addon.L = {
-	-- battlegrounds
-	["Alterac Valley"] = "奧特蘭克山谷",
-	["Arathi Basin"] = "阿拉希盆地",
-	["Warsong Gulch"] = "戰歌峽谷",
-	["Eye of the Storm"] = "暴風之眼",
-	["Wintergrasp"] = "冬握湖",
-	["Isle of Conquest"] = "征服之島",
-
 	-- options menu
 	["Auto Quest Turnins"] = "自動回報任務",
 	["Bar"] = "狀態條",

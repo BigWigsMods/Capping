@@ -3,14 +3,6 @@ if GetLocale() ~= "ruRU" then return end
 local _, addon = ...
 -- ru translations provided by McFLY aka mukha521
 addon.L = {
-	-- battlegrounds
-	["Alterac Valley"] = "Альтеракская долина",
-	["Arathi Basin"] = "Низина Арати",
-	["Warsong Gulch"] = "Ущелье Песни Войны",
-	["Eye of the Storm"] = "Око Бури",
-	["Wintergrasp"] = "Озеро Ледяных Оков",
-	--["Isle of Conquest"] = true,
-
 	-- options menu
 	["Auto Quest Turnins"] = "Авто сдача квестов",
 	["Bar"] = "Полоса",

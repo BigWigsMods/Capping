@@ -1,5 +1,5 @@
 
-local _, Capping = ...
+local addonName, Capping = ...
 
 -- HEADER
 local anchor = CreateFrame("Button", "CappingAnchor", UIParent)
@@ -19,7 +19,7 @@ local GetTime, time = GetTime, time
 -- LOCAL VARS
 local db, wasInBG, bgmap, bgtab, _, instance, worldwarned
 local activebars, bars, currentq, bgdd = { }, { }, { }, { }
-local av, ab, eots, wsg, winter, ioc = L["Alterac Valley"], L["Arathi Basin"], L["Eye of the Storm"], L["Warsong Gulch"], L["Wintergrasp"], L["Isle of Conquest"]
+local av, ab, eots, wsg, winter, ioc = GetMapNameByID(401), GetMapNameByID(461), GetMapNameByID(813), GetMapNameByID(443), GetMapNameByID(501), GetMapNameByID(540)
 local stamin = 1 / 60
 local narrowed, borderhidden, ACountText, HCountText
 Capping.backdrop = { bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", }
@@ -227,7 +227,7 @@ Capping:RegisterEvent("ADDON_LOADED")
 ---------------------------------
 function Capping:ADDON_LOADED(a1)
 ---------------------------------
-	if a1 ~= "Capping" then return end
+	if a1 ~= addonName then return end
 
 	-- saved variables database setup
 	CappingDB = CappingDB or {}

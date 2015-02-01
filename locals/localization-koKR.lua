@@ -3,14 +3,6 @@ if GetLocale() ~= "koKR" then return end
 local _, addon = ...
 --- ko translations initially provided by McKabi
 addon.L = {
-	-- battlegrounds
-	["Alterac Valley"] = "알터랙 계곡",
-	["Arathi Basin"] = "아라시 분지",
-	["Warsong Gulch"] = "전쟁노래 협곡",
-	["Eye of the Storm"] = "폭풍의 눈",
-	["Wintergrasp"] = "겨울손아귀 호수",
-	["Isle of Conquest"] = "정복의 섬",
-
 	-- options menu
 	["Auto Quest Turnins"] = "퀘스트 자동 반납",
 	["Bar"] = "막대",
