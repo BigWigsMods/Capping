@@ -74,14 +74,6 @@ addon.L = {
 	["%s's flag carrier: %s (%s)"] = "%s's Flaggenträger: %s (%s)",
 
 	-- AV
-	 -- NPC
-	["Smith Regzar"] = "Schmied Regzar",
-	["Murgot Deepforge"] = "Murgot Tiefenschmied",
-	-- ["Primalist Thurloga"] = "Primalistin Thurloga",  -- same as default
-	["Arch Druid Renferal"] = "Erzdruide Renferal",
-	["Stormpike Ram Rider Commander"] = "Kommandant der Sturmlanzenwidderreiter",
-	["Frostwolf Wolf Rider Commander"] = "Wolfsreiterkommandant der Frostwölfe",
-
 	 -- patterns
 	--["Upgrade to"] = "Upgrade", -- the option to upgrade units in AV	 === NEEDS TO BE CHECKED ===
 	["Wicked, wicked, mortals!"] = "Böse, böse sterbliche Wesen!", -- what Ivus says after being summoned

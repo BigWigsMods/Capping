@@ -74,14 +74,6 @@ addon.L = {
 	["%s's flag carrier: %s (%s)"] = "%s的旗幟攜帶者: %s (%s)", -- chat message
 
 	-- AV
-	 -- NPC
-	["Smith Regzar"] = "鐵匠雷格薩",
-	["Murgot Deepforge"] = "莫高特·深爐",
-	["Primalist Thurloga"] = "原獵者瑟魯加",
-	["Arch Druid Renferal"] = "大德魯伊雷弗拉爾",
-	["Stormpike Ram Rider Commander"] = "雷矛山羊騎兵指揮官",
-	["Frostwolf Wolf Rider Commander"] = "霜狼騎兵指揮官",
-
 	 -- patterns
 	["Upgrade to"] = "升級成", -- the option to upgrade units in AV
 	["Wicked, wicked, mortals!"] = "邪惡,太邪惡了,人類!", -- what Ivus says after being summoned

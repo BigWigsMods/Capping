@@ -270,36 +270,40 @@ function Capping:StartAV()
 		function Capping:AVQuests()
 		---------------------------
 			if not self.db.avquest then return end
-			local target = UnitName("target")
 			if self.ev == "GOSSIP_SHOW" or self.ev == "QUEST_PROGRESS" then
-				if target == L["Smith Regzar"] or target == L["Murgot Deepforge"] then
-					-- Open Quest to Smith or Murgot
-					if GetGossipOptions() and strmatch(GetGossipOptions(), L["Upgrade to"] ) then
-						SelectGossipOption(1)
-					elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
-						SelectGossipAvailableQuest(1)
-					end
-				elseif target == L["Primalist Thurloga"] then
-					local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
-					if num >= 5 then
-						SelectGossipAvailableQuest(2)
-					elseif num > 0 then
-						SelectGossipAvailableQuest(1)
-					end
-				elseif target == L["Arch Druid Renferal"] then
-					local num = GetItemCount(17423) -- Storm Crystal 17423
-					if num >= 5 then
-						SelectGossipAvailableQuest(2)
-					elseif num > 0 then
-						SelectGossipAvailableQuest(1)
-					end
-				elseif target == L["Stormpike Ram Rider Commander"] then
-					if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
-						SelectGossipAvailableQuest(1)
-					end
-				elseif target == L["Frostwolf Wolf Rider Commander"] then
-					if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
-						SelectGossipAvailableQuest(1)
+				local target = UnitGUID("target")
+				if target then
+					local _, _, _, _, _, id = strsplit("-", target)
+					local mobId = tonumber(id)
+					if mobId == 13176 or mobId == 13257 then -- Smith Regzar, Murgot Deepforge
+						-- Open Quest to Smith or Murgot
+						if GetGossipOptions() and strmatch(GetGossipOptions(), L["Upgrade to"] ) then
+							SelectGossipOption(1)
+						elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
+							SelectGossipAvailableQuest(1)
+						end
+					elseif mobId == 13236 then -- Primalist Thurloga
+						local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
+						if num >= 5 then
+							SelectGossipAvailableQuest(2)
+						elseif num > 0 then
+							SelectGossipAvailableQuest(1)
+						end
+					elseif mobId == 13442 then -- Arch Druid Renferal
+						local num = GetItemCount(17423) -- Storm Crystal 17423
+						if num >= 5 then
+							SelectGossipAvailableQuest(2)
+						elseif num > 0 then
+							SelectGossipAvailableQuest(1)
+						end
+					elseif mobId == 13577 then -- Stormpike Ram Rider Commander
+						if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
+							SelectGossipAvailableQuest(1)
+						end
+					elseif mobId == 13441 then -- Frostwolf Wolf Rider Commander
+						if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
+							SelectGossipAvailableQuest(1)
+						end
 					end
 				end
 			end
@@ -313,38 +317,38 @@ function Capping:StartAV()
 		end
 
 		------------------------------------------------------
-		function Capping:AVSync(prefix, message, chan, sender)
+		--function Capping:AVSync(prefix, message, chan, sender)
 		------------------------------------------------------
-			if prefix ~= "cap" or sender == pname then return end
-			if message == "r" then
-				for value, color in pairs(Capping.activebars) do
-					local f = Capping:GetBar(value)
-					if f and f:IsShown() then
-						SendAddonMessage("cap", format("%s@%d@%d@%s", value, f.duration, f.duration - f.remaining, color), "WHISPER", sender)
-					end
-				end
-			else
-				local name, duration, elapsed, color = strmatch(message, "^(.+)@(%d+)@(%d+)@(%a+)$")
-				local f = self:GetBar(name)
-				if name and elapsed and (not f or not f:IsShown()) then
-					local icon
-					if name == L["Ivus begins moving"] then
-						icon = "Interface\\Icons\\Spell_Nature_NaturesBlessing"
-					elseif name == L["Lokholar begins moving"] then
-						icon = "Interface\\Icons\\Spell_Frost_Glacier"
-					else
-						icon = GetIconData(color, strmatch(nodestates[name] or "symbol0", "(%a+)(%d+)") or "symbol")
-					end
-					duration = tonumber(duration) or 245
-					self:StartBar(name, duration - (tonumber(elapsed) or 245), icon, color or "info2")
-				end
-			end
-		end
-		-------------------------
-		function Capping:SyncAV()
-		-------------------------
-			SendAddonMessage("cap", "r", "INSTANCE_CHAT")
-		end
+		--	if prefix ~= "cap" or sender == pname then return end
+		--	if message == "r" then
+		--		for value, color in pairs(Capping.activebars) do
+		--			local f = Capping:GetBar(value)
+		--			if f and f:IsShown() then
+		--				SendAddonMessage("cap", format("%s@%d@%d@%s", value, f.duration, f.duration - f.remaining, color), "WHISPER", sender)
+		--			end
+		--		end
+		--	else
+		--		local name, duration, elapsed, color = strmatch(message, "^(.+)@(%d+)@(%d+)@(%a+)$")
+		--		local f = self:GetBar(name)
+		--		if name and elapsed and (not f or not f:IsShown()) then
+		--			local icon
+		--			if name == L["Ivus begins moving"] then
+		--				icon = "Interface\\Icons\\Spell_Nature_NaturesBlessing"
+		--			elseif name == L["Lokholar begins moving"] then
+		--				icon = "Interface\\Icons\\Spell_Frost_Glacier"
+		--			else
+		--				icon = GetIconData(color, strmatch(nodestates[name] or "symbol0", "(%a+)(%d+)") or "symbol")
+		--			end
+		--			duration = tonumber(duration) or 245
+		--			self:StartBar(name, duration - (tonumber(elapsed) or 245), icon, color or "info2")
+		--		end
+		--	end
+		--end
+		---------------------------
+		--function Capping:SyncAV()
+		---------------------------
+		--	SendAddonMessage("cap", "r", "INSTANCE_CHAT")
+		--end
 	end
 
 	SetupAssault(245)
@@ -352,8 +356,8 @@ function Capping:StartAV()
 	self:RegisterTempEvent("QUEST_PROGRESS", "AVQuests")
 	self:RegisterTempEvent("QUEST_COMPLETE", "AVQuests")
 
-	self:RegisterTempEvent("CHAT_MSG_ADDON", "AVSync")
-	self:SyncAV()
+	--self:RegisterTempEvent("CHAT_MSG_ADDON", "AVSync")
+	--self:SyncAV()
 end
 
 

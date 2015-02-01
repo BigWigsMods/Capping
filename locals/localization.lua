@@ -74,14 +74,6 @@ addon.L = {
 	["%s's flag carrier: %s (%s)"] = "%s's flag carrier: %s (%s)", -- chat message
 
 	-- AV
-	 -- NPC
-	["Smith Regzar"] = "Smith Regzar",
-	["Murgot Deepforge"] = "Murgot Deepforge",
-	["Primalist Thurloga"] = "Primalist Thurloga",
-	["Arch Druid Renferal"] = "Arch Druid Renferal",
-	["Stormpike Ram Rider Commander"] = "Stormpike Ram Rider Commander",
-	["Frostwolf Wolf Rider Commander"] = "Frostwolf Wolf Rider Commander",
-
 	 -- patterns
 	["Upgrade to"] = "Upgrade to", -- the option to upgrade units in AV
 	["Wicked, wicked, mortals!"] = "Wicked, wicked, mortals!", -- what Ivus says after being summoned

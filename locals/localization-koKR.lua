@@ -74,14 +74,6 @@ addon.L = {
 	["%s's flag carrier: %s (%s)"] = "%s 깃발 운반자: %s (%s)", -- chat message
 
 	-- AV
-	 -- NPC
-	["Smith Regzar"] = "대장장이 렉자르",
-	["Murgot Deepforge"] = "멀고트 딥포지",
-	["Primalist Thurloga"] = "원시술사 투를로가",
-	["Arch Druid Renferal"] = "대드루이드 렌퍼럴",
-	["Stormpike Ram Rider Commander"] = "스톰파이크 산양기병대 지휘관",
-	["Frostwolf Wolf Rider Commander"] = "서리늑대 늑대기병대 지휘관",
-
 	 -- patterns
 	["Upgrade to"] = "추가 전리품", -- the option to upgrade units in AV
 	---["Wicked, wicked, mortals!"] = true, -- what Ivus says after being summoned
