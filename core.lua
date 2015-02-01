@@ -573,7 +573,7 @@ do -- estimated wait timer and port timer
 		for map, flag in pairs(currentq) do -- stop inactive bars
 			if flag == 0 then
 				self:StopBar(format(p, map))
-				self:StopBar(format(q, map))
+				self:StopBar(map)
 				currentq[map] = nil
 			end
 		end
@@ -768,7 +768,7 @@ local function SortBars()
 	end
 end
 function Capping:StartBar(name, remaining, icon, colorid, separate, paused)
-	--print("Capping:", tostringall(name, remaining, icon, colorid, separate))
+	--print("Capping:", tostringall(name, remaining, icon, colorid, separate, paused))
 	self:StopBar(specialText or name)
 	local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
 	normalAnchor.bars[bar] = true
