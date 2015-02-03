@@ -523,7 +523,7 @@ function Capping:StartIoC()
 			end
 		end
 	end
-	SetupAssault(62, true)
+	SetupAssault(61, true)
 	self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HIoCAssault")
 	self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AIoCAssault")
 	self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "SiegeEngine")
