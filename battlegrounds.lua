@@ -245,6 +245,12 @@ function Capping:StartAB()
 	NewEstimator(1)
 end
 
+------------------------------------------------ Deepwind Gorge -----------------------------------------------------
+function Capping:StartDG()
+--------------------------
+	SetupAssault(61)
+	--NewEstimator(1)
+end
 
 ------------------------------------------------ Gilneas -----------------------------------------------------
 function Capping:StartGil()

@@ -436,6 +436,8 @@ function Capping:ZoneCheck() -- check if new zone is a battleground
 			self:StartIoC()
 		elseif z == "GilneasBattleground2" and not db.nogil then
 			self:StartGil()
+		elseif z == "GoldRush" then
+			Capping:StartDG()
 		end
 		if not self.bgtotals then -- frame to display roster count
 			self.bgtotals = CreateFrame("Frame", nil, AlwaysUpFrame1)
