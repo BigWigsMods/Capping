@@ -147,14 +147,14 @@ end
 --	if not db or not db.seatx then return end
 --	oSetPoint(VehicleSeatIndicator, "TOPRIGHT", UIParent, "BOTTOMLEFT", db.seatx, db.seaty)
 --end)
---local function UpdateZoneMapVisibility()
---	if (not bgmap or not bgmap:IsShown()) and GetCVar("showBattlefieldMinimap") ~= "0" then
---		if not bgmap then
---			LoadAddOn("Blizzard_BattlefieldMinimap")
---		end
---		bgmap:Show()
---	end
---end
+local function UpdateZoneMapVisibility()
+	if (not bgmap or not bgmap:IsShown()) and GetCVar("showBattlefieldMinimap") ~= "0" then
+		if not bgmap then
+			LoadAddOn("Blizzard_BattlefieldMinimap")
+		end
+		bgmap:Show()
+	end
+end
 --hooksecurefunc("WorldMapZoneMinimapDropDown_OnClick", function()
 --	if GetMapInfo() == "LakeWintergrasp" or GetMapInfo() == "TolBarad" then
 --		UpdateZoneMapVisibility()
@@ -436,7 +436,8 @@ function Capping:ZoneCheck() -- check if new zone is a battleground
 		elseif z == "GilneasBattleground2" and not db.nogil then
 			self:StartGil()
 		elseif z == "GoldRush" then
-			Capping:StartDG()
+			self:StartDG()
+			self:StartWSG()
 		end
 		if not self.bgtotals then -- frame to display roster count
 			self.bgtotals = CreateFrame("Frame", nil, AlwaysUpFrame1)
