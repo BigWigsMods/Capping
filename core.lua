@@ -34,7 +34,6 @@ end
 
 -- LOCAL FUNCS
 local ShowOptions
-local oSetPoint = Capping.SetPoint
 local nofunc = function() end
 local function ToggleAnchor()
 	if anchor:IsShown() then
@@ -128,34 +127,34 @@ local function CreateMover(oldframe, w, h, dragstopfunc)
 	mover.close:SetPoint("TOPRIGHT", 5, 5)
 	return mover
 end
-hooksecurefunc(WorldStateAlwaysUpFrame, "SetPoint", function()
-	if not db or not db.sbx then return end
-	oSetPoint(WorldStateAlwaysUpFrame, "TOP", UIParent, "TOPLEFT", db.sbx, db.sby)
-end)
-local function wsaufu()
-	if not db or not db.cbx then return end
-	local nexty = 0
-	for i = 1, NUM_EXTENDED_UI_FRAMES do
-		local cb = _G["WorldStateCaptureBar"..i]
-		if cb and cb:IsShown() then
-			cb:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", db.cbx, db.cby - nexty)
-			nexty = nexty + cb:GetHeight()
-		end
-	end
-end
-hooksecurefunc("WorldStateAlwaysUpFrame_Update", wsaufu)
-hooksecurefunc(VehicleSeatIndicator, "SetPoint", function()
-	if not db or not db.seatx then return end
-	oSetPoint(VehicleSeatIndicator, "TOPRIGHT", UIParent, "BOTTOMLEFT", db.seatx, db.seaty)
-end)
-local function UpdateZoneMapVisibility()
-	if (not bgmap or not bgmap:IsShown()) and GetCVar("showBattlefieldMinimap") ~= "0" then
-		if not bgmap then
-			LoadAddOn("Blizzard_BattlefieldMinimap")
-		end
-		bgmap:Show()
-	end
-end
+--hooksecurefunc(WorldStateAlwaysUpFrame, "SetPoint", function()
+--	if not db or not db.sbx then return end
+--	oSetPoint(WorldStateAlwaysUpFrame, "TOP", UIParent, "TOPLEFT", db.sbx, db.sby)
+--end)
+--local function wsaufu()
+--	if not db or not db.cbx then return end
+--	local nexty = 0
+--	for i = 1, NUM_EXTENDED_UI_FRAMES do
+--		local cb = _G["WorldStateCaptureBar"..i]
+--		if cb and cb:IsShown() then
+--			cb:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", db.cbx, db.cby - nexty)
+--			nexty = nexty + cb:GetHeight()
+--		end
+--	end
+--end
+--hooksecurefunc("WorldStateAlwaysUpFrame_Update", wsaufu)
+--hooksecurefunc(VehicleSeatIndicator, "SetPoint", function()
+--	if not db or not db.seatx then return end
+--	oSetPoint(VehicleSeatIndicator, "TOPRIGHT", UIParent, "BOTTOMLEFT", db.seatx, db.seaty)
+--end)
+--local function UpdateZoneMapVisibility()
+--	if (not bgmap or not bgmap:IsShown()) and GetCVar("showBattlefieldMinimap") ~= "0" then
+--		if not bgmap then
+--			LoadAddOn("Blizzard_BattlefieldMinimap")
+--		end
+--		bgmap:Show()
+--	end
+--end
 --hooksecurefunc("WorldMapZoneMinimapDropDown_OnClick", function()
 --	if GetMapInfo() == "LakeWintergrasp" or GetMapInfo() == "TolBarad" then
 --		UpdateZoneMapVisibility()
