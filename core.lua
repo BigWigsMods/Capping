@@ -18,12 +18,10 @@ local GetTime, time = GetTime, time
 
 -- LOCAL VARS
 local db, wasInBG, bgmap, bgtab, _, instance, worldwarned
-local activebars, bars, currentq, bgdd = { }, { }, { }, { }
+local activeBars, bars, currentq, bgdd = { }, { }, { }, { }
 local av, ab, eots, wsg, winter, ioc = GetMapNameByID(401), GetMapNameByID(461), GetMapNameByID(813), GetMapNameByID(443), GetMapNameByID(501), GetMapNameByID(540)
-local stamin = 1 / 60
 local narrowed, borderhidden, ACountText, HCountText
 Capping.backdrop = { bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", }
-Capping.activebars = activebars
 
 function Capping:RegisterEvent(event)
 	anchor:RegisterEvent(event)
@@ -407,9 +405,8 @@ function Capping:ResetAll() -- reset all timers and unregister temp events
 		elist[event] = nil
 		self:UnregisterEvent(event)
 	end
-	for value, _ in pairs(activebars) do -- close all temp timerbars
-		self:StopBar(value)
-		activebars[value] = nil
+	for bar in next, activeBars do -- close all temp timerbars
+		bar:Stop()
 	end
 	self:CheckCombat(HideProtectedStuff) -- hide secure frames
 	if ACountText then ACountText:SetText("") end
@@ -591,55 +588,26 @@ do -- estimated wait timer and port timer
 	end
 end
 
-
-local function CheckActive(barid)
-	local f = bars[barid]
-	if f and f:IsShown() then return f end
+local function ReportBar(bar, channel)
+	if not activeBars[bar] then return end
+	local colorid = bar:Get("capping:colorid")
+	local faction = colorid == "horde" and _G.FACTION_HORDE or colorid == "alliance" and _G.FACTION_ALLIANCE or ""
+	SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), bar.candyBarDuration:GetText(), faction == "" and faction or "("..faction..")"), channel)
 end
-local function DoReport(this, chan) -- format chat reports
-	if not activebars[this.name] then return end
-	local faction = (this.color == "horde" and _G.FACTION_HORDE) or (this.color == "alliance" and _G.FACTION_ALLIANCE) or ""
-	SendChatMessage(format(L["%s: %s - %d:%02d"], faction, this.displaytext:GetText(), this.remaining * stamin, this.remaining % 60), chan)
-end
-local function CheckQueue(name, join)
-	local qid = currentq[gsub(name, "^(.+): ", "")]
-	if type(qid) == "number" then
-		return true
-	end
-end
-local function ReportBG(barid) -- report timer to /bg
-	local this = CheckActive(barid)
-	if not this then return end
-	if not CheckQueue(this.name, true) then
-		DoReport(this, "INSTANCE_CHAT")
-	end
-end
-local function ReportSAY(barid) -- report timer to /s
-	local this = CheckActive(barid)
-	if not this then return end
-	DoReport(this, "SAY")
-end
-local function CancelBar(barid) -- close bar, leave queue if a queue timer
-	local this = CheckActive(barid)
-	if not this then return end
-	if not CheckQueue(this.name, nil) then
-		Capping:StopBar(nil, this)
-	end
-end
-local function BarOnClick(this, button)
+local function BarOnClick(bar, button)
 	if button == "LeftButton" then
 		if IsShiftKeyDown() then
-			ReportSAY(this.id)
+			ReportBar(bar, "SAY")
 		elseif IsControlKeyDown() then
-			ReportBG(this.id)
+			ReportBar(bar, "INSTANCE_CHAT")
 		else
 			ToggleAnchor()
 		end
 	elseif button == "RightButton" then
 		if IsControlKeyDown() then
-			CancelBar(this.id)
+			bar:Stop()
 		else
-			ShowOptions(nil, this.id)
+			ShowOptions(nil, bar)
 		end
 	end
 end
@@ -752,104 +720,101 @@ end
 --	end
 --end
 
-
-local temp = { }
-local normalAnchor = {bars={}}
-local function lsort(a, b)
-	return a.remaining < b.remaining
-end
-local function SortBars()
-	wipe(temp)
-	for k in next, normalAnchor.bars do
-		temp[#temp+1] = k
+do
+	local temp = { }
+	local function lsort(a, b)
+		return a.remaining < b.remaining
 	end
-	sort(temp, lsort)
-	local pdown, pup = nil, nil
-	for i = 1, #temp do
-		local bar = temp[i]
-		local separate = bar:Get("capping:separate")
-		bar:ClearAllPoints()
-		if separate then
-			bar:SetPoint("BOTTOMLEFT", pup or anchor, "TOPLEFT", 0, db.spacing or 1)
-			pup = bar
+	local function SortBars()
+		wipe(temp)
+		for k in next, activeBars do
+			temp[#temp+1] = k
+		end
+		sort(temp, lsort)
+		local pdown, pup = nil, nil
+		for i = 1, #temp do
+			local bar = temp[i]
+			local separate = bar:Get("capping:separate")
+			bar:ClearAllPoints()
+			if separate then
+				bar:SetPoint("BOTTOMLEFT", pup or anchor, "TOPLEFT", 0, db.spacing or 1)
+				pup = bar
+			else
+				bar:SetPoint("TOPLEFT", pdown or anchor, "BOTTOMLEFT", 0, -(db.spacing or 1))
+				pdown = bar
+			end
+		end
+	end
+	function Capping:StartBar(name, remaining, icon, colorid, separate, paused)
+		--print("Capping:", tostringall(name, remaining, icon, colorid, separate, paused))
+		self:StopBar(name)
+		local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
+		activeBars[bar] = true
+		bar:Set("capping:separate", not db.onegroup and separate)
+		bar:Set("capping:colorid", colorid)
+		local c = colorid and db.colors[colorid] or db.colors.info1
+		bar.candyBarBackground:SetVertexColor(c.r * 0.3, c.g * 0.3, c.b * 0.3, db.bgalpha or 0.7)
+		bar:SetColor(c.r, c.g, c.b, c.a or 0.9)
+		--bar.candyBarLabel:SetTextColor(colors:GetColor("barText", module, key))
+		--bar.candyBarDuration:SetTextColor(colors:GetColor("barText", module, key))
+		--bar.candyBarLabel:SetShadowColor(colors:GetColor("barTextShadow", module, key))
+		--bar.candyBarDuration:SetShadowColor(colors:GetColor("barTextShadow", module, key))
+		bar.candyBarLabel:SetJustifyH("LEFT")
+
+		--local flags = nil
+		--if db.monochrome and db.outline ~= "NONE" then
+		--	flags = "MONOCHROME," .. db.outline
+		--elseif db.monochrome then
+		--	flags = nil -- "MONOCHROME", XXX monochrome only is disabled for now as it causes a client crash
+		--elseif db.outline ~= "NONE" then
+		--	flags = db.outline
+		--end
+		local font = media:Fetch("font", db.font)
+		bar.candyBarLabel:SetFont(font, db.fontsize)
+		bar.candyBarDuration:SetFont(font, db.fontsize)
+
+		bar:SetLabel(name)
+		bar:SetDuration(remaining)
+		--bar:SetTimeVisibility(db.time)
+		if type(icon) == "table" then
+			bar:SetIcon(icon[1], icon[2], icon[3], icon[4], icon[5])
 		else
-			bar:SetPoint("TOPLEFT", pdown or anchor, "BOTTOMLEFT", 0, -(db.spacing or 1))
-			pdown = bar
+			bar:SetIcon(icon)
 		end
-	end
-end
-function Capping:StartBar(name, remaining, icon, colorid, separate, paused)
-	--print("Capping:", tostringall(name, remaining, icon, colorid, separate, paused))
-	self:StopBar(specialText or name)
-	local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
-	normalAnchor.bars[bar] = true
-	bar:Set("capping:anchor", normalAnchor)
-	bar:Set("capping:separate", not db.onegroup and separate)
-	local c = colorid and db.colors[colorid] or db.colors.info1
-	bar.candyBarBackground:SetVertexColor(c.r * 0.3, c.g * 0.3, c.b * 0.3, db.bgalpha or 0.7)
-	bar:SetColor(c.r, c.g, c.b, c.a or 0.9)
-	--bar.candyBarLabel:SetTextColor(colors:GetColor("barText", module, key))
-	--bar.candyBarDuration:SetTextColor(colors:GetColor("barText", module, key))
-	--bar.candyBarLabel:SetShadowColor(colors:GetColor("barTextShadow", module, key))
-	--bar.candyBarDuration:SetShadowColor(colors:GetColor("barTextShadow", module, key))
-	bar.candyBarLabel:SetJustifyH("LEFT")
-
-	--local flags = nil
-	--if db.monochrome and db.outline ~= "NONE" then
-	--	flags = "MONOCHROME," .. db.outline
-	--elseif db.monochrome then
-	--	flags = nil -- "MONOCHROME", XXX monochrome only is disabled for now as it causes a client crash
-	--elseif db.outline ~= "NONE" then
-	--	flags = db.outline
-	--end
-	local font = media:Fetch("font", db.font)
-	bar.candyBarLabel:SetFont(font, db.fontsize)
-	bar.candyBarDuration:SetFont(font, db.fontsize)
-
-	bar:SetLabel(specialText or name)
-	bar:SetDuration(remaining)
-	--bar:SetTimeVisibility(db.time)
-	if type(icon) == "table" then
-		bar:SetIcon(icon[1], icon[2], icon[3], icon[4], icon[5])
-	else
-		bar:SetIcon(icon)
-	end
-	bar:SetScript("OnMouseUp", BarOnClick)
-	--bar:SetScale(db.scale)
-	bar:SetFill(db.fill)
-	bar:Start()
-	if paused then bar:Pause() end
-	SortBars()
-end
-
-function Capping:GetBar(text)
-	for k in next, normalAnchor.bars do
-		if k.candyBarLabel:GetText() == text then
-			return k
-		end
-	end
-end
-
-function Capping:StopBar(text)
-	--if not normalAnchor then return end
-	local dirty = nil
-	for k in next, normalAnchor.bars do
-		if k.candyBarLabel:GetText() == text then
-			k:Stop()
-			dirty = true
-		end
-	end
-	if dirty then SortBars() end
-end
-
-candy.RegisterCallback(Capping, "LibCandyBar_Stop", function(event, bar)
-	local a = bar:Get("capping:anchor")
-	if a and a.bars and a.bars[bar] then
-		--currentBarStyler.BarStopped(bar)
-		a.bars[bar] = nil
+		bar:SetScript("OnMouseUp", BarOnClick)
+		--bar:SetScale(db.scale)
+		bar:SetFill(db.fill)
+		bar:Start()
+		if paused then bar:Pause() end
 		SortBars()
 	end
-end)
+
+	function Capping:GetBar(text)
+		for bar in next, activeBars do
+			if bar:GetLabel() == text then
+				return bar
+			end
+		end
+	end
+
+	function Capping:StopBar(text)
+		local dirty = nil
+		for bar in next, activeBars do
+			if bar:GetLabel() == text then
+				bar:Stop()
+				dirty = true
+			end
+		end
+		if dirty then SortBars() end
+	end
+
+	candy.RegisterCallback(Capping, "LibCandyBar_Stop", function(event, bar)
+		if activeBars[bar] then
+			activeBars[bar] = nil
+			SortBars()
+		end
+	end)
+end
 
 ------------------------------------
 function Capping:CheckStartTimer(a1) -- timer for when a battleground begins
@@ -909,7 +874,7 @@ function ShowOptions(a1, id)
 			local font = media:Fetch("font", db.font)
 			local fc = db.colors.font
 			anchor:SetWidth(db.width)
-			for bar in pairs(normalAnchor.bars) do
+			for bar in next, activeBars do
 				bar:SetTexture(texture)
 				bar.candyBarLabel:SetFont(font, db.fontsize)
 				bar.candyBarDuration:SetFont(font, db.fontsize-1)
@@ -923,7 +888,6 @@ function ShowOptions(a1, id)
 				--if k == "onegroup" and db.onegroup then f.down = not db.mainup end
 				--UpdateBarLayout(f)
 			end
-			SortBars()
 			Capping:ModMap()
 		end
 		local function HideCheck(b)
@@ -941,10 +905,10 @@ function ShowOptions(a1, id)
 			if k == "showoptions" then CloseMenu(b) ShowOptions()
 			elseif k == "anchor" then ToggleAnchor()
 			elseif k == "syncav" and GetRealZoneText() == av then Capping:SyncAV()
-			elseif k == "reportbg" then CloseMenu(b) ReportBG(value)
-			elseif k == "reportsay" then CloseMenu(b) ReportSAY(value)
+			elseif k == "reportbg" then CloseMenu(b) ReportBar(value, "INSTANCE_CHAT")
+			elseif k == "reportsay" then CloseMenu(b) ReportBar(value, "SAY")
 			elseif k == "enterbattle" then
-			elseif k == "canceltimer" then CloseMenu(b) CancelBar(value)
+			elseif k == "canceltimer" then CloseMenu(b) if value and activeBars[value] then value:Stop() end
 			elseif (k == "less" or k == "more") and lastb then
 				local off = (k == "less" and -8) or 8
 				if offsetvalue == value then
@@ -1143,7 +1107,7 @@ function ShowOptions(a1, id)
 					AddButton(lvl, bname)
 					if bname == winter then
 						AddExecute(lvl, L["Cancel Timer"], "canceltimer", barid)
-					elseif not activebars[bname] then
+					elseif not activeBars[bname] then
 	
 					else
 						AddExecute(lvl, L["Send to BG"], "reportbg", barid)
