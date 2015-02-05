@@ -593,7 +593,7 @@ local function ReportBar(bar, channel)
 	local colorid = bar:Get("capping:colorid")
 	local faction = colorid == "horde" and _G.FACTION_HORDE or colorid == "alliance" and _G.FACTION_ALLIANCE or ""
 	local timeLeft = bar.candyBarDuration:GetText()
-	if not timeLeft:find(":", nil true) then timeLeft = "0:"..timeLeft end
+	if not timeLeft:find(":", nil, true) then timeLeft = "0:"..timeLeft end
 	SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
 end
 local function BarOnClick(bar, button)
