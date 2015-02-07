@@ -462,6 +462,8 @@ function Capping:ZoneCheck() -- check if new zone is a battleground
 	elseif GetMapInfo() == "TolBarad" then
 		UpdateZoneMapVisibility()
 		wasInBG = true
+	elseif GetMapInfo() == "Ashran" then
+		self:StartAshran()
 	else
 		if instance == "arena" then
 			self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "CheckStartTimer")

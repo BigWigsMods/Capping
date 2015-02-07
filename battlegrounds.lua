@@ -734,3 +734,51 @@ function Capping:StartWintergrasp()
 	end
 	self:RegisterTempEvent("WORLD_MAP_UPDATE", "WinterAssault")
 end
+
+function Capping:StartAshran()
+	if not self.AshranControl then
+		function Capping:AshranControl(msg, ...)
+			--print(msg, ...)
+			--Ashran Herald yells: The Horde controls the Market Graveyard for 15 minutes!
+			local faction, point, timeString = strmatch(msg, "The (.+) controls the (.+) for (%d+) minutes!")
+			local timeLeft = tonumber(timeString)
+			if faction and point and timeLeft then
+				self:StartBar(point, timeLeft*60, nil, faction == "Horde" and "horde" or "alliance")
+			end
+		end
+	end
+	if not self.AshranEvents then
+		function Capping:AshranEvents(msg, ...)
+			local idString = strmatch(msg, "spell:(%d+)")
+			local id = tonumber(idString)
+			--print(msg:gsub("|", "||"), ...)
+			if id and id ~= 168506 then -- 168506 = Ancient Artifact
+				local name, _, icon = GetSpellInfo(id)
+				self:StartBar(name, 180, icon, "info2")
+			end
+		end
+	end
+	if not self.AshranTimeLeft then
+		function Capping:AshranTimeLeft()
+			local _, _, _, timeString = GetWorldStateUIInfo(12)
+			if timeString then
+				local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
+				minutes = tonumber(minutes)
+				seconds = tonumber(seconds)
+				if minutes and seconds then
+					local remaining = seconds + (minutes*60) + 1
+					if remaining > 4 then
+						local bar = self:GetBar(text)
+						if not bar or bar.remaining < remaining+5 then -- Don't restart bars for subtle changes +/- 5s
+							self:StartBar(_G.NEXT_BATTLE_LABEL, remaining, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
+						end
+					end
+				end
+			end
+		end
+	end
+	self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "AshranControl")
+	self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
+	self:RegisterTempEvent("UPDATE_WORLD_STATES", "AshranTimeLeft")
+end
+
