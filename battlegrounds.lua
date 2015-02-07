@@ -743,8 +743,9 @@ function Capping:StartAshran()
 			--Ashran Herald yells: The Horde controls the Market Graveyard for 15 minutes!
 			local faction, point, timeString = strmatch(msg, "The (.+) controls the (.+) for (%d+) minutes!")
 			local timeLeft = tonumber(timeString)
+			faction = faction == "Horde" and "horde" or "alliance"
 			if faction and point and timeLeft then
-				self:StartBar(point, timeLeft*60, nil, faction == "Horde" and "horde" or "alliance")
+				self:StartBar(point, timeLeft*60, GetIconData(faction, "graveyard"), faction)
 			end
 		end
 	end
@@ -769,9 +770,10 @@ function Capping:StartAshran()
 				if minutes and seconds then
 					local remaining = seconds + (minutes*60) + 1
 					if remaining > 4 then
+						local text = _G.NEXT_BATTLE_LABEL
 						local bar = self:GetBar(text)
-						if not bar or bar.remaining < remaining+5 then -- Don't restart bars for subtle changes +/- 5s
-							self:StartBar(_G.NEXT_BATTLE_LABEL, remaining, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
+						if not bar or remaining > bar.remaining+5 or remaining < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
+							self:StartBar(text, remaining, "Interface\\Icons\\achievement_zone_ashran", "info2")
 						end
 					end
 				end
