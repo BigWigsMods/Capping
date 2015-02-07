@@ -54,28 +54,29 @@ do -- POI handling
 		refinery = { 152, nil, nil, nil, 154, nil, nil, nil, 150, 151, 152, 153, 154, },
 		path = { "Interface\\Minimap\\POIIcons", },
 	}
-	local WorldMap_GetPOITextureCoords = _G.GetPOITextureCoords or _G.WorldMap_GetPOITextureCoords
+	local GetPOITextureCoords = _G.GetPOITextureCoords
 	for k, v in pairs(poicons) do
 		if k ~= "path" then
 			if k ~= "tower" then
-				v[1], v[2], v[3], v[4] = WorldMap_GetPOITextureCoords(v[1])
-				v[5], v[6], v[7], v[8] = WorldMap_GetPOITextureCoords(v[5])
+				v[1], v[2], v[3], v[4] = GetPOITextureCoords(v[1])
+				v[5], v[6], v[7], v[8] = GetPOITextureCoords(v[5])
 			else
-				v[2], v[1], v[3], v[4] = WorldMap_GetPOITextureCoords(v[1])
-				v[6], v[5], v[7], v[8] = WorldMap_GetPOITextureCoords(v[5])
+				v[2], v[1], v[3], v[4] = GetPOITextureCoords(v[1])
+				v[6], v[5], v[7], v[8] = GetPOITextureCoords(v[5])
 			end
 		end
 	end
-	--[[local m = UIParent:CreateTexture(nil, "OVERLAY")
-	m:SetTexture("Interface\\Minimap\\POIIcons")
-	m:SetPoint("CENTER")
-	m:SetWidth(256)
-	m:SetHeight(256)]]--
+	-- Easy world map icon checker
+	--local m = UIParent:CreateTexture(nil, "OVERLAY")
+	--m:SetTexture("Interface\\Minimap\\POIIcons")
+	--m:SetPoint("CENTER")
+	--m:SetWidth(512)
+	--m:SetHeight(700)
 
 	local path = poicons.path
 	Capping.iconpath = path
 	GetIconData = function(faction, name)
-		local t = poicons[name or "symbol"] or poicons.symbol
+		local t = name and poicons[name] or poicons.symbol
 		if faction == "horde" then
 			path[2], path[3], path[4], path[5] = t[5], t[6], t[7], t[8]
 		else
