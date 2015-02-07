@@ -595,7 +595,7 @@ local function ReportBar(bar, channel)
 	local colorid = bar:Get("capping:colorid")
 	local faction = colorid == "horde" and _G.FACTION_HORDE or colorid == "alliance" and _G.FACTION_ALLIANCE or ""
 	local timeLeft = bar.candyBarDuration:GetText()
-	if not timeLeft:find(":", nil, true) then timeLeft = "0:"..timeLeft end
+	if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
 	SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
 end
 local function BarOnClick(bar, button)
@@ -603,7 +603,7 @@ local function BarOnClick(bar, button)
 		if IsShiftKeyDown() then
 			ReportBar(bar, "SAY")
 		elseif IsControlKeyDown() then
-			ReportBar(bar, "INSTANCE_CHAT")
+			ReportBar(bar, IsInGroup(2) and "INSTANCE_CHAT" or "RAID") -- LE_PARTY_CATEGORY_INSTANCE = 2
 		else
 			ToggleAnchor()
 		end
