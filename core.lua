@@ -30,6 +30,31 @@ function Capping:UnregisterEvent(event)
 	anchor:UnregisterEvent(event)
 end
 
+-- EVENT HANDLERS
+local elist, clist = {}, {}
+anchor:SetScript("OnEvent", function(frame, event, ...)
+	Capping[elist[event] or event](Capping, ...)
+end)
+function Capping:RegisterTempEvent(event, other)
+	self:RegisterEvent(event)
+	elist[event] = other or event
+end
+function Capping:CheckCombat(func) -- check combat for secure functions
+	if InCombatLockdown() then
+		self:RegisterEvent("PLAYER_REGEN_ENABLED")
+		tinsert(clist, func)
+	else
+		func(self)
+	end
+end
+function Capping:PLAYER_REGEN_ENABLED() -- run queue when combat ends
+	for k, v in ipairs(clist) do
+		v(self)
+	end
+	wipe(clist)
+	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+end
+
 -- LOCAL FUNCS
 local ShowOptions
 local nofunc = function() end
@@ -71,7 +96,7 @@ local function WorldSoon(remain)
 end
 local function StartWorldTimers()
 	if IsInInstance() then return end
-	for i = 1, GetNumWorldPVPAreas() do
+	for i = 1, 2 do -- GetNumWorldPVPAreas() = 3: Wintergrasp, Tol Barad, Ashran
 		local _, localizedName, isActive, canQueue, startTime, canEnter = GetWorldPVPAreaInfo(i)
 		if localizedName then
 			db["worldname"..i] = localizedName
@@ -81,25 +106,21 @@ local function StartWorldTimers()
 				Capping:StopBar(localizedName)
 			elseif startTime > 0 then
 				worldwarned = nil
-				if i < 3 then
-					local currentmapid = GetCurrentMapAreaID()
-					SetMapByID((i == 2 and 708) or 485)
-					local concol, _, ti, _, _ = GetMapLandmarkInfo(1)
-					if ti == 46 then
-						concol = "alliance"
-					elseif ti == 48 then
-						concol = "horde"
-					else
-						concol = "info1"
-					end
-					SetMapByID(currentmapid)
-					local bar = Capping:GetBar(localizedName)
-					if not bar or startTime > bar.remaining+5 or startTime < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
-						Capping:StartBar(localizedName, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", concol, true) --WorldSoon
-					end
+				local currentmapid = GetCurrentMapAreaID()
+				SetMapByID((i == 2 and 708) or 485)
+				local concol, _, ti, _, _ = GetMapLandmarkInfo(1)
+				if ti == 46 then
+					concol = "alliance"
+				elseif ti == 48 then
+					concol = "horde"
 				else
-					-- Ashran?
-					--Capping:StartBar(localizedName, startTime, "Interface\\Icons\\INV_EssenceOfWintergrasp", "info1", true) --WorldSoon
+					concol = "info1"
+				end
+				SetMapByID(currentmapid)
+				local bar = Capping:GetBar(localizedName)
+				local icon = i == 1 and "Interface\\Icons\\INV_EssenceOfWintergrasp" or "Interface\\Icons\\achievement_zone_tolbarad"
+				if not bar or startTime > bar.remaining+5 or startTime < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
+					Capping:StartBar(localizedName, startTime, icon, concol, true) --WorldSoon
 				end
 			end
 		else
@@ -178,7 +199,7 @@ end
 --end)
 function Capping:START_TIMER(timerType, timeSeconds, totalTime)
 	local _, t = GetInstanceInfo()
-	if t == "pvp" then
+	if t == "pvp" or t == "arena" then
 		if db.hideblizztime then
 			for a, timer in pairs(TimerTracker.timerList) do
 				timer:Hide()
@@ -194,31 +215,6 @@ function Capping:START_TIMER(timerType, timeSeconds, totalTime)
 	end
 end
 Capping:RegisterEvent("START_TIMER")
-
--- EVENT HANDLERS
-local elist, clist = {}, {}
-anchor:SetScript("OnEvent", function(frame, event, ...)
-	Capping[elist[event] or event](Capping, ...)
-end)
-function Capping:RegisterTempEvent(event, other)
-	self:RegisterEvent(event)
-	elist[event] = other or event
-end
-function Capping:CheckCombat(func) -- check combat for secure functions
-	if InCombatLockdown() then
-		self:RegisterEvent("PLAYER_REGEN_ENABLED")
-		tinsert(clist, func)
-	else
-		func(self)
-	end
-end
-function Capping:PLAYER_REGEN_ENABLED() -- run queue when combat ends
-	for k, v in ipairs(clist) do
-		v(self)
-	end
-	wipe(clist)
-	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-end
 
 
 Capping:RegisterEvent("ADDON_LOADED")
@@ -310,9 +306,9 @@ function Capping:ADDON_LOADED(a1)
 	anchor:SetText("Capping")
 
 
-	if db.sbx then WorldStateAlwaysUpFrame:SetPoint("TOP") end -- world state info frame positioning
-	if db.cbx then wsaufu() end -- capturebar position
-	if db.seatx then VehicleSeatIndicator:SetPoint("TOPRIGHT") end -- vehicle seat position
+	--if db.sbx then WorldStateAlwaysUpFrame:SetPoint("TOP") end -- world state info frame positioning
+	--if db.cbx then wsaufu() end -- capturebar position
+	--if db.seatx then VehicleSeatIndicator:SetPoint("TOPRIGHT") end -- vehicle seat position
 
 	local regal = false
 	if BattlefieldMinimap then -- battlefield minimap setup
@@ -820,10 +816,9 @@ do
 	end)
 end
 
-------------------------------------
-function Capping:CheckStartTimer(a1) -- timer for when a battleground begins
-------------------------------------
-	if instance == "arena" and strmatch(a1, strlower(L["has begun"])) then -- Shadow Sight spawn timer
+function Capping:CheckStartTimer(msg) -- timer for when a battleground begins
+	local _, zoneType = GetInstanceInfo()
+	if zoneType == "arena" and strmatch(msg, L["has begun"]) then -- Shadow Sight spawn timer
 		local spell, _, icon = GetSpellInfo(34709)
 		self:StartBar(spell, 93, icon, "info2")
 	end
@@ -930,31 +925,31 @@ function ShowOptions(a1, id)
 				Capping:StartBar(L["Test"].." - ".._G.FACTION_ALLIANCE, 45, testicon, "alliance")
 				Capping:StartBar(L["Test"].." - ".._G.FACTION_HORDE, 100, testicon, "horde")
 				Capping:StartBar(L["Test"], 75, testicon, "info2")
-			elseif k == "movesb" then
-				sbmover = sbmover or CreateMover(nil, 220, 48, function(this)
-					this:StopMovingOrSizing()
-					db.sbx, db.sby = floor(this:GetLeft() + 50.5), floor(this:GetTop() - GetScreenHeight() + 10.5)
-					WorldStateAlwaysUpFrame:SetPoint("TOP")
-				end)
-				sbmover:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", WorldStateAlwaysUpFrame:GetLeft() - 50, WorldStateAlwaysUpFrame:GetTop() - 10)
-				sbmover:Show()
-			elseif k == "movecb" then
-				cbmover = cbmover or CreateMover(nil, 173, 27, function(this)
-					this:StopMovingOrSizing()
-					db.cbx, db.cby = floor(this:GetRight() + 0.5), floor(this:GetTop() + 0.5)
-					wsaufu()
-				end)
-				local x, y = db.cbx or max(0, MinimapCluster:GetRight() - CONTAINER_OFFSET_X), db.cby or max(20, MinimapCluster:GetBottom())
-				cbmover:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", x, y)
-				cbmover:Show()
-			elseif k == "moveseat" then
-				seatmover = seatmover or CreateMover(nil, 128, 128, function(this)
-					this:StopMovingOrSizing()
-					db.seatx, db.seaty = floor(this:GetRight() + 0.5), floor(this:GetTop() + 0.5)
-					VehicleSeatIndicator:SetPoint("TOPRIGHT")
-				end)
-				seatmover:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", VehicleSeatIndicator:GetRight(), VehicleSeatIndicator:GetTop())
-				seatmover:Show()
+			--elseif k == "movesb" then
+			--	sbmover = sbmover or CreateMover(nil, 220, 48, function(this)
+			--		this:StopMovingOrSizing()
+			--		db.sbx, db.sby = floor(this:GetLeft() + 50.5), floor(this:GetTop() - GetScreenHeight() + 10.5)
+			--		WorldStateAlwaysUpFrame:SetPoint("TOP")
+			--	end)
+			--	sbmover:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", WorldStateAlwaysUpFrame:GetLeft() - 50, WorldStateAlwaysUpFrame:GetTop() - 10)
+			--	sbmover:Show()
+			--elseif k == "movecb" then
+			--	cbmover = cbmover or CreateMover(nil, 173, 27, function(this)
+			--		this:StopMovingOrSizing()
+			--		db.cbx, db.cby = floor(this:GetRight() + 0.5), floor(this:GetTop() + 0.5)
+			--		wsaufu()
+			--	end)
+			--	local x, y = db.cbx or max(0, MinimapCluster:GetRight() - CONTAINER_OFFSET_X), db.cby or max(20, MinimapCluster:GetBottom())
+			--	cbmover:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", x, y)
+			--	cbmover:Show()
+			--elseif k == "moveseat" then
+			--	seatmover = seatmover or CreateMover(nil, 128, 128, function(this)
+			--		this:StopMovingOrSizing()
+			--		db.seatx, db.seaty = floor(this:GetRight() + 0.5), floor(this:GetTop() + 0.5)
+			--		VehicleSeatIndicator:SetPoint("TOPRIGHT")
+			--	end)
+			--	seatmover:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", VehicleSeatIndicator:GetRight(), VehicleSeatIndicator:GetTop())
+			--	seatmover:Show()
 			elseif k == "resetmap" and bgtab then
 				bgtab:ClearAllPoints()
 				bgtab:SetPoint("CENTER")

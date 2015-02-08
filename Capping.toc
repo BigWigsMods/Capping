@@ -3,7 +3,7 @@
 ## Author: Funkydude, TotalPackage
 ## Notes: Battleground timers and other goodies.
 ## Notes-zhTW: 顯示戰場上的狀態條。
-## Version: 6.0.004
+## Version: 6.0.005
 
 ## SavedVariables: CappingDB
 ## SavedVariablesPerCharacter: CappingCharDB
