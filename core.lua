@@ -17,7 +17,7 @@ local min, floor, math_sin, math_pi, tonumber = min, floor, math.sin, math.pi, t
 local GetTime, time = GetTime, time
 
 -- LOCAL VARS
-local db, wasInBG, bgmap, bgtab, _, instance, worldwarned
+local db, wasInBG, bgmap, bgtab, worldwarned
 local activeBars, bars, currentq, bgdd = { }, { }, { }, { }
 local av, ab, eots, wsg, winter, ioc = GetMapNameByID(401), GetMapNameByID(461), GetMapNameByID(813), GetMapNameByID(443), GetMapNameByID(501), GetMapNameByID(540)
 local narrowed, borderhidden, ACountText, HCountText
@@ -365,22 +365,12 @@ function Capping:PLAYER_ENTERING_WORLD()
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
 	self:UPDATE_BATTLEFIELD_STATUS()
-	self:ZoneCheck()
+	self:ZONE_CHANGED_NEW_AREA()
 
 	--RegisterAddonMessagePrefix("cap")
 
 	self.PLAYER_ENTERING_WORLD = nil
 end
-
-----------------------------------------
-function Capping:ZONE_CHANGED_NEW_AREA()
-----------------------------------------
-	if wasInBG then
-		self:ResetAll()
-	end
-	self:ZoneCheck()
-end
-
 
 local tohide = { }
 local function HideProtectedStuff()
@@ -408,70 +398,94 @@ function Capping:ResetAll() -- reset all timers and unregister temp events
 	if ACountText then ACountText:SetText("") end
 	if HCountText then HCountText:SetText("") end
 end
-----------------------------
-function Capping:ZoneCheck() -- check if new zone is a battleground
-----------------------------
-	SetMapToCurrentZone()
-	_, instance = IsInInstance()
-	if instance == "pvp" then
-		local z = GetMapInfo()
-		wasInBG = true
-		if (z == "WarsongGulch" and db.wsg) or (z == "TwinPeaks" and not db.notp) then
-			self:StartWSG()
-		elseif z == "NetherstormArena" and db.eots then
-			self:StartEotS()
-		elseif z == "ArathiBasin" and db.ab then
-			self:StartAB()
-		elseif z == "AlteracValley" and db.av then
-			self:StartAV()
-		elseif z == "IsleofConquest" and db.ioc then
-			self:StartIoC()
-		elseif z == "GilneasBattleground2" and not db.nogil then
-			self:StartGil()
-		elseif z == "GoldRush" then
-			self:StartDG()
-			self:StartWSG()
-		end
-		if not self.bgtotals then -- frame to display roster count
-			self.bgtotals = CreateFrame("Frame", nil, AlwaysUpFrame1)
-			self.bgtotals:SetScript("OnUpdate", function(this, elapsed)
-				this.elapsed = (this.elapsed or 0) + elapsed
-				if this.elapsed < 4 then return end
-				this.elapsed = 0
-				RequestBattlefieldScoreData()
-			end)
-			self:AddFrameToHide(self.bgtotals)
-		end
-		self.bgtotals:Show()
 
-		self:RegisterTempEvent("UPDATE_BATTLEFIELD_SCORE", "UpdateCountText")
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "CheckStartTimer")
-		RequestBattlefieldScoreData()
+do
+	local zoneIds = {}
+	function Capping:AddBG(id, func)
+		zoneIds[id] = func
+	end
+--732 tol barad
+	function Capping:ZONE_CHANGED_NEW_AREA()
+		if wasInBG then
+			self:ResetAll()
+		end
 
-		UpdateZoneMapVisibility()
-	elseif GetMapInfo() == "LakeWintergrasp" then
-		StartWorldTimers()
-		UpdateZoneMapVisibility()
-		wasInBG = true
-		Capping.CheckWinterEnd = StartWorldTimers
-		self:RegisterTempEvent("CHAT_MSG_RAID_BOSS_EMOTE", "CheckWinterEnd")
-	elseif GetMapInfo() == "TolBarad" then
-		UpdateZoneMapVisibility()
-		wasInBG = true
-	elseif GetMapInfo() == "Ashran" then
-		self:StartAshran()
-	else
-		if instance == "arena" then
+		local _, zoneType, _, _, _, _, _, id = GetInstanceInfo()
+		print(id)
+		if zoneType == "pvp" then
+			local func = zoneIds[id]
+			if func then
+				wasInBG = true
+				func(self)
+			end
+		elseif zoneType == "arena" then
 			self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "CheckStartTimer")
 			wasInBG = true
 		else
+			SetMapToCurrentZone()
+			local z = GetMapInfo()
+			local func = zoneIds[z]
+			if func then
+				wasInBG = true
+				func(self)
+			end
+		end
+
+		SetMapToCurrentZone()
+		if zoneType == "pvp" then
+			local z = GetMapInfo()
+			wasInBG = true
+			if (z == "WarsongGulch" and db.wsg) or (z == "TwinPeaks" and not db.notp) then
+				self:StartWSG()
+			elseif z == "ArathiBasin" and db.ab then
+				self:StartAB()
+			elseif z == "AlteracValley" and db.av then
+				self:StartAV()
+			elseif z == "IsleofConquest" and db.ioc then
+				self:StartIoC()
+			elseif z == "GilneasBattleground2" and not db.nogil then
+				self:StartGil()
+			elseif z == "GoldRush" then
+				self:StartDG()
+				self:StartWSG()
+			end
+			if not self.bgtotals then -- frame to display roster count
+				self.bgtotals = CreateFrame("Frame", nil, AlwaysUpFrame1)
+				self.bgtotals:SetScript("OnUpdate", function(this, elapsed)
+					this.elapsed = (this.elapsed or 0) + elapsed
+					if this.elapsed < 4 then return end
+					this.elapsed = 0
+					RequestBattlefieldScoreData()
+				end)
+				self:AddFrameToHide(self.bgtotals)
+			end
+			self.bgtotals:Show()
+
+			self:RegisterTempEvent("UPDATE_BATTLEFIELD_SCORE", "UpdateCountText")
+			RequestBattlefieldScoreData()
+
+			UpdateZoneMapVisibility()
+		elseif GetMapInfo() == "LakeWintergrasp" then
 			StartWorldTimers()
+			UpdateZoneMapVisibility()
+			wasInBG = true
+			Capping.CheckWinterEnd = StartWorldTimers
+			self:RegisterTempEvent("CHAT_MSG_RAID_BOSS_EMOTE", "CheckWinterEnd")
+		elseif GetMapInfo() == "TolBarad" then
+			UpdateZoneMapVisibility()
+			wasInBG = true
+		else
+			if zoneType == "arena" then
+
+			else
+				StartWorldTimers()
+			end
+			if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then
+				bgmap:Hide()
+			end
 		end
-		if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then
-			bgmap:Hide()
-		end
+		self:ModMap()
 	end
-	self:ModMap()
 end
 
 --------------------------------
@@ -479,7 +493,8 @@ function Capping:ModMap(disable) -- alter the default minimap
 --------------------------------
 	if not bgmap or db.disablemap then return end
 	bgmap:SetScale(db.mapscale)
-	disable = instance ~= "pvp" or disable
+	local _, zoneType = IsInInstance()
+	disable = zoneType ~= "pvp" or disable
 
 	if db.narrow and not narrowed and not disable then -- narrow setting
 		BattlefieldMinimap1:Hide() BattlefieldMinimap4:Hide() BattlefieldMinimap5:Hide()

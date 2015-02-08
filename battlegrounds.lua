@@ -369,90 +369,91 @@ function Capping:StartAV()
 end
 
 
-local ef, ResetCarrier
------------------------------------------------- Eye of the Storm -------------------------------------------------
-function Capping:StartEotS()
-----------------------------
-	if not ef then
-		local eficon, eftext, carrier, cclass
-		-- handles secure stuff
-		local function SetEotSCarrierAttribute()
-			ef:SetFrameStrata("HIGH")
-			ef:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() - 14, AlwaysUpFrame1:GetBottom() + 8.5)
-			if UnitExists("arena1") then
-				SecureUnitButton_OnLoad(ef, "arena1")
-			elseif UnitExists("arena2") then
-				SecureUnitButton_OnLoad(ef, "arena2")
-			end
-			UnregisterUnitWatch(ef)
-		end
-		-- resets carrier display
-		ResetCarrier = function(captured)
-			carrier, ef.faction, ef.car = nil, nil, nil
-			eftext:SetText("")
-			eficon:Hide()
-			if captured then
-				self:StartBar(L["Flag respawns"], 12, GetIconData(strlower(UnitFactionGroup("player")), "flag"), "info2")
-			end
-			self:CheckCombat(SetEotSCarrierAttribute)
-		end
-		local function CarrierOnClick(this)
-			if IsControlKeyDown() and carrier then
-				SendChatMessage(format(L["%s's flag carrier: %s (%s)"], this.faction, carrier, cclass), "INSTANCE_CHAT")
-			end
-		end
-		-- parse battleground messages
-		local function EotSFlag(a1, faction)
-			local name = strmatch(a1, L["^(.+) has taken the flag!"])
-			if name then
-				if name == "L'Alliance" then -- frFR
-					ResetCarrier(true)
-				else
-					cclass = GetClassByName(name, faction)
-					carrier, ef.car = name, true
-					ef.faction = (faction == 0 and _G.FACTION_HORDE) or _G.FACTION_ALLIANCE
-					eftext:SetFormattedText("|cff%s%s|r", classcolor[cclass or "PRIEST"] or classcolor.PRIEST, carrier or "")
-					eficon:SetTexture((faction == 0 and "Interface\\WorldStateFrame\\HordeFlag") or "Interface\\WorldStateFrame\\AllianceFlag")
-					eficon:Show()
-					self:CheckCombat(SetEotSCarrierAttribute)
+do
+	------------------------------------------------ Eye of the Storm -------------------------------------------------
+	local ef, ResetCarrier
+	local function EyeOfTheStorm(self)
+		if not ef then
+			local eficon, eftext, carrier, cclass
+			-- handles secure stuff
+			local function SetEotSCarrierAttribute()
+				ef:SetFrameStrata("HIGH")
+				ef:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() - 14, AlwaysUpFrame1:GetBottom() + 8.5)
+				if UnitExists("arena1") then
+					SecureUnitButton_OnLoad(ef, "arena1")
+				elseif UnitExists("arena2") then
+					SecureUnitButton_OnLoad(ef, "arena2")
 				end
-			elseif strmatch(a1, L["dropped"]) then
-				ResetCarrier()
-			elseif strmatch(a1, L["captured the"]) or strmatch(a1, taken) then
-				ResetCarrier(true)
+				UnregisterUnitWatch(ef)
 			end
-		end
-		--------------------------------
-		function Capping:HFlagUpdate(a1)
-		--------------------------------
-			EotSFlag(a1, 0)
-		end
-		--------------------------------
-		function Capping:AFlagUpdate(a1)
-		--------------------------------
-			EotSFlag(a1, 1)
+			-- resets carrier display
+			ResetCarrier = function(captured)
+				carrier, ef.faction, ef.car = nil, nil, nil
+				eftext:SetText("")
+				eficon:Hide()
+				if captured then
+					self:StartBar(L["Flag respawns"], 12, GetIconData(strlower(UnitFactionGroup("player")), "flag"), "info2")
+				end
+				self:CheckCombat(SetEotSCarrierAttribute)
+			end
+			local function CarrierOnClick(this)
+				if IsControlKeyDown() and carrier then
+					SendChatMessage(format(L["%s's flag carrier: %s (%s)"], this.faction, carrier, cclass), "INSTANCE_CHAT")
+				end
+			end
+			-- parse battleground messages
+			local function EotSFlag(a1, faction)
+				local name = strmatch(a1, L["^(.+) has taken the flag!"])
+				if name then
+					if name == "L'Alliance" then -- frFR
+						ResetCarrier(true)
+					else
+						cclass = GetClassByName(name, faction)
+						carrier, ef.car = name, true
+						ef.faction = (faction == 0 and _G.FACTION_HORDE) or _G.FACTION_ALLIANCE
+						eftext:SetFormattedText("|cff%s%s|r", classcolor[cclass or "PRIEST"] or classcolor.PRIEST, carrier or "")
+						eficon:SetTexture((faction == 0 and "Interface\\WorldStateFrame\\HordeFlag") or "Interface\\WorldStateFrame\\AllianceFlag")
+						eficon:Show()
+						self:CheckCombat(SetEotSCarrierAttribute)
+					end
+				elseif strmatch(a1, L["dropped"]) then
+					ResetCarrier()
+				elseif strmatch(a1, L["captured the"]) or strmatch(a1, taken) then
+					ResetCarrier(true)
+				end
+			end
+			--------------------------------
+			function Capping:HFlagUpdate(a1)
+			--------------------------------
+				EotSFlag(a1, 0)
+			end
+			--------------------------------
+			function Capping:AFlagUpdate(a1)
+			--------------------------------
+				EotSFlag(a1, 1)
+			end
+
+			ef = self:CreateCarrierButton("CappingEotSFrame", CarrierOnClick)
+			eficon = ef:CreateTexture(nil, "ARTWORK") -- flag icon
+			eficon:SetPoint("TOPLEFT", ef, "TOPLEFT", 0, 1)
+			eficon:SetPoint("BOTTOMRIGHT", ef, "BOTTOMLEFT", 20, -1)
+
+			eftext = self:CreateText(ef, 13, "LEFT", eficon, 22, 0, ef, 0, 0) -- carrier text
+			ef.text = eftext
+
+			self:AddFrameToHide(ef) -- add to the tohide list to hide when bg is over
 		end
 
-		ef = self:CreateCarrierButton("CappingEotSFrame", CarrierOnClick)
-		eficon = ef:CreateTexture(nil, "ARTWORK") -- flag icon
-		eficon:SetPoint("TOPLEFT", ef, "TOPLEFT", 0, 1)
-		eficon:SetPoint("BOTTOMRIGHT", ef, "BOTTOMLEFT", 20, -1)
+		ef:Show()
+		ResetCarrier()
 
-		eftext = self:CreateText(ef, 13, "LEFT", eficon, 22, 0, ef, 0, 0) -- carrier text
-		ef.text = eftext
-
-		self:AddFrameToHide(ef) -- add to the tohide list to hide when bg is over
+		-- setup for final score estimation (2 for EotS)
+		NewEstimator(2)
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HFlagUpdate")
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AFlagUpdate")
 	end
-
-	ef:Show()
-	ResetCarrier()
-
-	-- setup for final score estimation (2 for EotS)
-	NewEstimator(2)
-	self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HFlagUpdate")
-	self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AFlagUpdate")
+	Capping:AddBG(566, EyeOfTheStorm)
 end
-
 
 ------------------------------------------------ Isle of Conquest --------------------------------------
 function Capping:StartIoC()
@@ -736,52 +737,55 @@ function Capping:StartWintergrasp()
 	self:RegisterTempEvent("WORLD_MAP_UPDATE", "WinterAssault")
 end
 
-function Capping:StartAshran()
-	if not self.AshranControl then
-		function Capping:AshranControl(msg, ...)
-			--print(msg, ...)
-			--Ashran Herald yells: The Horde controls the Market Graveyard for 15 minutes!
-			local faction, point, timeString = strmatch(msg, "The (.+) controls the (.+) for (%d+) minutes!")
-			local timeLeft = tonumber(timeString)
-			faction = faction == "Horde" and "horde" or "alliance"
-			if faction and point and timeLeft then
-				self:StartBar(point, timeLeft*60, GetIconData(faction, "graveyard"), faction)
+do
+	local function Ashran(self)
+		if not self.AshranControl then
+			function Capping:AshranControl(msg, ...)
+				--print(msg, ...)
+				--Ashran Herald yells: The Horde controls the Market Graveyard for 15 minutes!
+				local faction, point, timeString = strmatch(msg, "The (.+) controls the (.+) for (%d+) minutes!")
+				local timeLeft = tonumber(timeString)
+				faction = faction == "Horde" and "horde" or "alliance"
+				if faction and point and timeLeft then
+					self:StartBar(point, timeLeft*60, GetIconData(faction, "graveyard"), faction)
+				end
 			end
 		end
-	end
-	if not self.AshranEvents then
-		function Capping:AshranEvents(msg, ...)
-			local idString = strmatch(msg, "spell:(%d+)")
-			local id = tonumber(idString)
-			--print(msg:gsub("|", "||"), ...)
-			if id and id ~= 168506 then -- 168506 = Ancient Artifact
-				local name, _, icon = GetSpellInfo(id)
-				self:StartBar(name, 180, icon, "info2")
+		if not self.AshranEvents then
+			function Capping:AshranEvents(msg, ...)
+				local idString = strmatch(msg, "spell:(%d+)")
+				local id = tonumber(idString)
+				--print(msg:gsub("|", "||"), ...)
+				if id and id ~= 168506 then -- 168506 = Ancient Artifact
+					local name, _, icon = GetSpellInfo(id)
+					self:StartBar(name, 180, icon, "info2")
+				end
 			end
 		end
-	end
-	if not self.AshranTimeLeft then
-		function Capping:AshranTimeLeft()
-			local _, _, _, timeString = GetWorldStateUIInfo(12)
-			if timeString then
-				local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
-				minutes = tonumber(minutes)
-				seconds = tonumber(seconds)
-				if minutes and seconds then
-					local remaining = seconds + (minutes*60) + 1
-					if remaining > 4 then
-						local text = _G.NEXT_BATTLE_LABEL
-						local bar = self:GetBar(text)
-						if not bar or remaining > bar.remaining+5 or remaining < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
-							self:StartBar(text, remaining, "Interface\\Icons\\achievement_zone_ashran", "info2")
+		if not self.AshranTimeLeft then
+			function Capping:AshranTimeLeft()
+				local _, _, _, timeString = GetWorldStateUIInfo(12)
+				if timeString then
+					local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
+					minutes = tonumber(minutes)
+					seconds = tonumber(seconds)
+					if minutes and seconds then
+						local remaining = seconds + (minutes*60) + 1
+						if remaining > 4 then
+							local text = _G.NEXT_BATTLE_LABEL
+							local bar = self:GetBar(text)
+							if not bar or remaining > bar.remaining+5 or remaining < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
+								self:StartBar(text, remaining, "Interface\\Icons\\achievement_zone_ashran", "info2")
+							end
 						end
 					end
 				end
 			end
 		end
+		self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "AshranControl")
+		self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
+		self:RegisterTempEvent("UPDATE_WORLD_STATES", "AshranTimeLeft")
 	end
-	self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "AshranControl")
-	self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
-	self:RegisterTempEvent("UPDATE_WORLD_STATES", "AshranTimeLeft")
+	Capping:AddBG("Ashran", Ashran) -- 1191
 end
 
