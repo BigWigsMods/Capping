@@ -17,7 +17,7 @@ local min, floor, math_sin, math_pi, tonumber = min, floor, math.sin, math.pi, t
 local GetTime, time = GetTime, time
 
 -- LOCAL VARS
-local db, wasInBG, bgmap, bgtab, worldwarned
+local db, wasInBG, bgmap, bgtab
 local activeBars, bars, currentq, bgdd = { }, { }, { }, { }
 local av, ab, eots, wsg, winter, ioc = GetMapNameByID(401), GetMapNameByID(461), GetMapNameByID(813), GetMapNameByID(443), GetMapNameByID(501), GetMapNameByID(540)
 local narrowed, borderhidden, ACountText, HCountText
@@ -88,16 +88,11 @@ local function NewText(parent, font, fontsize, justifyH, justifyV, overlay)
 	return t
 end
 
-local function WorldSoon(remain)
-	if remain < 60 and remain > 59 and not worldwarned then
-		worldwarned = true
-		RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format(_G.NEXT_BATTLE, 0, 1, 0))
-	end
-end
 local function StartWorldTimers()
-	--if IsInInstance() then return end
-	for i = 1, 2 do -- GetNumWorldPVPAreas() = 3: Wintergrasp, Tol Barad, Ashran
-		local _, localizedName, isActive, canQueue, startTime, canEnter = GetWorldPVPAreaInfo(i)
+	-- GetNumWorldPVPAreas() = 3
+	-- 1) Wintergrasp, 2) Tol Barad, 3) Ashran (not timed)
+	for i = 1, 2 do
+		local _, localizedName, isActive, _, startTime = GetWorldPVPAreaInfo(i)
 		if localizedName then
 			db["worldname"..i] = localizedName
 		end
@@ -105,32 +100,39 @@ local function StartWorldTimers()
 			if startTime < 1 or isActive then
 				Capping:StopBar(localizedName)
 			elseif startTime > 0 then
-				worldwarned = nil
-				local currentmapid = GetCurrentMapAreaID()
-				SetMapByID((i == 2 and 708) or 501)
-				local _, _, ti, _, _ = GetMapLandmarkInfo(1)
-				local color
-				if ti == 46 then
-					color = "alliance"
-				elseif ti == 48 then
-					color = "horde"
-				else
-					color = "info1"
-				end
-				SetMapByID(currentmapid)
 				local bar = Capping:GetBar(localizedName)
-				if bar and color ~= "info1" and bar:Get("capping:colorid") == "info1" then bar = nil end -- Force refresh the bar if we have capture data
-				local icon = i == 1 and "Interface\\Icons\\INV_EssenceOfWintergrasp" or "Interface\\Icons\\achievement_zone_tolbarad"
+				local prevColor = bar and bar:Get("capping:colorid") -- Force refresh the bar if we have capture data
+				local color
+				if not bar or prevColor == "info1" then
+					local currentmapid = GetCurrentMapAreaID()
+					SetMapByID((i == 2 and 708) or 501)
+					local _, _, ti, _, _ = GetMapLandmarkInfo(1)
+					if ti == 46 then
+						color = "alliance"
+					elseif ti == 48 then
+						color = "horde"
+					else
+						color = "info1"
+					end
+					SetMapByID(currentmapid)
+					if color ~= "info1" then
+						bar = nil
+						prevColor = color
+					end
+				end
+
 				if not bar or startTime > bar.remaining+5 or startTime < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
-					Capping:StartBar(localizedName, startTime, icon, color, true) --WorldSoon
+					local icon = i == 1 and "Interface\\Icons\\INV_EssenceOfWintergrasp" or "Interface\\Icons\\achievement_zone_tolbarad"
+					bar = Capping:StartBar(localizedName, startTime, icon, prevColor or color, true)
+					--bar:Set("capping:onexpire", func)
 				end
 			end
 		else
 			Capping:StopBar(localizedName)
 		end
 	end
-	return true
 end
+
 local function StartMoving(this) this:StartMoving() end
 local function CreateMover(oldframe, w, h, dragstopfunc)
 	local mover = oldframe or CreateFrame("Button", nil, UIParent)
@@ -569,7 +571,9 @@ do -- estimated wait timer and port timer
 								break
 							end
 						end
-						self:StartBar(map, 1, icon or "Interface\\Icons\\inv_misc_questionmark", "info1", true, true) -- Question mark icon for random battleground
+						oldBar = self:StartBar(map, 1, icon or "Interface\\Icons\\inv_misc_questionmark", "info1", true) -- Question mark icon for random battleground
+						oldBar:Pause()
+						oldBar:SetTimeVisibility(false)
 					end
 					currentq[map] = i
 				end
@@ -744,8 +748,8 @@ do
 			end
 		end
 	end
-	function Capping:StartBar(name, remaining, icon, colorid, separate, paused)
-		--print("Capping:", tostringall(name, remaining, icon, colorid, separate, paused))
+	function Capping:StartBar(name, remaining, icon, colorid, separate)
+		--print("Capping:", tostringall(name, remaining, icon, colorid, separate))
 		self:StopBar(name)
 		local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
 		activeBars[bar] = true
@@ -784,8 +788,8 @@ do
 		--bar:SetScale(db.scale)
 		bar:SetFill(db.fill)
 		bar:Start()
-		if paused then bar:Pause() end
 		SortBars()
+		return bar
 	end
 
 	function Capping:GetBar(text)
