@@ -238,136 +238,141 @@ do
 	end
 end
 
-
------------------------------------------------- Arathi Basin -----------------------------------------------------
-function Capping:StartAB()
---------------------------
-	SetupAssault(60)
-	NewEstimator(1)
+do
+	------------------------------------------------ Arathi Basin -----------------------------------------------------
+	local function ArathiBasin()
+		SetupAssault(60)
+		NewEstimator(1)
+	end
+	Capping:AddBG(529, ArathiBasin)
 end
 
------------------------------------------------- Deepwind Gorge -----------------------------------------------------
-function Capping:StartDG()
---------------------------
-	SetupAssault(61)
-	--NewEstimator(1)
+do
+	------------------------------------------------ Deepwind Gorge -----------------------------------------------------
+	local function DeepwindGorge()
+		SetupAssault(61)
+		--NewEstimator(1)
+	end
+	Capping:AddBG(1105, DeepwindGorge)
 end
 
------------------------------------------------- Gilneas -----------------------------------------------------
-function Capping:StartGil()
---------------------------
-	SetupAssault(60)
-	NewEstimator(3)
+do
+	------------------------------------------------ Gilneas -----------------------------------------------------
+	local function TheBattleForGilneas()
+		SetupAssault(60)
+		NewEstimator(3)
+	end
+	Capping:AddBG(761, TheBattleForGilneas)
 end
 
+do
+	------------------------------------------------ Alterac Valley ---------------------------------------------------
+	local function AlteracValley(self)
+		if not self.AVAssaults then
+			pname = pname or UnitName("player")
 
------------------------------------------------- Alterac Valley ---------------------------------------------------
-function Capping:StartAV()
---------------------------
-	if not self.AVAssaults then
-		pname = pname or UnitName("player")
-
-		function Capping:GOSSIP_SHOW()
-			if self.db.avquest then
-				local target = UnitGUID("target")
-				if target then
-					local _, _, _, _, _, id = strsplit("-", target)
-					local mobId = tonumber(id)
-					if mobId == 13176 or mobId == 13257 then -- Smith Regzar, Murgot Deepforge
-						-- Open Quest to Smith or Murgot
-						if GetGossipOptions() and strmatch(GetGossipOptions(), L["Upgrade to"] ) then
-							SelectGossipOption(1)
-						elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
-							SelectGossipAvailableQuest(1)
-						end
-					elseif mobId == 13617 or mobId == 13616 then -- Stormpike Stable Master, Frostwolf Stable Master
-						if GetGossipOptions() then
-							SelectGossipOption(1)
-						end
-					elseif mobId == 13236 then -- Primalist Thurloga
-						local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
-						if num >= 5 then
-							SelectGossipAvailableQuest(2)
-						elseif num > 0 then
-							SelectGossipAvailableQuest(1)
-						end
-					elseif mobId == 13442 then -- Arch Druid Renferal
-						local num = GetItemCount(17423) -- Storm Crystal 17423
-						if num >= 5 then
-							SelectGossipAvailableQuest(2)
-						elseif num > 0 then
-							SelectGossipAvailableQuest(1)
-						end
-					elseif mobId == 13577 then -- Stormpike Ram Rider Commander
-						if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
-							SelectGossipAvailableQuest(1)
-						end
-					elseif mobId == 13441 then -- Frostwolf Wolf Rider Commander
-						if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
-							SelectGossipAvailableQuest(1)
+			function Capping:GOSSIP_SHOW()
+				if self.db.avquest then
+					local target = UnitGUID("target")
+					if target then
+						local _, _, _, _, _, id = strsplit("-", target)
+						local mobId = tonumber(id)
+						if mobId == 13176 or mobId == 13257 then -- Smith Regzar, Murgot Deepforge
+							-- Open Quest to Smith or Murgot
+							if GetGossipOptions() and strmatch(GetGossipOptions(), L["Upgrade to"] ) then
+								SelectGossipOption(1)
+							elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
+								SelectGossipAvailableQuest(1)
+							end
+						elseif mobId == 13617 or mobId == 13616 then -- Stormpike Stable Master, Frostwolf Stable Master
+							if GetGossipOptions() then
+								SelectGossipOption(1)
+							end
+						elseif mobId == 13236 then -- Primalist Thurloga
+							local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
+							if num >= 5 then
+								SelectGossipAvailableQuest(2)
+							elseif num > 0 then
+								SelectGossipAvailableQuest(1)
+							end
+						elseif mobId == 13442 then -- Arch Druid Renferal
+							local num = GetItemCount(17423) -- Storm Crystal 17423
+							if num >= 5 then
+								SelectGossipAvailableQuest(2)
+							elseif num > 0 then
+								SelectGossipAvailableQuest(1)
+							end
+						elseif mobId == 13577 then -- Stormpike Ram Rider Commander
+							if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
+								SelectGossipAvailableQuest(1)
+							end
+						elseif mobId == 13441 then -- Frostwolf Wolf Rider Commander
+							if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
+								SelectGossipAvailableQuest(1)
+							end
 						end
 					end
 				end
 			end
-		end
-		function Capping:QUEST_PROGRESS()
-			if self.db.avquest then
-				self:GOSSIP_SHOW()
-				if IsQuestCompletable() then
-					CompleteQuest()
+			function Capping:QUEST_PROGRESS()
+				if self.db.avquest then
+					self:GOSSIP_SHOW()
+					if IsQuestCompletable() then
+						CompleteQuest()
+					end
 				end
 			end
-		end
-		function Capping:QUEST_COMPLETE()
-			if self.db.avquest then
-				GetQuestReward(0)
+			function Capping:QUEST_COMPLETE()
+				if self.db.avquest then
+					GetQuestReward(0)
+				end
 			end
+
+			------------------------------------------------------
+			--function Capping:AVSync(prefix, message, chan, sender)
+			------------------------------------------------------
+			--	if prefix ~= "cap" or sender == pname then return end
+			--	if message == "r" then
+			--		for value, color in pairs(Capping.activebars) do
+			--			local f = Capping:GetBar(value)
+			--			if f and f:IsShown() then
+			--				SendAddonMessage("cap", format("%s@%d@%d@%s", value, f.duration, f.duration - f.remaining, color), "WHISPER", sender)
+			--			end
+			--		end
+			--	else
+			--		local name, duration, elapsed, color = strmatch(message, "^(.+)@(%d+)@(%d+)@(%a+)$")
+			--		local f = self:GetBar(name)
+			--		if name and elapsed and (not f or not f:IsShown()) then
+			--			local icon
+			--			if name == L["Ivus begins moving"] then
+			--				icon = "Interface\\Icons\\Spell_Nature_NaturesBlessing"
+			--			elseif name == L["Lokholar begins moving"] then
+			--				icon = "Interface\\Icons\\Spell_Frost_Glacier"
+			--			else
+			--				icon = GetIconData(color, strmatch(nodestates[name] or "symbol0", "(%a+)(%d+)") or "symbol")
+			--			end
+			--			duration = tonumber(duration) or 245
+			--			self:StartBar(name, duration - (tonumber(elapsed) or 245), icon, color or "info2")
+			--		end
+			--	end
+			--end
+			---------------------------
+			--function Capping:SyncAV()
+			---------------------------
+			--	SendAddonMessage("cap", "r", "INSTANCE_CHAT")
+			--end
 		end
 
-		------------------------------------------------------
-		--function Capping:AVSync(prefix, message, chan, sender)
-		------------------------------------------------------
-		--	if prefix ~= "cap" or sender == pname then return end
-		--	if message == "r" then
-		--		for value, color in pairs(Capping.activebars) do
-		--			local f = Capping:GetBar(value)
-		--			if f and f:IsShown() then
-		--				SendAddonMessage("cap", format("%s@%d@%d@%s", value, f.duration, f.duration - f.remaining, color), "WHISPER", sender)
-		--			end
-		--		end
-		--	else
-		--		local name, duration, elapsed, color = strmatch(message, "^(.+)@(%d+)@(%d+)@(%a+)$")
-		--		local f = self:GetBar(name)
-		--		if name and elapsed and (not f or not f:IsShown()) then
-		--			local icon
-		--			if name == L["Ivus begins moving"] then
-		--				icon = "Interface\\Icons\\Spell_Nature_NaturesBlessing"
-		--			elseif name == L["Lokholar begins moving"] then
-		--				icon = "Interface\\Icons\\Spell_Frost_Glacier"
-		--			else
-		--				icon = GetIconData(color, strmatch(nodestates[name] or "symbol0", "(%a+)(%d+)") or "symbol")
-		--			end
-		--			duration = tonumber(duration) or 245
-		--			self:StartBar(name, duration - (tonumber(elapsed) or 245), icon, color or "info2")
-		--		end
-		--	end
-		--end
-		---------------------------
-		--function Capping:SyncAV()
-		---------------------------
-		--	SendAddonMessage("cap", "r", "INSTANCE_CHAT")
-		--end
+		SetupAssault(245)
+		self:RegisterTempEvent("GOSSIP_SHOW")
+		self:RegisterTempEvent("QUEST_PROGRESS")
+		self:RegisterTempEvent("QUEST_COMPLETE")
+
+		--self:RegisterTempEvent("CHAT_MSG_ADDON", "AVSync")
+		--self:SyncAV()
 	end
-
-	SetupAssault(245)
-	self:RegisterTempEvent("GOSSIP_SHOW")
-	self:RegisterTempEvent("QUEST_PROGRESS")
-	self:RegisterTempEvent("QUEST_COMPLETE")
-
-	--self:RegisterTempEvent("CHAT_MSG_ADDON", "AVSync")
-	--self:SyncAV()
+	Capping:AddBG(30, AlteracValley)
 end
-
 
 do
 	------------------------------------------------ Eye of the Storm -------------------------------------------------
@@ -455,289 +460,295 @@ do
 	Capping:AddBG(566, EyeOfTheStorm)
 end
 
------------------------------------------------- Isle of Conquest --------------------------------------
-function Capping:StartIoC()
----------------------------
-	if not self.HIoCAssault then
-		pname = pname or UnitName("player")
-		local siege = GetSpellInfo(56661)
-		local damaged, _, siegeicon = GetSpellInfo(67323)
-		local nodes = { L["Alliance Keep"], L["Horde Keep"], }
-		local function IoCAssault(text, faction)
-			text = strlower(text)
-			for _, value in ipairs(nodes) do
-				if strmatch(text, strlower(value)) then
-					if strmatch(text, assaulted) then
-						return self:StartBar(value, 62, GetIconData(faction, "tower"), faction)
-					elseif strmatch(text, defended) or strmatch(text, taken) or strmatch(text, claimed) then
-						return self:StopBar(value)
-					end
-				end
-			end
-		end
-		--------------------------------
-		function Capping:HIoCAssault(a1)
-		--------------------------------
-			IoCAssault(a1, "horde")
-		end
-		--------------------------------
-		function Capping:AIoCAssault(a1)
-		--------------------------------
-			IoCAssault(a1, "alliance")
-		end
-		---------------------------------------------------------
-		--function Capping:IoCSync(event, prefix, message, chan, sender) -- only sync for siege engine timer
-		---------------------------------------------------------
-		--	if sender == pname then return end
-		--	if prefix == "cap" then
-		--		local f = self:GetBar(siege)
-		--		if (not f or not f:IsShown()) and message then
-		--			local faction, remain = strmatch(message, "(%a)(%d+)")
-		--			faction = (faction == "a" and "alliance") or (faction == "h" and "horde")
-		--			remain = (remain == "1" and 183) or (remain == "2" and 92) or tonumber(remain or 0) or 0
-		--			if faction and remain > 0 then
-		--				self:StartBar(siege, remain, siegeicon, faction)
-		--			end
-		--		end
-		--	elseif prefix == "DBMv4-Mod" then
-		--		local isle, _, remain, faction = strsplit("\t", message)
-		--		if isle == "IsleofConquest" then
-		--			remain = (remain == "SEStart" and 183) or (remain == "SEHalfway" and 92) or nil
-		--			if remain and faction then
-		--				self:StartBar(siege, remain, siegeicon, strlower(faction))
-		--			end
-		--		end
-		--	end
-		--end
-		------------------------------------
-		function Capping:SiegeEngine(a1, a2)
-		------------------------------------
-			if a1 and a2 then -- check npc yells
-				if strmatch(a1, L["seaforium bombs"]) or strmatch(a1, L["It's broken"]) then
-					local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
-					self:StartBar(siege, 183, siegeicon, faction)
-					--SendAddonMessage("cap", faction == "alliance" and "a1" or "h1", "INSTANCE_CHAT")
-				elseif strmatch(a1, L["halfway"]) then
-					local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
-					self:StartBar(siege, 92, siegeicon, faction)
-					--SendAddonMessage("cap", faction == "alliance" and "a2" or "h2", "INSTANCE_CHAT")
-				end
-			end
-		end
-	end
-	SetupAssault(61, true)
-	self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HIoCAssault")
-	self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AIoCAssault")
-	self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "SiegeEngine")
-	--self:RegisterTempEvent("CHAT_MSG_ADDON", "IoCSync")
-end
-
-
------------------------------------------------- Warsong Gulch ----------------------------------------------------
-function Capping:StartWSG()
----------------------------
-	if not self.WSGBulk then -- init some data and create carrier frames
-		local wsgicon, playerfaction, prevtime, togunit
-		local af, aftext, aftexthp, acarrier, aclass
-		local hf, hftext, hftexthp, hcarrier, hclass
-		local ahealth, hhealth = 0, 0
-		local elap = 0
-		local unknownhp = "|cff777777??%|r"
-
-		-- props to "Fedos" and the ICU mod
-		-- updates a carrier's frame secure stuff, button will be slightly transparent if button cannot update (in combat)
-		local function SetWSGCarrierAttribute()
-			if not af:GetAttribute("unit") or not hf:GetAttribute("unit") then
-				if acarrier == "arena1" or hcarrier == "arena2" then
-					SecureUnitButton_OnLoad(af, "arena1")
-					SecureUnitButton_OnLoad(hf, "arena2")
-				elseif acarrier or hcarrier then
-					SecureUnitButton_OnLoad(af, "arena2")
-					SecureUnitButton_OnLoad(hf, "arena1")
-				end
-				UnregisterUnitWatch(af)
-				UnregisterUnitWatch(hf)
-			end
-			af:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() + 38, AlwaysUpFrame1:GetTop())
-			hf:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame2:GetRight() + 38, AlwaysUpFrame2:GetTop())
-		end
-		local function SetCarrier(faction, carrier, class, u) -- setup carrier frames
-			if faction == "Horde" then
-				hcarrier, hclass, hf.car = carrier, class, carrier
-				hftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
-				local hhealth_before = hhealth
-				hhealth = min(floor(100 * UnitHealth(u)/UnitHealthMax(u)), 100)
-				hftexthp:SetFormattedText("|cff%s%d%%|r", (hhealth < hhealth_before and "ff2222") or "dddddd", hhealth)
-				hcarrier = u
-				hftext.unit = u
-				return hhealth
-			elseif faction == "Alliance" then
-				acarrier, aclass, af.car = carrier, class, carrier
-				aftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
-				ahealth = 0
-				aftexthp:SetText((carrier and unknownhp) or "")
-				local ahealth_before = ahealth
-				ahealth = min(floor(100 * UnitHealth(u)/UnitHealthMax(u)), 100)
-				aftexthp:SetFormattedText("|cff%s%d%%|r", (ahealth < ahealth_before and "ff2222") or "dddddd", ahealth)
-				acarrier = u
-				aftext.unit = u
-				return ahealth
-			elseif aftext.unit == faction then
-				aftext:SetText("")
-				aftexthp:SetText("")
-				acarrier, aclass, af.car = "", "", nil
-			elseif hftext.unit == faction then
-				hftext:SetText("")
-				hftexthp:SetText("")
-				hcarrier, hclass, hf.car = "", "", nil
-			end
-			Capping:CheckCombat(SetWSGCarrierAttribute)
-		end
-		local function CarrierOnClick(this) -- sends basic carrier info to battleground chat
-
-		end
-		local function CreateWSGFrame() -- create all frames
-			local function CreateCarrierFrame(faction) -- create carriers' frames
-				local b = self:CreateCarrierButton("CappingTarget"..faction, CarrierOnClick)
-				local text = self:CreateText(b, 14, "LEFT", b, 29, 0, b, 0, 0)
-				local texthp = self:CreateText(b, 10, "RIGHT", b, -4, 0, b, 28 - b:GetWidth(), 0)
-				b.faction = (faction == "Alliance" and _G.FACTION_ALLIANCE) or _G.FACTION_HORDE
-				b.text = text
-				self:AddFrameToHide(b)
-				return b, text, texthp
-			end
-			af, aftext, aftexthp = CreateCarrierFrame("Alliance")
-			hf, hftext, hftexthp = CreateCarrierFrame("Horde")
-
-			af:SetScript("OnUpdate", function(this, a1)
-				elap = elap + a1
-				if elap > 0.25 then -- health check and display
-					elap, togunit = 0, not togunit
-					if togunit then
-						if UnitExists("arena1") then
-							local faction = UnitFactionGroup("arena1")
-							local name = GetUnitName("arena1", true)
-							local health = UnitHealth("arena1")
-							local _, class = UnitClass("arena1")
-							SetCarrier(faction, name, class, "arena1")
-						else
-							SetCarrier("arena1")
-						end
-					else
-						if UnitExists("arena2") then
-							local faction = UnitFactionGroup("arena2")
-							local name = GetUnitName("arena2", true)
-							local health = UnitHealth("arena2")
-							local _, class = UnitClass("arena2")
-							SetCarrier(faction, name, class, "arena2")
-						else
-							SetCarrier("arena2")
+do
+	------------------------------------------------ Isle of Conquest --------------------------------------
+	local function IsleOfConquest(self)
+		if not self.HIoCAssault then
+			pname = pname or UnitName("player")
+			local siege = GetSpellInfo(56661)
+			local damaged, _, siegeicon = GetSpellInfo(67323)
+			local nodes = { L["Alliance Keep"], L["Horde Keep"], }
+			local function IoCAssault(text, faction)
+				text = strlower(text)
+				for _, value in ipairs(nodes) do
+					if strmatch(text, strlower(value)) then
+						if strmatch(text, assaulted) then
+							return self:StartBar(value, 62, GetIconData(faction, "tower"), faction)
+						elseif strmatch(text, defended) or strmatch(text, taken) or strmatch(text, claimed) then
+							return self:StopBar(value)
 						end
 					end
 				end
-			end)
-			CreateCarrierFrame, CreateWSGFrame = nil, nil
-		end
-		self.WSGBulk = function() -- stuff to do at the beginning of every wsg, but after combat
-			af:Show()
-			hf:Show()
-			SetCarrier()
-
-			self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "WSGFlagCarrier")
-			self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "WSGFlagCarrier")
-			self:RegisterTempEvent("UPDATE_WORLD_STATES", "WSGEnd")
-			prevtime = nil
-			self:WSGEnd()
-		end
-		--------------------------------------------
-		function Capping:WSGFlagCarrier(a1) -- carrier detection and setup
-		--------------------------------------------
-			if strmatch(a1, L["captured the"]) then -- flag was captured, reset all carriers
-				SetCarrier()
-				self:StartBar(L["Flag respawns"], 12, GetIconData(wsgicon, "flag"), "info2")
 			end
-		end
-		-------------------------
-		function Capping:WSGEnd() -- timer for last 5 minutes of WSG
-		-------------------------
-			local _, _, _, timeString = GetWorldStateUIInfo(4)
-			if timeString then
-				local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
-				minutes = tonumber(minutes)
-				seconds = tonumber(seconds)
-				if minutes and seconds then
-					local remaining = seconds + (minutes*60) + 1
-					local text = gsub(_G.TIME_REMAINING, ":", "")
-					local bar = self:GetBar(text)
-					if remaining < 301 and (not bar or bar.remaining < remaining+5) then -- Don't restart bars for subtle changes +/- 5s
-						self:StartBar(text, remaining, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
+			--------------------------------
+			function Capping:HIoCAssault(a1)
+			--------------------------------
+				IoCAssault(a1, "horde")
+			end
+			--------------------------------
+			function Capping:AIoCAssault(a1)
+			--------------------------------
+				IoCAssault(a1, "alliance")
+			end
+			---------------------------------------------------------
+			--function Capping:IoCSync(event, prefix, message, chan, sender) -- only sync for siege engine timer
+			---------------------------------------------------------
+			--	if sender == pname then return end
+			--	if prefix == "cap" then
+			--		local f = self:GetBar(siege)
+			--		if (not f or not f:IsShown()) and message then
+			--			local faction, remain = strmatch(message, "(%a)(%d+)")
+			--			faction = (faction == "a" and "alliance") or (faction == "h" and "horde")
+			--			remain = (remain == "1" and 183) or (remain == "2" and 92) or tonumber(remain or 0) or 0
+			--			if faction and remain > 0 then
+			--				self:StartBar(siege, remain, siegeicon, faction)
+			--			end
+			--		end
+			--	elseif prefix == "DBMv4-Mod" then
+			--		local isle, _, remain, faction = strsplit("\t", message)
+			--		if isle == "IsleofConquest" then
+			--			remain = (remain == "SEStart" and 183) or (remain == "SEHalfway" and 92) or nil
+			--			if remain and faction then
+			--				self:StartBar(siege, remain, siegeicon, strlower(faction))
+			--			end
+			--		end
+			--	end
+			--end
+			------------------------------------
+			function Capping:SiegeEngine(a1, a2)
+			------------------------------------
+				if a1 and a2 then -- check npc yells
+					if strmatch(a1, L["seaforium bombs"]) or strmatch(a1, L["It's broken"]) then
+						local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
+						self:StartBar(siege, 183, siegeicon, faction)
+						--SendAddonMessage("cap", faction == "alliance" and "a1" or "h1", "INSTANCE_CHAT")
+					elseif strmatch(a1, L["halfway"]) then
+						local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
+						self:StartBar(siege, 92, siegeicon, faction)
+						--SendAddonMessage("cap", faction == "alliance" and "a2" or "h2", "INSTANCE_CHAT")
 					end
-					prevtime = remaining
 				end
 			end
 		end
-
-		playerfaction = UnitFactionGroup("player")
-		wsgicon = strlower(playerfaction)
-		self:CheckCombat(CreateWSGFrame)
+		SetupAssault(61, true)
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HIoCAssault")
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AIoCAssault")
+		self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "SiegeEngine")
+		--self:RegisterTempEvent("CHAT_MSG_ADDON", "IoCSync")
 	end
-
-	self:CheckCombat(self.WSGBulk)
-end
-
-
------------------------------------------------- Wintergrasp ------------------------------------------
-local wallid, walls = nil, nil
-function Capping:StartWintergrasp()
------------------------------------
-	if not self.WinterAssault then
-		wallid = { -- wall section locations
-			["4308_1733"] = "NW ", ["4311_1940"] = "NW ", ["4481_2197"] = "NW ", ["4619_2206"] = "NW ",
-			["4689_2324"] = "SW ", ["4689_2523"] = "SW ", ["4861_2795"] = "S ",
-			["5144_2788"] = "S ", ["5314_2527"] = "SE ", ["5316_2320"] = "SE ",
-			["5391_2202"] = "NE ", ["5530_2204"] = "NE ", ["5709_1946"] = "NE ", ["5708_1733"] = "NE ",
-			["4770_1664"] = "Inner W ", ["4773_1882"] = "Inner W ", ["4772_2098"] = "Inner W ",
-			["4860_2205"] = "Inner S ", ["5004_2197"] = "Inner S ", ["5144_2200"] = "Inner S ",
-			["5235_2090"] = "Inner E ", ["5237_1880"] = "Inner E ", ["5232_1675"] = "Inner E ",
-			["5001_2793"] = "", ["5000_1623"] = "", -- front gate and fortress door
-		}
-
-		-- POI icon texture id
-		local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
-		local damaged, destroyed, all = { }, { }, { }
-		for k, v in pairs(intact) do
-			damaged[k + 1] = true
-			destroyed[k + 2] = true
-			all[k], all[k + 1], all[k + 2] = true, true, true
-		end
-		function Capping:WinterAssault() -- scans POI landmarks for changes in wall textures
-			for i = 1, GetNumMapLandmarks(), 1 do
-				local name, _, textureIndex, x, y = GetMapLandmarkInfo(i)
-				local tindex = floor(x * 10000).."_"..floor(y * 10000)
-				local ti = walls[tindex]
-				if (ti and ti ~= textureIndex) or (not ti and wallid[tindex]) then
-					if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
-						RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[tindex], name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
-					elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-						RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[tindex], name, _G.ACTION_UNIT_DESTROYED))
-					end
-					walls[tindex] = all[textureIndex] and textureIndex or ti
-				end
-			end
-		end
-	end
-	walls = { }
-	for i = 1, GetNumMapLandmarks(), 1 do
-		local _, _, textureIndex, x, y = GetMapLandmarkInfo(i)
-		local tindex = floor(x * 10000).."_"..floor(y * 10000)
-		if wallid[tindex] then
-			walls[tindex] = textureIndex
-		end
-	end
-	self:RegisterTempEvent("WORLD_MAP_UPDATE", "WinterAssault")
+	Capping:AddBG(628, IsleOfConquest)
 end
 
 do
+	------------------------------------------------ Warsong Gulch ----------------------------------------------------
+	local function WarsongGulch(self)
+		if not self.WSGBulk then -- init some data and create carrier frames
+			local wsgicon, playerfaction, prevtime, togunit
+			local af, aftext, aftexthp, acarrier, aclass
+			local hf, hftext, hftexthp, hcarrier, hclass
+			local ahealth, hhealth = 0, 0
+			local elap = 0
+			local unknownhp = "|cff777777??%|r"
+
+			-- props to "Fedos" and the ICU mod
+			-- updates a carrier's frame secure stuff, button will be slightly transparent if button cannot update (in combat)
+			local function SetWSGCarrierAttribute()
+				if not af:GetAttribute("unit") or not hf:GetAttribute("unit") then
+					if acarrier == "arena1" or hcarrier == "arena2" then
+						SecureUnitButton_OnLoad(af, "arena1")
+						SecureUnitButton_OnLoad(hf, "arena2")
+					elseif acarrier or hcarrier then
+						SecureUnitButton_OnLoad(af, "arena2")
+						SecureUnitButton_OnLoad(hf, "arena1")
+					end
+					UnregisterUnitWatch(af)
+					UnregisterUnitWatch(hf)
+				end
+				af:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() + 38, AlwaysUpFrame1:GetTop())
+				hf:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame2:GetRight() + 38, AlwaysUpFrame2:GetTop())
+			end
+			local function SetCarrier(faction, carrier, class, u) -- setup carrier frames
+				if faction == "Horde" then
+					hcarrier, hclass, hf.car = carrier, class, carrier
+					hftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
+					local hhealth_before = hhealth
+					hhealth = min(floor(100 * UnitHealth(u)/UnitHealthMax(u)), 100)
+					hftexthp:SetFormattedText("|cff%s%d%%|r", (hhealth < hhealth_before and "ff2222") or "dddddd", hhealth)
+					hcarrier = u
+					hftext.unit = u
+					return hhealth
+				elseif faction == "Alliance" then
+					acarrier, aclass, af.car = carrier, class, carrier
+					aftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
+					ahealth = 0
+					aftexthp:SetText((carrier and unknownhp) or "")
+					local ahealth_before = ahealth
+					ahealth = min(floor(100 * UnitHealth(u)/UnitHealthMax(u)), 100)
+					aftexthp:SetFormattedText("|cff%s%d%%|r", (ahealth < ahealth_before and "ff2222") or "dddddd", ahealth)
+					acarrier = u
+					aftext.unit = u
+					return ahealth
+				elseif aftext.unit == faction then
+					aftext:SetText("")
+					aftexthp:SetText("")
+					acarrier, aclass, af.car = "", "", nil
+				elseif hftext.unit == faction then
+					hftext:SetText("")
+					hftexthp:SetText("")
+					hcarrier, hclass, hf.car = "", "", nil
+				end
+				Capping:CheckCombat(SetWSGCarrierAttribute)
+			end
+			local function CarrierOnClick(this) -- sends basic carrier info to battleground chat
+
+			end
+			local function CreateWSGFrame() -- create all frames
+				local function CreateCarrierFrame(faction) -- create carriers' frames
+					local b = self:CreateCarrierButton("CappingTarget"..faction, CarrierOnClick)
+					local text = self:CreateText(b, 14, "LEFT", b, 29, 0, b, 0, 0)
+					local texthp = self:CreateText(b, 10, "RIGHT", b, -4, 0, b, 28 - b:GetWidth(), 0)
+					b.faction = (faction == "Alliance" and _G.FACTION_ALLIANCE) or _G.FACTION_HORDE
+					b.text = text
+					self:AddFrameToHide(b)
+					return b, text, texthp
+				end
+				af, aftext, aftexthp = CreateCarrierFrame("Alliance")
+				hf, hftext, hftexthp = CreateCarrierFrame("Horde")
+
+				af:SetScript("OnUpdate", function(this, a1)
+					elap = elap + a1
+					if elap > 0.25 then -- health check and display
+						elap, togunit = 0, not togunit
+						if togunit then
+							if UnitExists("arena1") then
+								local faction = UnitFactionGroup("arena1")
+								local name = GetUnitName("arena1", true)
+								local health = UnitHealth("arena1")
+								local _, class = UnitClass("arena1")
+								SetCarrier(faction, name, class, "arena1")
+							else
+								SetCarrier("arena1")
+							end
+						else
+							if UnitExists("arena2") then
+								local faction = UnitFactionGroup("arena2")
+								local name = GetUnitName("arena2", true)
+								local health = UnitHealth("arena2")
+								local _, class = UnitClass("arena2")
+								SetCarrier(faction, name, class, "arena2")
+							else
+								SetCarrier("arena2")
+							end
+						end
+					end
+				end)
+				CreateCarrierFrame, CreateWSGFrame = nil, nil
+			end
+			self.WSGBulk = function() -- stuff to do at the beginning of every wsg, but after combat
+				af:Show()
+				hf:Show()
+				SetCarrier()
+
+				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "WSGFlagCarrier")
+				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "WSGFlagCarrier")
+				self:RegisterTempEvent("UPDATE_WORLD_STATES", "WSGEnd")
+				prevtime = nil
+				self:WSGEnd()
+			end
+			--------------------------------------------
+			function Capping:WSGFlagCarrier(a1) -- carrier detection and setup
+			--------------------------------------------
+				if strmatch(a1, L["captured the"]) then -- flag was captured, reset all carriers
+					SetCarrier()
+					self:StartBar(L["Flag respawns"], 12, GetIconData(wsgicon, "flag"), "info2")
+				end
+			end
+			-------------------------
+			function Capping:WSGEnd() -- timer for last 5 minutes of WSG
+			-------------------------
+				local _, _, _, timeString = GetWorldStateUIInfo(4)
+				if timeString then
+					local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
+					minutes = tonumber(minutes)
+					seconds = tonumber(seconds)
+					if minutes and seconds then
+						local remaining = seconds + (minutes*60) + 1
+						local text = gsub(_G.TIME_REMAINING, ":", "")
+						local bar = self:GetBar(text)
+						if remaining < 301 and (not bar or bar.remaining < remaining+5) then -- Don't restart bars for subtle changes +/- 5s
+							self:StartBar(text, remaining, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
+						end
+						prevtime = remaining
+					end
+				end
+			end
+
+			playerfaction = UnitFactionGroup("player")
+			wsgicon = strlower(playerfaction)
+			self:CheckCombat(CreateWSGFrame)
+		end
+
+		self:CheckCombat(self.WSGBulk)
+	end
+	Capping:AddBG(489, WarsongGulch)
+	Capping:AddBG(726, WarsongGulch) -- Twin Peaks
+end
+
+do
+	------------------------------------------------ Wintergrasp ------------------------------------------
+	local wallid, walls = nil, nil
+	local function Wintergrasp(self)
+		if not self.WinterAssault then
+			wallid = { -- wall section locations
+				["4308_1733"] = "NW ", ["4311_1940"] = "NW ", ["4481_2197"] = "NW ", ["4619_2206"] = "NW ",
+				["4689_2324"] = "SW ", ["4689_2523"] = "SW ", ["4861_2795"] = "S ",
+				["5144_2788"] = "S ", ["5314_2527"] = "SE ", ["5316_2320"] = "SE ",
+				["5391_2202"] = "NE ", ["5530_2204"] = "NE ", ["5709_1946"] = "NE ", ["5708_1733"] = "NE ",
+				["4770_1664"] = "Inner W ", ["4773_1882"] = "Inner W ", ["4772_2098"] = "Inner W ",
+				["4860_2205"] = "Inner S ", ["5004_2197"] = "Inner S ", ["5144_2200"] = "Inner S ",
+				["5235_2090"] = "Inner E ", ["5237_1880"] = "Inner E ", ["5232_1675"] = "Inner E ",
+				["5001_2793"] = "", ["5000_1623"] = "", -- front gate and fortress door
+			}
+
+			-- POI icon texture id
+			local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
+			local damaged, destroyed, all = { }, { }, { }
+			for k, v in pairs(intact) do
+				damaged[k + 1] = true
+				destroyed[k + 2] = true
+				all[k], all[k + 1], all[k + 2] = true, true, true
+			end
+			function Capping:WinterAssault() -- scans POI landmarks for changes in wall textures
+				for i = 1, GetNumMapLandmarks(), 1 do
+					local name, _, textureIndex, x, y = GetMapLandmarkInfo(i)
+					local tindex = floor(x * 10000).."_"..floor(y * 10000)
+					local ti = walls[tindex]
+					if (ti and ti ~= textureIndex) or (not ti and wallid[tindex]) then
+						if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
+							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[tindex], name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
+						elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
+							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[tindex], name, _G.ACTION_UNIT_DESTROYED))
+						end
+						walls[tindex] = all[textureIndex] and textureIndex or ti
+					end
+				end
+			end
+		end
+		walls = { }
+		for i = 1, GetNumMapLandmarks(), 1 do
+			local _, _, textureIndex, x, y = GetMapLandmarkInfo(i)
+			local tindex = floor(x * 10000).."_"..floor(y * 10000)
+			if wallid[tindex] then
+				walls[tindex] = textureIndex
+			end
+		end
+		self:RegisterTempEvent("WORLD_MAP_UPDATE", "WinterAssault")
+	end
+	Capping:AddBG("LakeWintergrasp", Wintergrasp) -- 571, but used for the entirety of Northrend
+end
+
+do
+	------------------------------------------------ Ashran ------------------------------------------
 	local function Ashran(self)
 		if not self.AshranControl then
 			function Capping:AshranControl(msg, ...)
@@ -786,6 +797,6 @@ do
 		self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
 		self:RegisterTempEvent("UPDATE_WORLD_STATES", "AshranTimeLeft")
 	end
-	Capping:AddBG("Ashran", Ashran) -- 1191
+	Capping:AddBG("Ashran", Ashran) -- 1191, but takes a few seconds after ZONE_CHANGED_NEW_AREA (walking in) until it's at this (correct) value
 end
 

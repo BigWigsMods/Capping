@@ -95,7 +95,7 @@ local function WorldSoon(remain)
 	end
 end
 local function StartWorldTimers()
-	if IsInInstance() then return end
+	--if IsInInstance() then return end
 	for i = 1, 2 do -- GetNumWorldPVPAreas() = 3: Wintergrasp, Tol Barad, Ashran
 		local _, localizedName, isActive, canQueue, startTime, canEnter = GetWorldPVPAreaInfo(i)
 		if localizedName then
@@ -107,20 +107,22 @@ local function StartWorldTimers()
 			elseif startTime > 0 then
 				worldwarned = nil
 				local currentmapid = GetCurrentMapAreaID()
-				SetMapByID((i == 2 and 708) or 485)
-				local concol, _, ti, _, _ = GetMapLandmarkInfo(1)
+				SetMapByID((i == 2 and 708) or 501)
+				local _, _, ti, _, _ = GetMapLandmarkInfo(1)
+				local color
 				if ti == 46 then
-					concol = "alliance"
+					color = "alliance"
 				elseif ti == 48 then
-					concol = "horde"
+					color = "horde"
 				else
-					concol = "info1"
+					color = "info1"
 				end
 				SetMapByID(currentmapid)
 				local bar = Capping:GetBar(localizedName)
+				if bar and color ~= "info1" and bar:Get("capping:colorid") == "info1" then bar = nil end -- Force refresh the bar if we have capture data
 				local icon = i == 1 and "Interface\\Icons\\INV_EssenceOfWintergrasp" or "Interface\\Icons\\achievement_zone_tolbarad"
 				if not bar or startTime > bar.remaining+5 or startTime < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
-					Capping:StartBar(localizedName, startTime, icon, concol, true) --WorldSoon
+					Capping:StartBar(localizedName, startTime, icon, color, true) --WorldSoon
 				end
 			end
 		else
@@ -348,7 +350,7 @@ function Capping:InitBGMap()
 	bgmap, bgtab = BattlefieldMinimap, BattlefieldMinimapTab
 	if not db.disablemap then
 		bgdd.notCheckable, bgdd.text, bgdd.func = 1, "Capping", ShowOptions
-		hooksecurefunc("BattlefieldMinimapTabDropDown_Initialize", function() UIDropDownMenu_AddButton(bgdd, 1) end)
+		--hooksecurefunc("BattlefieldMinimapTabDropDown_Initialize", function() UIDropDownMenu_AddButton(bgdd, 1) end)
 		self:ModMap()
 		self.InitBGMap = nil
 		if PVPUIFrame then
@@ -404,51 +406,22 @@ do
 	function Capping:AddBG(id, func)
 		zoneIds[id] = func
 	end
---732 tol barad
+
 	function Capping:ZONE_CHANGED_NEW_AREA()
 		if wasInBG then
 			self:ResetAll()
 		end
 
 		local _, zoneType, _, _, _, _, _, id = GetInstanceInfo()
-		print(id)
+		--print(id)
+		--print(GetZonePVPInfo())
 		if zoneType == "pvp" then
 			local func = zoneIds[id]
 			if func then
 				wasInBG = true
 				func(self)
 			end
-		elseif zoneType == "arena" then
-			self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "CheckStartTimer")
-			wasInBG = true
-		else
-			SetMapToCurrentZone()
-			local z = GetMapInfo()
-			local func = zoneIds[z]
-			if func then
-				wasInBG = true
-				func(self)
-			end
-		end
 
-		SetMapToCurrentZone()
-		if zoneType == "pvp" then
-			local z = GetMapInfo()
-			wasInBG = true
-			if (z == "WarsongGulch" and db.wsg) or (z == "TwinPeaks" and not db.notp) then
-				self:StartWSG()
-			elseif z == "ArathiBasin" and db.ab then
-				self:StartAB()
-			elseif z == "AlteracValley" and db.av then
-				self:StartAV()
-			elseif z == "IsleofConquest" and db.ioc then
-				self:StartIoC()
-			elseif z == "GilneasBattleground2" and not db.nogil then
-				self:StartGil()
-			elseif z == "GoldRush" then
-				self:StartDG()
-				self:StartWSG()
-			end
 			if not self.bgtotals then -- frame to display roster count
 				self.bgtotals = CreateFrame("Frame", nil, AlwaysUpFrame1)
 				self.bgtotals:SetScript("OnUpdate", function(this, elapsed)
@@ -465,25 +438,36 @@ do
 			RequestBattlefieldScoreData()
 
 			UpdateZoneMapVisibility()
-		elseif GetMapInfo() == "LakeWintergrasp" then
-			StartWorldTimers()
-			UpdateZoneMapVisibility()
+		elseif zoneType == "arena" then
+			self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "CheckStartTimer")
 			wasInBG = true
-			Capping.CheckWinterEnd = StartWorldTimers
-			self:RegisterTempEvent("CHAT_MSG_RAID_BOSS_EMOTE", "CheckWinterEnd")
-		elseif GetMapInfo() == "TolBarad" then
-			UpdateZoneMapVisibility()
-			wasInBG = true
-		else
-			if zoneType == "arena" then
-
-			else
-				StartWorldTimers()
-			end
 			if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then
 				bgmap:Hide()
 			end
+		else
+			if GetZonePVPInfo() == "combat" then
+				SetMapToCurrentZone()
+				local z = GetMapInfo()
+				local func = zoneIds[z]
+				if func then
+					wasInBG = true
+					func(self)
+					UpdateZoneMapVisibility()
+				else
+					if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then
+						bgmap:Hide()
+					end
+				end
+			elseif id == 732 then -- Tol Barad, can't use GetZonePVPInfo, but it has it's own id!
+				wasInBG = true
+				UpdateZoneMapVisibility()
+			else
+				if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then
+					bgmap:Hide()
+				end
+			end
 		end
+		StartWorldTimers()
 		self:ModMap()
 	end
 end
