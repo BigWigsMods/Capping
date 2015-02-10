@@ -454,6 +454,7 @@ do
 
 		-- setup for final score estimation (2 for EotS)
 		NewEstimator(2)
+		SetupAssault(60) -- In RBG the four points have flags that need to be assaulted, like AB
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HFlagUpdate")
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AFlagUpdate")
 	end
