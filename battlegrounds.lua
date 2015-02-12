@@ -401,7 +401,7 @@ do
 				eftext:SetText("")
 				eficon:Hide()
 				if captured then
-					self:StartBar(L["Flag respawns"], 12, GetIconData(strlower(UnitFactionGroup("player")), "flag"), "info2")
+					self:StartBar(L["Flag respawns"], 21, GetIconData(strlower(UnitFactionGroup("player")), "flag"), "info2")
 				end
 				self:CheckCombat(SetEotSCarrierAttribute)
 			end
