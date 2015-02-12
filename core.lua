@@ -18,7 +18,7 @@ local GetTime, time = GetTime, time
 
 -- LOCAL VARS
 local db, wasInBG, bgmap, bgtab
-local activeBars, bars, currentq, bgdd = { }, { }, { }, { }
+local activeBars, bars, bgdd = { }, { }, { }
 local av, ab, eots, wsg, winter, ioc = GetMapNameByID(401), GetMapNameByID(461), GetMapNameByID(813), GetMapNameByID(443), GetMapNameByID(501), GetMapNameByID(540)
 local narrowed, borderhidden, ACountText, HCountText
 Capping.backdrop = { bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", }
@@ -368,7 +368,6 @@ function Capping:PLAYER_ENTERING_WORLD()
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
-	self:UPDATE_BATTLEFIELD_STATUS()
 	self:ZONE_CHANGED_NEW_AREA()
 
 	--RegisterAddonMessagePrefix("cap")
@@ -522,68 +521,66 @@ function Capping:ModMap(disable) -- alter the default minimap
 end
 
 do -- estimated wait timer and port timer
-	local port = _G.READY.."-%s"
 	local GetBattlefieldStatus = GetBattlefieldStatus
 	local GetBattlefieldPortExpiration = GetBattlefieldPortExpiration
 	local GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited = GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited
-	--------------------------------------------
-	function Capping:UPDATE_BATTLEFIELD_STATUS()
-	--------------------------------------------
+
+	function Capping:UPDATE_BATTLEFIELD_STATUS(queueId)
 		if not db.port and not db.wait then return end
 
-		for map in pairs(currentq) do -- tag each entry to see if it's changed after updating the list
-			currentq[map] = 0
-		end
-		for i = 1, 2 do -- Check the status of each queue, 2 is the maximum according to MAX_WORLD_PVP_QUEUES
-			local status, map = GetBattlefieldStatus(i)
-			if status == "confirm" and db.port then
+		local status, map = GetBattlefieldStatus(queueId)
+		if status == "confirm" then -- BG has popped, time until cancelled
+			local bar = self:GetBar(map)
+			if bar and bar:Get("capping:colorid") == "info1" then
 				self:StopBar(map)
-				if not self:GetBar(format(port, map)) then
-					self:StartBar(format(port, map), GetBattlefieldPortExpiration(i), "Interface\\Icons\\Ability_TownWatch", "info2", true)
+				bar = nil
+			end
+
+			if not bar and db.port then
+				self:StartBar(map, GetBattlefieldPortExpiration(queueId), "Interface\\Icons\\Ability_TownWatch", "info2", true)
+			end
+		elseif status == "queued" and db.wait then -- Waiting for BG to pop
+			local esttime = GetBattlefieldEstimatedWaitTime(queueId) / 1000 -- 0 when queue is paused
+			local waited = GetBattlefieldTimeWaited(queueId) / 1000
+			local estremain = esttime - waited
+			if estremain > 1 then -- Not a paused queue (0) and not a negative queue (in queue longer than estimated time).
+				local bar = self:GetBar(map)
+				if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 then -- Don't restart bars for subtle changes +/- 10s
+					local icon
+					for i = 1, GetNumBattlegroundTypes() do
+						local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(i)
+						if name == map then
+							icon = bgIcon
+							break
+						end
+					end
+					bar = self:StartBar(map, estremain, icon or "Interface\\Icons\\inv_misc_questionmark", "info1", true) -- Question mark icon for random battleground
+					bar:Set("capping:queueid", queueId)
 				end
-				currentq[map] = i
-			elseif status == "queued" and db.wait then
-				local esttime = GetBattlefieldEstimatedWaitTime(i) / 1000 -- 0 when queue is paused
-				local waited = GetBattlefieldTimeWaited(i) / 1000
-				local estremain = esttime - waited
-				if estremain > 1 then -- Not a paused queue (0) and not a negative queue (in queue longer than estimated time).
-					local bar = self:GetBar(map)
-					if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 then -- Don't restart bars for subtle changes +/- 10s
-						local icon
-						for j = 1, GetNumBattlegroundTypes() do
-							local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(j)
-							if name == map then
-								icon = bgIcon
-								break
-							end
+			else -- Negative queue (in queue longer than estimated time) or 0 queue (paused)
+				local bar = self:GetBar(map)
+				if not bar or bar.remaining ~= 1 then
+					local icon
+					for i = 1, GetNumBattlegroundTypes() do
+						local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(i)
+						if name == map then
+							icon = bgIcon
+							break
 						end
-						self:StartBar(map, estremain, icon or "Interface\\Icons\\inv_misc_questionmark", "info1", true) -- Question mark icon for random battleground
 					end
-					currentq[map] = i
-				elseif esttime ~= 0 then -- Negative queue (in queue longer than estimated time) but not paused.
-					local oldBar = self:GetBar(map)
-					if not oldBar or oldBar.remaining ~= 1 then
-						local icon
-						for j = 1, GetNumBattlegroundTypes() do
-							local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(j)
-							if name == map then
-								icon = bgIcon
-								break
-							end
-						end
-						oldBar = self:StartBar(map, 1, icon or "Interface\\Icons\\inv_misc_questionmark", "info1", true) -- Question mark icon for random battleground
-						oldBar:Pause()
-						oldBar:SetTimeVisibility(false)
-					end
-					currentq[map] = i
+					bar = self:StartBar(map, 1, icon or "Interface\\Icons\\inv_misc_questionmark", "info1", true) -- Question mark icon for random battleground
+					bar:Pause()
+					bar:SetTimeVisibility(false)
+					bar:Set("capping:queueid", queueId)
 				end
 			end
-		end
-		for map, flag in pairs(currentq) do -- stop inactive bars
-			if flag == 0 then
-				self:StopBar(format(port, map))
-				self:StopBar(map)
-				currentq[map] = nil
+		elseif status == "active" then -- Inside BG
+			self:StopBar(map)
+		elseif status == "none" then -- Leaving queue
+			for bar in next, activeBars do
+				if bar:Get("capping:queueid") == queueId then
+					bar:Stop()
+				end
 			end
 		end
 	end
