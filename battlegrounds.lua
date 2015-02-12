@@ -680,7 +680,7 @@ do
 						local remaining = seconds + (minutes*60) + 1
 						local text = gsub(_G.TIME_REMAINING, ":", "")
 						local bar = self:GetBar(text)
-						if remaining > 3 and remaining < 600 and (not bar or bar.remaining < remaining+5) then -- Don't restart bars for subtle changes +/- 5s
+						if remaining > 3 and remaining < 600 and (not bar or bar.remaining > remaining+5 or bar.remaining < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
 							self:StartBar(text, remaining, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
 						end
 						prevtime = remaining
