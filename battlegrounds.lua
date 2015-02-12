@@ -96,38 +96,42 @@ do -- POI handling
 		ntime = bgcaptime -- cap time
 		skipkeep = nokeep -- workaround for IoC keep
 		nodestates = { }
-		for i = 1, GetNumMapLandmarks(), 1 do
+		for i = 1, GetNumMapLandmarks() do
 			local name, _, ti = GetMapLandmarkInfo(i)
 			nodestates[name] = getnodetype(ti)
+			--print("Creating base:", name, ti, nodestates[name])
 		end
 		Capping:RegisterTempEvent("WORLD_MAP_UPDATE")
 	end
 	-----------------------------------
 	function Capping:WORLD_MAP_UPDATE()
 	-----------------------------------
-		if C_Garrison.IsOnGarrisonMap() then return end -- Don't run in Garrison
 		for i = 1, GetNumMapLandmarks() do
 			local name, _, ti = GetMapLandmarkInfo(i)
-			local ns = nodestates[name]
-			if not ns then
-				nodestates[name] = getnodetype(ti)
-			elseif ns ~= "none" then
-				local nodetype, prevstate = strmatch(ns, "(%a+)(%d+)")
-				if tonumber(prevstate) ~= ti then
-					if ti == poicons[nodetype][11] then
-						self:StartBar(name, ntime, GetIconData("alliance", nodetype), "alliance")
-						if nodetype == "workshop" then -- reset siege engine timer
-							self:StopBar(GetSpellInfo(56661), nil)
+			if name then
+				local ns = nodestates[name]
+				if not ns then
+				--	print("New base?", name, ti, ti and getnodetype(ti) or "NOPE")
+				--	nodestates[name] = getnodetype(ti)
+				elseif ns ~= "none" then
+					local nodetype, prevstate = strmatch(ns, "(%a+)(%d+)")
+					if tonumber(prevstate) ~= ti then
+						if ti == poicons[nodetype][11] then
+							self:StartBar(name, ntime, GetIconData("alliance", nodetype), "alliance")
+							if nodetype == "workshop" then -- reset siege engine timer
+								self:StopBar((GetSpellInfo(56661)))
+							end
+						elseif ti == poicons[nodetype][13] then
+							self:StartBar(name, ntime, GetIconData("horde", nodetype), "horde")
+							if nodetype == "workshop" then -- reset siege engine timer
+								self:StopBar((GetSpellInfo(56661)))
+							end
+						else
+							self:StopBar(name)
 						end
-					elseif ti == poicons[nodetype][13] then
-						self:StartBar(name, ntime, GetIconData("horde", nodetype), "horde")
-						if nodetype == "workshop" then -- reset siege engine timer
-							self:StopBar(GetSpellInfo(56661), nil)
-						end
-					else
-						self:StopBar(name)
+						--print("Updating node:", name, "from:", nodestates[name], "to:", nodetype..ti)
+						nodestates[name] = nodetype..ti
 					end
-					nodestates[name] = nodetype..ti
 				end
 			end
 		end
