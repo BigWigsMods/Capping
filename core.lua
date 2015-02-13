@@ -395,7 +395,10 @@ function Capping:ResetAll() -- reset all timers and unregister temp events
 		self:UnregisterEvent(event)
 	end
 	for bar in next, activeBars do -- close all temp timerbars
-		bar:Stop()
+		local separate = bar:Get("capping:separate")
+		if not separate then
+			bar:Stop()
+		end
 	end
 	self:CheckCombat(HideProtectedStuff) -- hide secure frames
 	if ACountText then ACountText:SetText("") end
