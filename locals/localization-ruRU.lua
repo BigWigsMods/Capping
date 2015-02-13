@@ -43,7 +43,6 @@ addon.L = {
 	--["Forty five seconds"] = true,
 	["Thirty seconds until"] = "через 30 секунд",
 	["Fifteen seconds until"] = "Пятнадцать секунд до",
-	--["has begun"] = true, -- start of arena key phrase
 	["%s: %s - %d:%02d"] = "%s: %s - через %d:%02d", -- chat message after shift left-clicking a bar
 
 	-- AB

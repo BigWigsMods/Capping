@@ -443,8 +443,12 @@ do
 
 			UpdateZoneMapVisibility()
 		elseif zoneType == "arena" then
-			self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL", "CheckStartTimer")
-			wasInBG = true
+			local func = zoneIds[id]
+			if func then
+				wasInBG = true
+				func(self)
+			end
+
 			if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then
 				bgmap:Hide()
 			end
@@ -842,14 +846,6 @@ do
 			SortBars()
 		end
 	end)
-end
-
-function Capping:CheckStartTimer(msg) -- timer for when a battleground begins
-	local _, zoneType = GetInstanceInfo()
-	if zoneType == "arena" and strmatch(msg, L["has begun"]) then -- Shadow Sight spawn timer
-		local spell, _, icon = GetSpellInfo(34709)
-		self:StartBar(spell, 93, icon, "info2")
-	end
 end
 
 local GetBattlefieldScore, GetNumBattlefieldScores = GetBattlefieldScore, GetNumBattlefieldScores

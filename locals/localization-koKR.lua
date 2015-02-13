@@ -43,7 +43,6 @@ addon.L = {
 	["Forty five seconds"] = "45초 전",
 	["Thirty seconds until"] = "30초 전",
 	["Fifteen seconds until"] = "15초 전",
-	["has begun"] = "시작", -- start of arena key phrase
 	["%s: %s - %d:%02d remaining"] = "%s: %s - %d:%02d 남았음", -- chat message after shift left-clicking a bar
 
 	-- AB

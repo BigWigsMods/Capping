@@ -656,7 +656,7 @@ do
 
 				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "WSGFlagCarrier")
 				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "WSGFlagCarrier")
-				self:RegisterTempEvent("UPDATE_WORLD_STATES", "WSGEnd")
+				self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "WSGEnd")
 				prevtime = nil
 				self:WSGEnd()
 			end
@@ -800,8 +800,51 @@ do
 		end
 		self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "AshranControl")
 		self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
-		self:RegisterTempEvent("UPDATE_WORLD_STATES", "AshranTimeLeft")
+		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "AshranTimeLeft")
 	end
 	Capping:AddBG("Ashran", Ashran) -- 1191, but takes a few seconds after ZONE_CHANGED_NEW_AREA (walking in) until it's at this (correct) value
+end
+
+do
+	------------------------------------------------ Arena ------------------------------------------
+	local function Arena(self)
+		if not self.ArenaTimeLeft then
+			function Capping:ArenaTimeLeft()
+				local _, _, _, timeString = GetWorldStateUIInfo(2)
+				if timeString then
+					local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
+					minutes = tonumber(minutes)
+					seconds = tonumber(seconds)
+					if minutes and seconds then
+						local remaining = seconds + (minutes*60) + 1
+						if remaining > 4 and remaining < 1190 then
+							local text = gsub(_G.TIME_REMAINING, ":", "")
+							local bar = self:GetBar(text)
+							if not bar or remaining > bar.remaining+5 or remaining < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
+								self:StartBar(text, remaining, nil, "info2")
+							end
+						end
+					end
+				end
+			end
+		end
+		if not self.ShadowSightTimer then
+			function Capping:ShadowSightTimer(_, _, _, _, _, _, _, destGUID, _, _, _, spellId) -- Arena preparation removed, doors open
+				if spellId == 32727 and destGUID == UnitGUID("player") then
+					self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+					local spell, _, icon = GetSpellInfo(34709)
+					self:StartBar(spell, 93, icon, "info2")
+				end
+			end
+		end
+		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "ArenaTimeLeft")
+		self:RegisterTempEvent("COMBAT_LOG_EVENT_UNFILTERED", "ShadowSightTimer")
+	end
+	Capping:AddBG(559, Arena) -- Nagrand Arena
+	Capping:AddBG(562, Arena) -- Blade's Edge Arena
+	Capping:AddBG(572, Arena) -- Ruins of Lordaeron
+	Capping:AddBG(617, Arena) -- Dalaran Sewers
+	Capping:AddBG(980, Arena) -- Tol'Viron Arena
+	Capping:AddBG(1134, Arena) -- The Tiger's Peak
 end
 

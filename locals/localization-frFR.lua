@@ -44,7 +44,6 @@ addon.L = {
 	["Forty five seconds"] = "commence dans quarante-cinq secondes",
 	["Thirty seconds until"] = "commence dans trente secondes",
 	["Fifteen seconds until"] = "commence dans quinze secondes",
-	["has begun"] = "commence !", -- start of arena key phrase
 	["%s: %s - %d:%02d"] = "%s : %s - %d:%02d restantes", -- chat message after shift left-clicking a bar
 
 	-- AB
