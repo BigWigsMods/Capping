@@ -565,7 +565,8 @@ do -- estimated wait timer and port timer
 			end
 
 			if not bar and db.port then
-				self:StartBar(map, GetBattlefieldPortExpiration(queueId), "Interface\\Icons\\Ability_TownWatch", "info2", true)
+				bar = self:StartBar(map, GetBattlefieldPortExpiration(queueId), "Interface\\Icons\\Ability_TownWatch", "info2", true)
+				bar:Set("capping:queueid", queueId)
 			end
 		elseif status == "queued" and db.wait then -- Waiting for BG to pop
 			if size == "ARENASKIRMISH" then
