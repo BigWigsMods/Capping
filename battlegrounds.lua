@@ -808,19 +808,21 @@ end
 do
 	------------------------------------------------ Arena ------------------------------------------
 	local function Arena(self)
-		if not self.ArenaTimeLeft then
-			function Capping:ArenaTimeLeft()
-				local _, _, _, timeString = GetWorldStateUIInfo(2)
-				if timeString then
-					local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
-					minutes = tonumber(minutes)
-					seconds = tonumber(seconds)
-					if minutes and seconds then
-						local remaining = seconds + (minutes*60) + 1
-						if remaining > 4 and remaining < 1190 then
-							local text = gsub(_G.TIME_REMAINING, ":", "")
-							local bar = self:GetBar(text)
-							if not bar or remaining > bar.remaining+5 or remaining < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
+		if not self.ArenaTimers then
+			function Capping:ArenaTimers()
+				for i = 1, GetNumWorldStateUI() do -- Not always at the same location, so check them all
+					local _, state, _, timeString = GetWorldStateUIInfo(i)
+					if state > 0 and timeString then -- Skip hidden states and states without text
+						local minutes, seconds = timeString:match("(%d+):(%d+)")
+						minutes = tonumber(minutes)
+						seconds = tonumber(seconds)
+						if minutes and seconds then
+							local remaining = seconds + (minutes*60) + 1
+							if remaining > 4 then
+								self:UnregisterEvent("WORLD_STATE_UI_TIMER_UPDATE")
+								local spell, _, icon = GetSpellInfo(34709)
+								self:StartBar(spell, 93, icon, "info2")
+								local text = gsub(_G.TIME_REMAINING, ":", "")
 								self:StartBar(text, remaining, nil, "info2")
 							end
 						end
@@ -828,17 +830,14 @@ do
 				end
 			end
 		end
-		if not self.ShadowSightTimer then
-			function Capping:ShadowSightTimer(_, _, _, _, _, _, _, destGUID, _, _, _, spellId) -- Arena preparation removed, doors open
-				if spellId == 32727 and destGUID == UnitGUID("player") then
-					self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-					local spell, _, icon = GetSpellInfo(34709)
-					self:StartBar(spell, 93, icon, "info2")
-				end
-			end
-		end
-		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "ArenaTimeLeft")
-		self:RegisterTempEvent("COMBAT_LOG_EVENT_UNFILTERED", "ShadowSightTimer")
+		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "ArenaTimers")
+		-- What we CAN'T use for Shadow Sight timer
+		-- COMBAT_LOG_EVENT_UNFILTERED for Arena Preparation removal event, it randomly removes and reapplies itself during the warmup
+		-- UPDATE_WORLD_STATES will sometimes fire during the warmup, so we can't assume the first time it fires is the doors opening
+		-- UNIT_SPELLCAST_SUCCEEDED arena1-5 events, probably won't work if the entire enemy team is stealth
+		-- What we CAN use for Shadow Sight timer
+		-- CHAT_MSG_BG_SYSTEM_NEUTRAL#The Arena battle has begun! - Requires localization
+		-- WORLD_STATE_UI_TIMER_UPDATE The first event fired with a valid remaining time (the current chosen method)
 	end
 	Capping:AddBG(559, Arena) -- Nagrand Arena
 	Capping:AddBG(562, Arena) -- Blade's Edge Arena
