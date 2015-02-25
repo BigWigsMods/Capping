@@ -1,14 +1,15 @@
-## Interface: 60000
+## Interface: 60100
 ## Title: Capping
-## Author: Funkydude, TotalPackage
+## Author: Funkydude
 ## Notes: Battleground timers and other goodies.
 ## Notes-zhTW: 顯示戰場上的狀態條。
-## Version: 6.0.007
+## Version: 6.1.01
 
 ## SavedVariables: CappingDB
 ## SavedVariablesPerCharacter: CappingCharDB
 
 ## X-Category: Battlegrounds/PvP
+## X-Credits: TotalPackage
 ## OptionalDeps: LibSharedMedia-3.0, LibCandyBar-3.0, LibChatAnims
 ## X-Embeds: LibSharedMedia-3.0, LibCandyBar-3.0, LibChatAnims
 
