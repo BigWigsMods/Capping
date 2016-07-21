@@ -97,7 +97,7 @@ do -- POI handling
 		skipkeep = nokeep -- workaround for IoC keep
 		nodestates = { }
 		for i = 1, GetNumMapLandmarks() do
-			local name, _, ti = GetMapLandmarkInfo(i)
+			local _, name, _, ti = GetMapLandmarkInfo(i)
 			nodestates[name] = getnodetype(ti)
 			--print("Creating base:", name, ti, nodestates[name])
 		end
@@ -107,7 +107,7 @@ do -- POI handling
 	function Capping:WORLD_MAP_UPDATE()
 	-----------------------------------
 		for i = 1, GetNumMapLandmarks() do
-			local name, _, ti = GetMapLandmarkInfo(i)
+			local _, name, _, ti = GetMapLandmarkInfo(i)
 			if name then
 				local ns = nodestates[name]
 				if not ns then
@@ -194,10 +194,10 @@ do
 
 				local currenttime = GetTime()
 
-				local _, _, _, scoreStringA = GetWorldStateUIInfo(currentbg == 2 and 3 or 2) -- 2/3 for AB and Gil, 3/4 for EotS
+				local _, _, _, scoreStringA = GetWorldStateUIInfo(currentbg == 2 and 2 or 1) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
 				local base, score, smax = strmatch(scoreStringA, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
 				local ABases, AScore, MaxScore = tonumber(base), tonumber(score), tonumber(smax) or 2000
-				local _, _, _, scoreStringH = GetWorldStateUIInfo(currentbg == 2 and 4 or 3) -- 2/3 for AB and Gil, 3/4 for EotS
+				local _, _, _, scoreStringH = GetWorldStateUIInfo(currentbg == 2 and 3 or 2) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
 
 				base, score = strmatch(scoreStringH, "[^%d]+(%d+)[^%d]+(%d+)/") -- Bases: %d  Resources: %d/%d
 				local HBases, HScore = tonumber(base), tonumber(score)
