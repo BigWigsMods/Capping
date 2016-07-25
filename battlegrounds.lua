@@ -68,7 +68,7 @@ do -- POI handling
 	end
 	-- Easy world map icon checker
 	--local m = UIParent:CreateTexture(nil, "OVERLAY")
-	--m:SetTexture("Interface\\Minimap\\POIIcons")
+	--m:SetTexture(136441) --"Interface\\Minimap\\POIIcons"
 	--m:SetPoint("CENTER")
 	--m:SetWidth(512)
 	--m:SetHeight(700)
@@ -421,7 +421,7 @@ do
 						carrier, ef.car = name, true
 						ef.faction = (faction == 0 and _G.FACTION_HORDE) or _G.FACTION_ALLIANCE
 						eftext:SetFormattedText("|cff%s%s|r", classcolor[cclass or "PRIEST"] or classcolor.PRIEST, carrier or "")
-						eficon:SetTexture((faction == 0 and "Interface\\WorldStateFrame\\HordeFlag") or "Interface\\WorldStateFrame\\AllianceFlag")
+						eficon:SetTexture(faction == 0 and 137218 or 137200) --137218-"Interface\\WorldStateFrame\\HordeFlag" || 137200-"Interface\\WorldStateFrame\\AllianceFlag"
 						eficon:Show()
 						self:CheckCombat(SetEotSCarrierAttribute)
 					end
