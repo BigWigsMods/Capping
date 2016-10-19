@@ -75,13 +75,13 @@ local function SetWH(this, w, h)
 	this:SetHeight(h)
 end
 local function NewText(parent, font, fontsize, justifyH, justifyV, overlay)
-	local t = parent:CreateFontString(nil, overlay or "OVERLAY")
+	local t = parent:CreateFontString(nil, overlay or "OVERLAY", font)
 	if fontsize then
-		t:SetFont(font, fontsize)
+		--t:SetFont(font, fontsize)
 		t:SetShadowColor(0, 0, 0)
 		t:SetShadowOffset(1, -1)
 	else
-		t:SetFontObject(font)
+		--t:SetFontObject(font)
 	end
 	t:SetJustifyH(justifyH)
 	t:SetJustifyV(justifyV)
@@ -876,7 +876,7 @@ end
 ---------------------------------------------------------------------------------------
 function Capping:CreateText(parent, fontsize, justifyH, tlrp, tlx, tly, brrp, brx, bry) -- create common text fontstring
 ---------------------------------------------------------------------------------------
-	local text = NewText(parent, GameFontNormal:GetFont(), fontsize, justifyH, "CENTER")
+	local text = NewText(parent, "GameFontNormal", fontsize, justifyH, "CENTER")
 	SetPoints(text, "TOPLEFT", tlrp, "TOPLEFT", tlx, tly, "BOTTOMRIGHT", brrp, "BOTTOMRIGHT", brx, bry)
 	text:SetShadowColor(0,0,0)
 	text:SetShadowOffset(-1, -1)
