@@ -569,8 +569,10 @@ do
 					UnregisterUnitWatch(af)
 					UnregisterUnitWatch(hf)
 				end
-				af:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() + 38, AlwaysUpFrame1:GetTop())
-				hf:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame2:GetRight() + 38, AlwaysUpFrame2:GetTop())
+				if AlwaysUpFrame1 then
+					af:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() + 38, AlwaysUpFrame1:GetTop())
+					hf:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame2:GetRight() + 38, AlwaysUpFrame2:GetTop())
+				end
 			end
 			local function SetCarrier(faction, carrier, class, u) -- setup carrier frames
 				if faction == "Horde" then
