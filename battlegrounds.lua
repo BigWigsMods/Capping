@@ -172,9 +172,9 @@ do
 		if not Capping.UPDATE_WORLD_STATES then
 			local f2 = L["Final: %d - %d"]
 			local lookup = {
-				[1] = { [0] = 0, [1] = 0.8333, [2] = 1.1111, [3] = 1.6667, [4] = 3.3333, [5] = 30, }, -- ab -- 1=2, 2=3, 3=4
+				[1] = { [0] = 0, [1] = 1, [2] = 1.5, [3] = 2, [4] = 3.5, [5] = 30, }, -- ab -- 1=2, 2=3, 3=4
 				[2] = { [0] = 0, [1] = 0.5, [2] = 1, [3] = 2.5, [4] = 5, }, -- eots
-				[3] = { [0] = 0, [1] = 1.1111, [2] = 3.3333, [3] = 30, }, -- gilneas
+				[3] = { [0] = 0, [1] = 1, [2] = 3, [3] = 30, }, -- gilneas
 			}
 			local function getlscore(ltime, pps, currentscore, maxscore, awin) -- estimate loser's final score
 				if currentbg == 2 then -- EotS
