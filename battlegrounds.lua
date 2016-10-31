@@ -135,8 +135,8 @@ do -- POI handling
 		[38] = true,
 		[40] = true,
 		-- Workshop/Tent
-		[136] = true,
-		[138] = true,
+		[136] = "alliance",
+		[138] = "horde",
 		-- Hangar/Mushroom
 		[141] = true,
 		[143] = true,
