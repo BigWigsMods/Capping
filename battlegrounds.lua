@@ -191,9 +191,10 @@ do
 		if not Capping.UPDATE_WORLD_STATES then
 			local f2 = L["Final: %d - %d"]
 			local lookup = {
-				[1] = { [0] = 0, [1] = 1, [2] = 1.5, [3] = 2, [4] = 3.5, [5] = 30, }, -- ab -- 1=2, 2=3, 3=4
+				[1] = { [0] = 0, [1] = 1, [2] = 1.5, [3] = 2, [4] = 3.5, [5] = 30, }, -- ab
 				[2] = { [0] = 0, [1] = 0.5, [2] = 1, [3] = 2.5, [4] = 5, }, -- eots
 				[3] = { [0] = 0, [1] = 1, [2] = 3, [3] = 30, }, -- gilneas
+				[4] = { [0] = 0, [1] = 8, [2] = 16, [3] = 32, }, -- Deepwind Gorge
 			}
 			local function getlscore(ltime, pps, currentscore, maxscore, awin) -- estimate loser's final score
 				if currentbg == 2 then -- EotS
@@ -274,7 +275,7 @@ do
 	------------------------------------------------ Deepwind Gorge -----------------------------------------------------
 	local function DeepwindGorge()
 		SetupAssault(61)
-		--NewEstimator(1)
+		NewEstimator(4)
 	end
 	Capping:AddBG(1105, DeepwindGorge)
 end
