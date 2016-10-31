@@ -34,72 +34,109 @@ if CUSTOM_CLASS_COLORS then
 	end)
 end
 
-local SetupAssault, GetIconData, nodestates
+local SetupAssault, GetIconData
 do -- POI handling
-	local GetNumMapLandmarks, GetMapLandmarkInfo = GetNumMapLandmarks, GetMapLandmarkInfo
-	local ntime, skipkeep
-	local poicons = { -- textures used on worldmap { al, ar, at, ab, hl, hr, ht, hb, neutral, ally, ally half, horde, horde half
-		symbol = { 46, nil, nil, nil, 48, nil, nil, nil, },
-		flag = { 43, nil, nil, nil, 44, nil, nil, nil, },
-		graveyard = { 4, nil, nil, nil, 14, nil, nil, nil, 8, 15, 4, 13, 14, },
-		tower = { 9, nil, nil, nil, 12, nil, nil, nil, 6, 11, 9, 10, 12, },
-		farm = { 32, nil, nil, nil, 34, nil, nil, nil, 31, 33, 32, 35, 34, },
-		blacksmith = { 27, nil, nil, nil, 29, nil, nil, nil, 26, 28, 27, 30, 29, },
-		mine = { 17, nil, nil, nil, 19, nil, nil, nil, 16, 18, 17, 20, 19, },
-		stables = { 37, nil, nil, nil, 39, nil, nil, nil, 36, 38, 37, 40, 39, },
-		lumbermill = { 22, nil, nil, nil, 24, nil, nil, nil, 21, 23, 22, 25, 24, },
-		workshop = { 137, nil, nil, nil, 139, nil, nil, nil, 135, 136, 137, 138, 139, },
-		hangar = { 142, nil, nil, nil, 144, nil, nil, nil, 140, 141, 142, 143, 144, },
-		docks = { 147, nil, nil, nil, 149, nil, nil, nil, 145, 146, 147, 148, 149, },
-		refinery = { 152, nil, nil, nil, 154, nil, nil, nil, 150, 151, 152, 153, 154, },
-		path = { "Interface\\Minimap\\POIIcons", },
-	}
-	local GetPOITextureCoords = _G.GetPOITextureCoords
-	for k, v in pairs(poicons) do
-		if k ~= "path" then
-			if k ~= "tower" then
-				v[1], v[2], v[3], v[4] = GetPOITextureCoords(v[1])
-				v[5], v[6], v[7], v[8] = GetPOITextureCoords(v[5])
-			else
-				v[2], v[1], v[3], v[4] = GetPOITextureCoords(v[1])
-				v[6], v[5], v[7], v[8] = GetPOITextureCoords(v[5])
-			end
-		end
-	end
 	-- Easy world map icon checker
-	--local m = UIParent:CreateTexture(nil, "OVERLAY")
-	--m:SetTexture(136441) --"Interface\\Minimap\\POIIcons"
-	--m:SetPoint("CENTER")
-	--m:SetWidth(512)
-	--m:SetHeight(700)
+	--local start = function(self) self:StartMoving() end
+	--local stop = function(self) self:StopMovingOrSizing() end
+	--local frames = {}
+	--do
+	--	local f = CreateFrame("Frame", nil, UIParent)
+	--	f:SetPoint("CENTER")
+	--	f:SetSize(24,24)
+	--	f:EnableMouse(true)
+	--	f:SetMovable(true)
+	--	f:RegisterForDrag("LeftButton")
+	--	f:SetScript("OnDragStart", start)
+	--	f:SetScript("OnDragStop", stop)
+	--	frames[1] = f
+	--	local tx = f:CreateTexture()
+	--	tx:SetAllPoints(f)
+	--	tx:SetTexture(136441) -- Interface\\Minimap\\POIIcons
+	--	tx:SetTexCoord(GetPOITextureCoords(1))
+	--	local n = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	--	n:SetPoint("BOTTOM", f, "TOP")
+	--	n:SetText(1)
+	--end
+	--for i = 2, 205 do
+	--	local f = CreateFrame("Frame", nil, UIParent)
+	--	f:SetPoint("LEFT", frames[i-1], "RIGHT", 10, 0)
+	--	f:SetSize(24,24)
+	--	f:EnableMouse(true)
+	--	f:SetMovable(true)
+	--	f:RegisterForDrag("LeftButton")
+	--	f:SetScript("OnDragStart", start)
+	--	f:SetScript("OnDragStop", stop)
+	--	frames[i] = f
+	--	local tx = f:CreateTexture()
+	--	tx:SetAllPoints(f)
+	--	tx:SetTexture(136441) -- Interface\\Minimap\\POIIcons
+	--	tx:SetTexCoord(GetPOITextureCoords(i))
+	--	local n = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	--	n:SetPoint("BOTTOM", f, "TOP")
+	--	n:SetText(i)
+	--end
 
-	local path = poicons.path
-	Capping.iconpath = path
-	GetIconData = function(faction, name)
-		local t = name and poicons[name] or poicons.symbol
-		if faction == "horde" then
-			path[2], path[3], path[4], path[5] = t[5], t[6], t[7], t[8]
-		else
-			path[2], path[3], path[4], path[5] = t[1], t[2], t[3], t[4]
-		end
+	local iconDataConflict = {
+		-- Graveyard
+		[4] = "alliance",
+		[14] = "horde",
+		-- Tower
+		[9] = "alliance",
+		[12] = "horde",
+		-- Mine
+		[17] = "alliance",
+		[19] = "horde",
+		-- Lumber
+		[22] = "alliance",
+		[24] = "horde",
+		-- Blacksmith
+		[27] = "alliance",
+		[29] = "horde",
+		-- Farm
+		[32] = "alliance",
+		[34] = "horde",
+		-- Stables
+		[37] = "alliance",
+		[39] = "horde",
+	}
+	local iconDataOwned = {
+		-- Graveyard
+		[13] = true,
+		[15] = true,
+		-- Tower
+		[10] = true,
+		[11] = true,
+		-- Mine
+		[18] = true,
+		[20] = true,
+		-- Lumber
+		[23] = true,
+		[25] = true,
+		-- Blacksmith
+		[28] = true,
+		[30] = true,
+		-- Farm
+		[33] = true,
+		[35] = true,
+		-- Stables
+		[38] = true,
+		[40] = true,
+	}
+	local GetNumMapLandmarks, GetMapLandmarkInfo, GetPOITextureCoords = GetNumMapLandmarks, GetMapLandmarkInfo, GetPOITextureCoords
+	local capTime = 0
+	local path = {136441}
+	GetIconData = function(icon)
+		path[2], path[3], path[4], path[5] = GetPOITextureCoords(icon)
 		return path
 	end
-	local function getnodetype(tindex)
-		for k, v in pairs(poicons) do
-			if v[9] and (not skipkeep or k ~= "tower") and (tindex == v[9] or tindex == v[10] or tindex == v[11] or tindex == v[12] or tindex == v[13]) then
-				return k..tindex
-			end
-		end
-		return "none"
-	end
-	SetupAssault = function(bgcaptime, nokeep)
-		ntime = bgcaptime -- cap time
-		skipkeep = nokeep -- workaround for IoC keep
-		nodestates = { }
+	local landmarkCache = {}
+	SetupAssault = function(bgcaptime)
+		capTime = bgcaptime -- cap time
+		landmarkCache = {}
 		for i = 1, GetNumMapLandmarks() do
-			local _, name, _, ti = GetMapLandmarkInfo(i)
-			nodestates[name] = getnodetype(ti)
-			--print("Creating base:", name, ti, nodestates[name])
+			local _, name, _, icon = GetMapLandmarkInfo(i)
+			landmarkCache[name] = icon
 		end
 		Capping:RegisterTempEvent("WORLD_MAP_UPDATE")
 	end
@@ -107,37 +144,19 @@ do -- POI handling
 	function Capping:WORLD_MAP_UPDATE()
 	-----------------------------------
 		for i = 1, GetNumMapLandmarks() do
-			local _, name, _, ti = GetMapLandmarkInfo(i)
-			if name then
-				local ns = nodestates[name]
-				if not ns then
-				--	print("New base?", name, ti, ti and getnodetype(ti) or "NOPE")
-				--	nodestates[name] = getnodetype(ti)
-				elseif ns ~= "none" then
-					local nodetype, prevstate = strmatch(ns, "(%a+)(%d+)")
-					if tonumber(prevstate) ~= ti then
-						if ti == poicons[nodetype][11] then
-							self:StartBar(name, ntime, GetIconData("alliance", nodetype), "alliance")
-							if nodetype == "workshop" then -- reset siege engine timer
-								self:StopBar((GetSpellInfo(56661)))
-							end
-						elseif ti == poicons[nodetype][13] then
-							self:StartBar(name, ntime, GetIconData("horde", nodetype), "horde")
-							if nodetype == "workshop" then -- reset siege engine timer
-								self:StopBar((GetSpellInfo(56661)))
-							end
-						else
-							self:StopBar(name)
-						end
-						--print("Updating node:", name, "from:", nodestates[name], "to:", nodetype..ti)
-						nodestates[name] = nodetype..ti
-					end
+			local _, name, _, icon = GetMapLandmarkInfo(i)
+			if landmarkCache[name] ~= icon then
+				landmarkCache[name] = icon
+				if iconDataConflict[icon] then
+					self:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
+				elseif iconDataOwned[icon] then
+					self:StopBar(name)
 				end
 			end
 		end
 	end
-	function Capping:TestNode(ntype, faction)
-		self:StartBar("Test", 20, GetIconData(faction, ntype), faction)
+	function Capping:TestNode()
+		self:StartBar("Test", 20, GetIconData(7), random(1,2) == 1 and "alliance" or "horde") -- 7 = flag icon
 	end
 end
 
@@ -224,14 +243,14 @@ do
 					local newText = getlscore(HTime, apps, ascore, MaxScore)
 					if newText ~= prevText then
 						self:StopBar(prevText)
-						self:StartBar(newText, HTime, GetIconData("horde", "symbol"), "horde")
+						self:StartBar(newText, HTime, GetIconData(48), "horde") -- 48 = Horde Insignia
 						prevText = newText
 					end
 				else -- Alliance is winning
 					local newText = getlscore(ATime, hpps, hscore, MaxScore, true)
 					if newText ~= prevText then
 						self:StopBar(prevText)
-						self:StartBar(newText, ATime, GetIconData("alliance", "symbol"), "alliance")
+						self:StartBar(newText, ATime, GetIconData(46), "alliance") -- 46 = Alliance Insignia
 						prevText = newText
 					end
 				end
@@ -401,7 +420,7 @@ do
 				eftext:SetText("")
 				eficon:Hide()
 				if captured then
-					self:StartBar(L["Flag respawns"], 21, GetIconData(strlower(UnitFactionGroup("player")), "flag"), "info2")
+					self:StartBar(L["Flag respawns"], 21, GetIconData(45), "info2") -- 45 = White flag
 				end
 				self:CheckCombat(SetEotSCarrierAttribute)
 			end
@@ -478,7 +497,7 @@ do
 				for _, value in ipairs(nodes) do
 					if strmatch(text, strlower(value)) then
 						if strmatch(text, assaulted) then
-							return self:StartBar(value, 62, GetIconData(faction, "tower"), faction)
+							return self:StartBar(value, 62, GetIconData(faction == "horde" and 12 or 9), faction)
 						elseif strmatch(text, defended) or strmatch(text, taken) or strmatch(text, claimed) then
 							return self:StopBar(value)
 						end
@@ -535,7 +554,7 @@ do
 				end
 			end
 		end
-		SetupAssault(61, true)
+		SetupAssault(61)
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HIoCAssault")
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AIoCAssault")
 		self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "SiegeEngine")
@@ -667,7 +686,7 @@ do
 			--------------------------------------------
 				if strmatch(a1, L["captured the"]) then -- flag was captured, reset all carriers
 					SetCarrier()
-					self:StartBar(L["Flag respawns"], 12, GetIconData(wsgicon, "flag"), "info2")
+					self:StartBar(L["Flag respawns"], 12, GetIconData(45), "info2") -- White flag
 				end
 			end
 			-------------------------
@@ -765,7 +784,7 @@ do
 				local timeLeft = tonumber(timeString)
 				faction = faction == "Horde" and "horde" or "alliance"
 				if faction and point and timeLeft then
-					self:StartBar(point, timeLeft*60, GetIconData(faction, "graveyard"), faction)
+					self:StartBar(point, timeLeft*60, GetIconData(faction == "horde" and 14 or 4), faction)
 				end
 			end
 		end
