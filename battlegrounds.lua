@@ -37,45 +37,45 @@ end
 local SetupAssault, GetIconData
 do -- POI handling
 	-- Easy world map icon checker
-	--local start = function(self) self:StartMoving() end
-	--local stop = function(self) self:StopMovingOrSizing() end
-	--local frames = {}
-	--do
-	--	local f = CreateFrame("Frame", nil, UIParent)
-	--	f:SetPoint("CENTER")
-	--	f:SetSize(24,24)
-	--	f:EnableMouse(true)
-	--	f:SetMovable(true)
-	--	f:RegisterForDrag("LeftButton")
-	--	f:SetScript("OnDragStart", start)
-	--	f:SetScript("OnDragStop", stop)
-	--	frames[1] = f
-	--	local tx = f:CreateTexture()
-	--	tx:SetAllPoints(f)
-	--	tx:SetTexture(136441) -- Interface\\Minimap\\POIIcons
-	--	tx:SetTexCoord(GetPOITextureCoords(1))
-	--	local n = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-	--	n:SetPoint("BOTTOM", f, "TOP")
-	--	n:SetText(1)
-	--end
-	--for i = 2, 205 do
-	--	local f = CreateFrame("Frame", nil, UIParent)
-	--	f:SetPoint("LEFT", frames[i-1], "RIGHT", 10, 0)
-	--	f:SetSize(24,24)
-	--	f:EnableMouse(true)
-	--	f:SetMovable(true)
-	--	f:RegisterForDrag("LeftButton")
-	--	f:SetScript("OnDragStart", start)
-	--	f:SetScript("OnDragStop", stop)
-	--	frames[i] = f
-	--	local tx = f:CreateTexture()
-	--	tx:SetAllPoints(f)
-	--	tx:SetTexture(136441) -- Interface\\Minimap\\POIIcons
-	--	tx:SetTexCoord(GetPOITextureCoords(i))
-	--	local n = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-	--	n:SetPoint("BOTTOM", f, "TOP")
-	--	n:SetText(i)
-	--end
+	--[[local start = function(self) self:StartMoving() end
+	local stop = function(self) self:StopMovingOrSizing() end
+	local frames = {}
+	do
+		local f = CreateFrame("Frame", nil, UIParent)
+		f:SetPoint("CENTER")
+		f:SetSize(24,24)
+		f:EnableMouse(true)
+		f:SetMovable(true)
+		f:RegisterForDrag("LeftButton")
+		f:SetScript("OnDragStart", start)
+		f:SetScript("OnDragStop", stop)
+		frames[1] = f
+		local tx = f:CreateTexture()
+		tx:SetAllPoints(f)
+		tx:SetTexture(136441) -- Interface\\Minimap\\POIIcons
+		tx:SetTexCoord(GetPOITextureCoords(1))
+		local n = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+		n:SetPoint("BOTTOM", f, "TOP")
+		n:SetText(1)
+	end
+	for i = 2, 205 do
+		local f = CreateFrame("Frame", nil, UIParent)
+		f:SetPoint("LEFT", frames[i-1], "RIGHT", 10, 0)
+		f:SetSize(24,24)
+		f:EnableMouse(true)
+		f:SetMovable(true)
+		f:RegisterForDrag("LeftButton")
+		f:SetScript("OnDragStart", start)
+		f:SetScript("OnDragStop", stop)
+		frames[i] = f
+		local tx = f:CreateTexture()
+		tx:SetAllPoints(f)
+		tx:SetTexture(136441) -- Interface\\Minimap\\POIIcons
+		tx:SetTexCoord(GetPOITextureCoords(i))
+		local n = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+		n:SetPoint("BOTTOM", f, "TOP")
+		n:SetText(i)
+	end]]
 
 	local iconDataConflict = {
 		-- Graveyard
@@ -84,21 +84,33 @@ do -- POI handling
 		-- Tower
 		[9] = "alliance",
 		[12] = "horde",
-		-- Mine
+		-- Mine/Stone
 		[17] = "alliance",
 		[19] = "horde",
-		-- Lumber
+		-- Lumber/Wood
 		[22] = "alliance",
 		[24] = "horde",
-		-- Blacksmith
+		-- Blacksmith/Anvil
 		[27] = "alliance",
 		[29] = "horde",
-		-- Farm
+		-- Farm/House
 		[32] = "alliance",
 		[34] = "horde",
-		-- Stables
+		-- Stables/Horse
 		[37] = "alliance",
 		[39] = "horde",
+		-- Workshop/Tent
+		[137] = "alliance",
+		[139] = "horde",
+		-- Hangar/Mushroom
+		[142] = "alliance",
+		[144] = "horde",
+		-- Docks/Anchor
+		[147] = "alliance",
+		[149] = "horde",
+		-- Oil/Refinery
+		[152] = "alliance",
+		[154] = "horde",
 	}
 	local iconDataOwned = {
 		-- Graveyard
@@ -107,21 +119,33 @@ do -- POI handling
 		-- Tower
 		[10] = true,
 		[11] = true,
-		-- Mine
+		-- Mine/Stone
 		[18] = true,
 		[20] = true,
-		-- Lumber
+		-- Lumber/Wood
 		[23] = true,
 		[25] = true,
-		-- Blacksmith
+		-- Blacksmith/Anvil
 		[28] = true,
 		[30] = true,
-		-- Farm
+		-- Farm/House
 		[33] = true,
 		[35] = true,
-		-- Stables
+		-- Stables/Horse
 		[38] = true,
 		[40] = true,
+		-- Workshop/Tent
+		[136] = true,
+		[138] = true,
+		-- Hangar/Mushroom
+		[141] = true,
+		[143] = true,
+		-- Docks/Anchor
+		[146] = true,
+		[148] = true,
+		-- Oil/Refinery
+		[151] = true,
+		[153] = true,
 	}
 	local GetNumMapLandmarks, GetMapLandmarkInfo, GetPOITextureCoords = GetNumMapLandmarks, GetMapLandmarkInfo, GetPOITextureCoords
 	local capTime = 0
@@ -149,8 +173,14 @@ do -- POI handling
 				landmarkCache[name] = icon
 				if iconDataConflict[icon] then
 					self:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
+					if icon == 137 or icon == 139 then -- Workshop in IoC
+						self:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
+					end
 				elseif iconDataOwned[icon] then
 					self:StopBar(name)
+					if icon == 136 or icon == 138 then -- Workshop in IoC
+						self:StartBar((GetSpellInfo(56661)), 181, 252187, iconDataOwned[icon]) -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+					end
 				end
 			end
 		end
@@ -488,78 +518,7 @@ end
 do
 	------------------------------------------------ Isle of Conquest --------------------------------------
 	local function IsleOfConquest(self)
-		if not self.HIoCAssault then
-			pname = pname or UnitName("player")
-			local siege = GetSpellInfo(56661)
-			local damaged, _, siegeicon = GetSpellInfo(67323)
-			local nodes = { L["Alliance Keep"], L["Horde Keep"], }
-			local function IoCAssault(text, faction)
-				text = strlower(text)
-				for _, value in ipairs(nodes) do
-					if strmatch(text, strlower(value)) then
-						if strmatch(text, assaulted) then
-							return self:StartBar(value, 62, GetIconData(faction == "horde" and 12 or 9), faction)
-						elseif strmatch(text, defended) or strmatch(text, taken) or strmatch(text, claimed) then
-							return self:StopBar(value)
-						end
-					end
-				end
-			end
-			--------------------------------
-			function Capping:HIoCAssault(a1)
-			--------------------------------
-				IoCAssault(a1, "horde")
-			end
-			--------------------------------
-			function Capping:AIoCAssault(a1)
-			--------------------------------
-				IoCAssault(a1, "alliance")
-			end
-			---------------------------------------------------------
-			--function Capping:IoCSync(event, prefix, message, chan, sender) -- only sync for siege engine timer
-			---------------------------------------------------------
-			--	if sender == pname then return end
-			--	if prefix == "cap" then
-			--		local f = self:GetBar(siege)
-			--		if (not f or not f:IsShown()) and message then
-			--			local faction, remain = strmatch(message, "(%a)(%d+)")
-			--			faction = (faction == "a" and "alliance") or (faction == "h" and "horde")
-			--			remain = (remain == "1" and 183) or (remain == "2" and 92) or tonumber(remain or 0) or 0
-			--			if faction and remain > 0 then
-			--				self:StartBar(siege, remain, siegeicon, faction)
-			--			end
-			--		end
-			--	elseif prefix == "DBMv4-Mod" then
-			--		local isle, _, remain, faction = strsplit("\t", message)
-			--		if isle == "IsleofConquest" then
-			--			remain = (remain == "SEStart" and 183) or (remain == "SEHalfway" and 92) or nil
-			--			if remain and faction then
-			--				self:StartBar(siege, remain, siegeicon, strlower(faction))
-			--			end
-			--		end
-			--	end
-			--end
-			------------------------------------
-			function Capping:SiegeEngine(a1, a2)
-			------------------------------------
-				if a1 and a2 then -- check npc yells
-					if strmatch(a1, L["seaforium bombs"]) or strmatch(a1, L["It's broken"]) then
-						local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
-						self:StartBar(siege, 183, siegeicon, faction)
-						--SendAddonMessage("cap", faction == "alliance" and "a1" or "h1", "INSTANCE_CHAT")
-					elseif strmatch(a1, L["halfway"]) then
-						local faction = (strmatch(a2, L["Goblin"]) and "horde") or "alliance"
-						self:StartBar(siege, 92, siegeicon, faction)
-						--SendAddonMessage("cap", faction == "alliance" and "a2" or "h2", "INSTANCE_CHAT")
-					end
-				end
-			end
-		end
 		SetupAssault(61)
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HIoCAssault")
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AIoCAssault")
-		self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "SiegeEngine")
-		--self:RegisterTempEvent("CHAT_MSG_ADDON", "IoCSync")
 	end
 	Capping:AddBG(628, IsleOfConquest)
 end
