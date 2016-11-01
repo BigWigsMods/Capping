@@ -417,8 +417,6 @@ do
 		end
 
 		local _, zoneType, _, _, _, _, _, id = GetInstanceInfo()
-		--print(id)
-		--print(GetZonePVPInfo())
 		if zoneType == "pvp" then
 			local func = zoneIds[id]
 			if func then
@@ -453,21 +451,11 @@ do
 				bgmap:Hide()
 			end
 		else
-			if GetZonePVPInfo() == "combat" then
-				SetMapToCurrentZone()
-				local z = GetMapInfo()
-				local func = zoneIds[z]
-				if func then
-					wasInBG = true
-					func(self)
-					UpdateZoneMapVisibility()
-				else
-					if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then
-						bgmap:Hide()
-					end
-				end
-			elseif id == 732 then -- Tol Barad, can't use GetZonePVPInfo, but it has it's own id!
+			local id = -(GetPlayerMapAreaID("player") or 0)
+			local func = zoneIds[id]
+			if func then
 				wasInBG = true
+				func(self)
 				UpdateZoneMapVisibility()
 			else
 				if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then

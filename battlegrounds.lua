@@ -730,7 +730,7 @@ do
 		end
 		self:RegisterTempEvent("WORLD_MAP_UPDATE", "WinterAssault")
 	end
-	Capping:AddBG("LakeWintergrasp", Wintergrasp) -- 571, but used for the entirety of Northrend
+	Capping:AddBG(-501, Wintergrasp) -- map id
 end
 
 do
@@ -783,7 +783,12 @@ do
 		self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
 		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "AshranTimeLeft")
 	end
-	Capping:AddBG("Ashran", Ashran) -- 1191, but takes a few seconds after ZONE_CHANGED_NEW_AREA (walking in) until it's at this (correct) value
+	Capping:AddBG(-978, Ashran) -- map id
+end
+
+do
+	------------------------------------------------ Tol Barad ------------------------------------------
+	Capping:AddBG(-708, function() end) -- map id
 end
 
 do
