@@ -150,26 +150,7 @@ local function CreateMover(oldframe, w, h, dragstopfunc)
 	mover.close:SetPoint("TOPRIGHT", 5, 5)
 	return mover
 end
---hooksecurefunc(WorldStateAlwaysUpFrame, "SetPoint", function()
---	if not db or not db.sbx then return end
---	oSetPoint(WorldStateAlwaysUpFrame, "TOP", UIParent, "TOPLEFT", db.sbx, db.sby)
---end)
---local function wsaufu()
---	if not db or not db.cbx then return end
---	local nexty = 0
---	for i = 1, NUM_EXTENDED_UI_FRAMES do
---		local cb = _G["WorldStateCaptureBar"..i]
---		if cb and cb:IsShown() then
---			cb:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", db.cbx, db.cby - nexty)
---			nexty = nexty + cb:GetHeight()
---		end
---	end
---end
---hooksecurefunc("WorldStateAlwaysUpFrame_Update", wsaufu)
---hooksecurefunc(VehicleSeatIndicator, "SetPoint", function()
---	if not db or not db.seatx then return end
---	oSetPoint(VehicleSeatIndicator, "TOPRIGHT", UIParent, "BOTTOMLEFT", db.seatx, db.seaty)
---end)
+
 local function UpdateZoneMapVisibility()
 	if (not bgmap or not bgmap:IsShown()) and GetCVar("showBattlefieldMinimap") ~= "0" then
 		if not bgmap then
@@ -178,29 +159,7 @@ local function UpdateZoneMapVisibility()
 		bgmap:Show()
 	end
 end
---hooksecurefunc("WorldMapZoneMinimapDropDown_OnClick", function()
---	if GetMapInfo() == "LakeWintergrasp" or GetMapInfo() == "TolBarad" then
---		UpdateZoneMapVisibility()
---	end
---end)
---TimerTracker:HookScript("OnEvent", function(this, event, timerType, timeSeconds, totalTime)
---	if not db or not wasInBG then return end
---	if db.hideblizztime then
---		for a, timer in pairs(this.timerList) do
---			timer.time = nil
---			timer.type = nil
---			timer.isFree = nil
---			timer:SetScript("OnUpdate", nil)
---			timer.fadeBarOut:Stop()
---			timer.fadeBarIn:Stop()
---			timer.startNumbers:Stop()
---			timer.bar:SetAlpha(0)
---		end
---	end
---	if not db.hidecaptime and event == "START_TIMER" then
---		Capping:StartBar(L["Battle Begins"], timeSeconds+3, "Interface\\Icons\\Spell_Holy_PrayerOfHealing", "info2")
---	end
---end)
+
 function Capping:START_TIMER(timerType, timeSeconds, totalTime)
 	local _, t = GetInstanceInfo()
 	if t == "pvp" or t == "arena" then
@@ -265,32 +224,6 @@ function Capping:ADDON_LOADED(a1)
 	db.colors.spark = db.colors.spark or { r=1, g=1, b=1, a=1, }
 	SlashCmdList.CAPPING = ShowOptions
 	SLASH_CAPPING1 = "/capping"
-
-	-- adds Capping config to default UI Interface Options
-	--local panel = CreateFrame("Frame", "CappingOptionsPanel", UIParent)
-	--panel.name = "Capping"
-	--panel:SetScript("OnShow", function(this)
-	--	local t1 = NewText(this, GameFontNormalLarge, nil, "LEFT", "TOP", "ARTWORK")
-	--	t1:SetPoint("TOPLEFT", 16, -16)
-	--	t1:SetText(this.name)
-    --
-	--	local t2 = NewText(this, GameFontHighlightSmall, nil, "LEFT", "TOP", "ARTWORK")
-	--	t2:SetHeight(43)
-	--	SetPoints(t2, "TOPLEFT", t1, "BOTTOMLEFT", 0, -8, "RIGHT", this, "RIGHT", -32, 0)
-	--	t2:SetNonSpaceWrap(true)
-	--	local function GetInfo(field)
-	--		return GetAddOnMetadata("Capping", field) or "N/A"
-	--	end
-	--	t2:SetFormattedText("Notes: %s\nAuthor: %s\nVersion: %s", GetInfo("Notes"), GetInfo("Author"), GetInfo("Version"))
-    --
-	--	local b = CreateFrame("Button", nil, this, "UIPanelButtonTemplate")
-	--	SetWH(b, 120, 20)
-	--	b:SetText(_G.GAMEOPTIONS_MENU)
-	--	b:SetScript("OnClick", ShowOptions)
-	--	b:SetPoint("TOPLEFT", t2, "BOTTOMLEFT", -2, -8)
-	--	this:SetScript("OnShow", nil)
-	--end)
-	--InterfaceOptions_AddCategory(panel)
 
 	-- anchor frame
 	anchor:Hide()
@@ -632,114 +565,6 @@ local function BarOnClick(bar, button)
 		end
 	end
 end
-
-local function SetDepleteValue(this, remain, duration)
-	this.bar:SetValue( (remain > 0 and remain or 0.0001) / duration )
-end
-local function SetFillValue(this, remain, duration)
-	this.bar:SetValue( ((remain > 0 and duration - remain) or duration) / duration )
-end
---local function BarOnUpdate(this, a1)
---	this.elapsed = this.elapsed + a1
---	if this.elapsed < this.throt then return end
---	this.elapsed = 0
---
---	local remain = this.endtime - GetTime()
---	this.remaining = remain
---
---	this:SetValue(remain, this.duration)
---	this.pfunction(remain)
---	if remain < 60 then
---		if remain < 10 then -- fade effects
---			if remain > 0.5 then
---				this:SetAlpha(0.75 + 0.25 * math_sin(remain * math_pi))
---			elseif remain > -1.5 then
---				this:SetAlpha((remain + 1.5) * 0.5)
---			elseif this.noclose then
---				if remain < -this.noclose then
---					Capping:StopBar(nil, this)
---				else
---					this:SetAlpha(0.7)
---					this.throt = 10
---				end
---				this.endfunction()
---				return
---			else
---				this.endfunction()
---				return Capping:StopBar(nil, this)
---			end
---			this.throt = 0.05
---		end
---		this.timetext:SetFormattedText("%d", remain < 0 and 0 or remain)
---	elseif remain < 600 then
---		this.timetext:SetFormattedText("%d:%02d", remain * stamin, remain % 60)
---	elseif remain < 3600 then
---		this.timetext:SetFormattedText("%dm", remain * stamin)
---	else
---		this.timetext:SetFormattedText("|cffaaaaaa%d:%02d|r", remain / 3600, remain % 3600 * stamin)
---	end
---end
-
---local function SetValue(this, frac)
---	frac = (frac < 0.0001 and 0.0001) or (frac > 1 and 1) or frac
---	this:SetWidth(frac * this.basevalue)
---	this:SetTexCoord(0, frac, 0, 1)
---end
---local function SetReverseValue(this, frac)
---	frac = (frac < 0.0001 and 0.0001) or (frac > 1 and 1) or frac
---	this:SetWidth(frac * this.basevalue)
---	this:SetTexCoord(frac, 0, 0, 1)
---end
---local function UpdateBarLayout(f)
---	local inset, w, h, tc = db.inset or 0, db.width or 200, db.height or 12, db.colors.font
---	local icon, bar, barback, spark, timetext, displaytext = f.icon, f.bar, f.barback, f.spark, f.timetext, f.displaytext
---	local nh = h * (db.altstyle and 0.25 or 1)
---	local ih = nh - 2 * inset
---	ih = ih > 0 and ih or 0.5
---	SetWH(f, w, h)
---	SetWH(icon, h, h)
---	SetWH(barback, w - h, nh)
---	bar:SetHeight(ih)
---	spark:SetHeight(2.35 * ih)
---	spark:SetVertexColor(db.colors.spark.r, db.colors.spark.g, db.colors.spark.b, db.colors.spark.a)
---	timetext:SetTextColor(tc.r, tc.g, tc.b, tc.a)
---	displaytext:SetTextColor(tc.r, tc.g, tc.b, tc.a)
---	f.SetValue = db.fill and SetFillValue or SetDepleteValue
---	if db.iconpos == "X" then -- icon position
---		icon:Hide()
---		barback:SetWidth(w)
---		SetPoints(barback, "BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
---	elseif db.iconpos == "->" then
---		icon:Show()
---		SetPoints(icon, "RIGHT", f, "RIGHT", 0, 0)
---		SetPoints(barback, "BOTTOMRIGHT", icon, "BOTTOMLEFT", 0, 0)
---	else
---		icon:Show()
---		SetPoints(icon, "LEFT", f, "LEFT", 0, 0)
---		SetPoints(barback, "BOTTOMLEFT", icon, "BOTTOMRIGHT", 0, 0)
---	end
---	if db.timepos == "->" then -- time text placement
---		SetPoints(timetext, "RIGHT", barback, "RIGHT", -(4 + inset), db.altstyle and (0.5 * h) or 0)
---		SetPoints(displaytext, "LEFT", barback, "LEFT", (4 + inset), db.altstyle and (0.5 * h) or 0, "RIGHT", timetext, "LEFT", -(4 + inset), 0)
---	else
---		SetPoints(displaytext, "LEFT", barback, "LEFT", db.fontsize * 3, db.altstyle and (0.5 * h) or 0, "RIGHT", barback, "RIGHT", -(4 + inset), 0)
---		SetPoints(timetext, "RIGHT", displaytext, "LEFT", -db.fontsize / 2.2, 0)
---	end
---	if db.reverse then -- horizontal flip of bar growth
---		SetPoints(bar, "RIGHT", barback, "RIGHT", -inset, 0)
---		spark:SetPoint("CENTER", bar, "LEFT", 0, 0)
---		bar.SetValue = SetReverseValue
---	else
---		SetPoints(bar, "LEFT", barback, "LEFT", inset, 0)
---		spark:SetPoint("CENTER", bar, "RIGHT", 0, 0)
---		bar.SetValue = SetValue
---	end
---	f:EnableMouse(not db.lockbar)
---	bar.basevalue = (w - h) - (2 * inset)
---	if f:IsShown() then
---		BarOnUpdate(f, 11)
---	end
---end
 
 do
 	local temp = { }
