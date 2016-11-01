@@ -533,7 +533,15 @@ do -- estimated wait timer and port timer
 				end
 			end
 		elseif status == "active" then -- Inside BG
-			self:StopBar(map)
+			-- We can't directly call :StopBar(map) as it doesn't work for random BGs.
+			-- A random BG will adopt the zone name when it changes to "active" E.g. Random Battleground > Arathi Basin
+			for bar in next, activeBars do
+				local id = bar:Get("capping:queueid")
+				if id == queueId then
+					bar:Stop()
+					break
+				end
+			end
 		elseif status == "none" then -- Leaving queue
 			cleanupQueue()
 		end
