@@ -112,41 +112,6 @@ do -- POI handling
 		[152] = "alliance",
 		[154] = "horde",
 	}
-	local iconDataOwned = {
-		-- Graveyard
-		[13] = true,
-		[15] = true,
-		-- Tower
-		[10] = true,
-		[11] = true,
-		-- Mine/Stone
-		[18] = true,
-		[20] = true,
-		-- Lumber/Wood
-		[23] = true,
-		[25] = true,
-		-- Blacksmith/Anvil
-		[28] = true,
-		[30] = true,
-		-- Farm/House
-		[33] = true,
-		[35] = true,
-		-- Stables/Horse
-		[38] = true,
-		[40] = true,
-		-- Workshop/Tent
-		[136] = "alliance",
-		[138] = "horde",
-		-- Hangar/Mushroom
-		[141] = true,
-		[143] = true,
-		-- Docks/Anchor
-		[146] = true,
-		[148] = true,
-		-- Oil/Refinery
-		[151] = true,
-		[153] = true,
-	}
 	local GetNumMapLandmarks, GetMapLandmarkInfo, GetPOITextureCoords = GetNumMapLandmarks, GetMapLandmarkInfo, GetPOITextureCoords
 	local capTime = 0
 	local path = {136441}
@@ -176,10 +141,10 @@ do -- POI handling
 					if icon == 137 or icon == 139 then -- Workshop in IoC
 						self:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
 					end
-				elseif iconDataOwned[icon] then
+				else
 					self:StopBar(name)
 					if icon == 136 or icon == 138 then -- Workshop in IoC
-						self:StartBar((GetSpellInfo(56661)), 181, 252187, iconDataOwned[icon]) -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+						self:StartBar((GetSpellInfo(56661)), 181, 252187, icon == 136 and "alliance" or "horde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
 					end
 				end
 			end
