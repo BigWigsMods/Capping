@@ -145,6 +145,13 @@ do -- POI handling
 					self:StopBar(name)
 					if icon == 136 or icon == 138 then -- Workshop in IoC
 						self:StartBar((GetSpellInfo(56661)), 181, 252187, icon == 136 and "alliance" or "horde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+					elseif icon == 2 or icon == 3 then
+						local _, _, _, id = UnitPosition("player")
+						if id == 30 then -- Alterac Valley
+							local bar = self:StartBar(name, 3600, GetIconData(icon), icon == 3 and "alliance" or "horde") -- Paused bar for mine status
+							bar:Pause()
+							bar:SetTimeVisibility(false)
+						end
 					end
 				end
 			end
@@ -382,7 +389,7 @@ do
 			--end
 		end
 
-		SetupAssault(245)
+		SetupAssault(242)
 		self:RegisterTempEvent("GOSSIP_SHOW")
 		self:RegisterTempEvent("QUEST_PROGRESS")
 		self:RegisterTempEvent("QUEST_COMPLETE")
