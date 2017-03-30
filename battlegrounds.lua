@@ -112,7 +112,7 @@ do -- POI handling
 		[152] = "alliance",
 		[154] = "horde",
 	}
-	local GetNumMapLandmarks, GetMapLandmarkInfo, GetPOITextureCoords = GetNumMapLandmarks, GetMapLandmarkInfo, GetPOITextureCoords
+	local GetNumMapLandmarks, GetMapLandmarkInfo, GetPOITextureCoords = GetNumMapLandmarks, C_WorldMap.GetMapLandmarkInfo, GetPOITextureCoords
 	local capTime = 0
 	local path = {136441}
 	GetIconData = function(icon)
@@ -678,7 +678,7 @@ do
 			end
 			function Capping:WinterAssault() -- scans POI landmarks for changes in wall textures
 				for i = 1, GetNumMapLandmarks(), 1 do
-					local name, _, textureIndex, x, y = GetMapLandmarkInfo(i)
+					local name, _, textureIndex, x, y = C_WorldMap.GetMapLandmarkInfo(i)
 					local tindex = floor(x * 10000).."_"..floor(y * 10000)
 					local ti = walls[tindex]
 					if (ti and ti ~= textureIndex) or (not ti and wallid[tindex]) then
@@ -694,7 +694,7 @@ do
 		end
 		walls = { }
 		for i = 1, GetNumMapLandmarks(), 1 do
-			local _, _, textureIndex, x, y = GetMapLandmarkInfo(i)
+			local _, _, textureIndex, x, y = C_WorldMap.GetMapLandmarkInfo(i)
 			local tindex = floor(x * 10000).."_"..floor(y * 10000)
 			if wallid[tindex] then
 				walls[tindex] = textureIndex

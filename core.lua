@@ -106,7 +106,7 @@ local function StartWorldTimers()
 				if not bar or prevColor == "info1" then
 					local currentmapid = GetCurrentMapAreaID()
 					SetMapByID((i == 2 and 708) or 501)
-					local _, _, ti, _, _ = GetMapLandmarkInfo(1)
+					local _, _, ti, _, _ = C_WorldMap.GetMapLandmarkInfo(1)
 					if ti == 46 then
 						color = "alliance"
 					elseif ti == 48 then
