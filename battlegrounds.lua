@@ -271,6 +271,12 @@ do
 		NewEstimator(1)
 	end
 	Capping:AddBG(529, ArathiBasin)
+
+	local function ArathiBasinSnowyPvPBrawl()
+		SetupAssault(60)
+		NewEstimator(2)
+	end
+	Capping:AddBG(1681, ArathiBasinSnowyPvPBrawl)
 end
 
 do
