@@ -439,16 +439,16 @@ do
 				end
 			end
 			-- parse battleground messages
-			local function EotSFlag(a1, faction)
-				local name = strmatch(a1, L["^(.+) has taken the flag!"])
-				if name then
-					if name == "L'Alliance" then -- frFR
+			local function EotSFlag(a1, faction, name)
+				local found = strmatch(a1, L["^(.+) has taken the flag!"])
+				if found then
+					if found == "L'Alliance" then -- frFR
 						ResetCarrier(true)
 					else
 						cclass = GetClassByName(name, faction)
 						carrier, ef.car = name, true
 						ef.faction = (faction == 0 and _G.FACTION_HORDE) or _G.FACTION_ALLIANCE
-						eftext:SetFormattedText("|cff%s%s|r", classcolor[cclass or "PRIEST"] or classcolor.PRIEST, carrier or "")
+						eftext:SetFormattedText("|cff%s%s|r", classcolor[cclass or "PRIEST"] or classcolor.PRIEST, name or "")
 						eficon:SetTexture(faction == 0 and 137218 or 137200) --137218-"Interface\\WorldStateFrame\\HordeFlag" || 137200-"Interface\\WorldStateFrame\\AllianceFlag"
 						eficon:Show()
 						self:CheckCombat(SetEotSCarrierAttribute)
@@ -459,15 +459,48 @@ do
 					ResetCarrier(true)
 				end
 			end
-			--------------------------------
-			function Capping:HFlagUpdate(a1)
-			--------------------------------
-				EotSFlag(a1, 0)
+			function Capping:HFlagUpdate(msg, _, _, _, name)
+				EotSFlag(msg, 0, name)
 			end
-			--------------------------------
-			function Capping:AFlagUpdate(a1)
-			--------------------------------
-				EotSFlag(a1, 1)
+			function Capping:AFlagUpdate(msg, _, _, _, name)
+				EotSFlag(msg, 1, name)
+			end
+			-- EotS PvP Brawl: Gravity Lapse
+			local ticker1, ticker2 = nil, nil
+			local extraMsg = nil
+			local color = {r=0,g=1,b=0}
+			local function PrintExtraMessage()
+				local _, _, _, _, _, _, _, id = GetInstanceInfo()
+				if extraMsg and id == 566 then -- Check the game isn't over
+					RaidNotice_AddMessage(RaidBossEmoteFrame, extraMsg, color, 3)
+				end
+			end
+			local function StartNextGravTimer()
+				local _, _, _, _, _, _, _, id = GetInstanceInfo()
+				if id == 566 then -- Check the game isn't over
+					local name = GetSpellInfo(44224) -- Gravity Lapse
+					local icon = GetSpellTexture(44224)
+					self:StartBar(name, 55, icon, "info2")
+					ticker1 = C_Timer.NewTicker(55, StartNextGravTimer, 1) -- Compensate for being dead (you don't get the message)
+					ticker2 = C_Timer.NewTicker(50, PrintExtraMessage, 1)
+				end
+			end
+			function Capping:CheckForGravity(msg)
+				if msg:find("15", nil, true) then
+					if not extraMsg then
+						extraMsg = msg:gsub("1", "")
+					end
+					local name = GetSpellInfo(44224) -- Gravity Lapse
+					local icon = GetSpellTexture(44224)
+					self:StartBar(name, 15, icon, "info2")
+					C_Timer.After(15, StartNextGravTimer)
+					C_Timer.After(10, PrintExtraMessage)
+					if ticker1 then
+						ticker1:Cancel()
+						ticker2:Cancel()
+						ticker1, ticker2 = nil, nil
+					end
+				end
 			end
 
 			ef = self:CreateCarrierButton("CappingEotSFrame", CarrierOnClick)
@@ -489,6 +522,7 @@ do
 		SetupAssault(60) -- In RBG the four points have flags that need to be assaulted, like AB
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HFlagUpdate")
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AFlagUpdate")
+		self:RegisterTempEvent("RAID_BOSS_WHISPER", "CheckForGravity")
 	end
 	Capping:AddBG(566, EyeOfTheStorm)
 end
