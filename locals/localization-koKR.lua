@@ -4,34 +4,34 @@ local _, addon = ...
 --- ko translations initially provided by McKabi
 addon.L = {
 	-- options menu
-	["Auto Quest Turnins"] = "퀘스트 자동 반납",
-	["Bar"] = "막대",
+	["Auto Quest Turnins"] = "자동 퀘스트 반납",
+	["Bar"] = "바",
 	["Width"] = "너비",
 	["Height"] = "높이",
-	["Texture"] = "텍스처",
-	["Map Scale"] = "지도 크기",
+	["Texture"] = "텍스쳐",
+	["Map Scale"] = "지도 크기 비율",
 	["Hide Border"] = "테두리 숨기기",
 	["Port Timer"] = "입장 시간",
 	["Wait Timer"] = "대기 시간",
-	["Show/Hide Anchor"] = "표식 보이기/감추기",
-	["Narrow Map Mode"] = "좁은 지도 표시",
-	["Narrow Anchor Left"] = "좌측 좁은 표식",
+	["Show/Hide Anchor"] = "고정기 표시/숨기기",
+	["Narrow Map Mode"] = "좁은 지도 모드",
+	["Narrow Anchor Left"] = "좁은 지도 좌측 고정",
 	["Test"] = "시험",
-	["Flip Growth"] = "막대 위로 쌓기",
+	["Flip Growth"] = "바 위로 쌓기",
 	["Single Group"] = "단일 그룹",
-	["Move Scoreboard"] = "점수판 위치 바꾸기",
+	["Move Scoreboard"] = "점수판 이동",
 	["Spacing"] = "간격",
 	["Request Sync"] = "동기화 요청",
-	["Fill Grow"] = "성장방향 채우기",
-	["Fill Right"] = "우측부터 채우기",
+	["Fill Grow"] = "왼쪽부터 채우기",
+	["Fill Right"] = "오른쪽부터 채우기",
 	["Font"] = "글꼴",
 	["Time Position"] = "시간 위치",
 	["Border Width"] = "테두리 너비",
-	["Send to BG"] = "전장 대화 출력",
-	["Send to SAY"] = "일반 대화 출력",
-	["Cancel Timer"] = "시간 취소",
-	["Move Capture Bar"] = "점령시간 바",
-	["Move Vehicle Seat"] = "탑승 차량",
+	["Send to BG"] = "전장으로 전송",
+	["Send to SAY"] = "일반 대화로 전송",
+	["Cancel Timer"] = "취소 타이머",
+	["Move Capture Bar"] = "점령시간 바 이동",
+	["Move Vehicle Seat"] = "차량 좌석 이동",
 
 	-- etc timers
 	["Battle Begins"] = "전투 개시", -- bar text for bg gates opening
@@ -43,7 +43,7 @@ addon.L = {
 	["Forty five seconds"] = "45초 전",
 	["Thirty seconds until"] = "30초 전",
 	["Fifteen seconds until"] = "15초 전",
-	["%s: %s - %d:%02d remaining"] = "%s: %s - %d:%02d 남았음", -- chat message after shift left-clicking a bar
+	["%s: %s - %d:%02d remaining"] = "%s: %s - %d:%02d 남음", -- chat message after shift left-clicking a bar
 
 	-- AB
 	["Bases: (%d+)  Resources: (%d+)/(%d+)"] = "거점: (%d+)  자원: (%d+)/(%d+)", -- arathi basin scoreboard
@@ -59,8 +59,8 @@ addon.L = {
 	--["was picked up by (.+)!2"] = "([^ ]*)|1이;가; ([^!]*) 깃발을 손에 넣었습니다!2",
 	["dropped"] = "([^ ]*)|1이;가; ([^!]*) 깃발을 떨어뜨렸습니다!",
 	["captured the"] = "([^ ]*)|1이;가; ([^!]*) 깃발 쟁탈에 성공했습니다!",
-	["Flag respawns"] = "새 깃발 생성",
-	["%s's flag carrier: %s (%s)"] = "%s 깃발 운반자: %s (%s)", -- chat message
+	["Flag respawns"] = "깃발 생성",
+	["%s's flag carrier: %s (%s)"] = "%s의 깃발 운반자: %s (%s)", -- chat message
 
 	-- AV
 	 -- patterns
@@ -78,12 +78,12 @@ addon.L = {
 
 	-- IoC
 	 -- node keywords (text is also displayed on timer bar)
-	--["Alliance Keep"] = true,
-	--["Horde Keep"] = true,
+	["Alliance Keep"] = "얼라이언스 요새",
+	["Horde Keep"] = "호드 요새",
 	 -- Siege Engine keyphrases
-	--["Goblin"] = true,  -- Horde mechanic name keyword
-	--["seaforium bombs"] = true,  -- start (after capturing the workshop)
-	--["It's broken"] = true,  -- start again (after engine is destroyed)
-	--["halfway"] = true,  -- middle
+	["Goblin"] = "작업장",  -- Horde mechanic name keyword
+	["seaforium bombs"] = "시포리움 폭탄",  -- start (after capturing the workshop)
+	["It's broken"] = true,  -- start again (after engine is destroyed)
+	["halfway"] = true,  -- middle
 }
 
