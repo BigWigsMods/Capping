@@ -670,24 +670,16 @@ do
 	end)
 end
 
-local GetBattlefieldScore, GetNumBattlefieldScores = GetBattlefieldScore, GetNumBattlefieldScores
 ----------------------------------
 function Capping:UpdateCountText() -- roster counts
 ----------------------------------
-	if not AlwaysUpFrame2 then return end
-	local na, nh
-	for i = 1, GetNumBattlefieldScores(), 1 do
-		local _, _, _, _, _, ifaction = GetBattlefieldScore(i)
-		if ifaction == 0 then
-			nh = (nh or 0) + 1
-		elseif ifaction == 1 then
-			na = (na or 0) + 1
-		end
-	end
+	local _, _, _, _, numHorde = GetBattlefieldTeamInfo(0)
+	local _, _, _, _, numAlliance = GetBattlefieldTeamInfo(1)
+
 	ACountText = ACountText or self:CreateText(AlwaysUpFrame1, 10, "CENTER", AlwaysUpFrame1Icon, 3, 2, AlwaysUpFrame1Icon, -19, 16)
 	HCountText = HCountText or self:CreateText(AlwaysUpFrame2, 10, "CENTER", AlwaysUpFrame2Icon, 3, 2, AlwaysUpFrame2Icon, -19, 16)
-	ACountText:SetText(na or "")
-	HCountText:SetText(nh or "")
+	ACountText:SetText(numAlliance or "")
+	HCountText:SetText(numHorde or "")
 
 	local offset = ((not AlwaysUpFrame1Icon:GetTexture() or AlwaysUpFrame1Icon:GetTexture() == "") and 1) or 0
 	SetPoints(ACountText, "TOPLEFT", _G["AlwaysUpFrame"..(1 + offset).."Icon"], "TOPLEFT", 3, 2, "BOTTOMRIGHT", _G["AlwaysUpFrame"..(1 + offset).."Icon"], "BOTTOMRIGHT", -19, 16)
