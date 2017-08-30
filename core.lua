@@ -92,33 +92,56 @@ local function StartWorldTimers()
 	-- GetNumWorldPVPAreas() = 3
 	-- 1) Wintergrasp, 2) Tol Barad, 3) Ashran (not timed)
 	for i = 1, 2 do
-		local _, localizedName, isActive, _, startTime = GetWorldPVPAreaInfo(i)
+		local _, localizedName, _, _, startTime = GetWorldPVPAreaInfo(i)
 		if localizedName then
 			db["worldname"..i] = localizedName
 		end
 		if db["world"..i] then
-			if startTime < 1 or isActive then
+			if startTime < 1 then
 				Capping:StopBar(localizedName)
-			elseif startTime > 0 then
+			elseif startTime then
 				local bar = Capping:GetBar(localizedName)
 				local prevColor = bar and bar:Get("capping:colorid") -- Force refresh the bar if we have capture data
 				local color
 				if not bar or prevColor == "info1" then
 					local currentmapid = GetCurrentMapAreaID()
-					SetMapByID((i == 2 and 708) or 501)
-					local _, _, ti, _, _ = C_WorldMap.GetMapLandmarkInfo(1)
-					if ti == 46 then
-						color = "alliance"
-					elseif ti == 48 then
-						color = "horde"
+					if i == 1 then
+						SetMapByID(501)
+						for i = 1, GetNumMapLandmarks() do
+							local _, _, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
+							if poiID == 2266 then -- Graveyard
+								if textureIndex == 15 then
+									color = "alliance"
+								elseif textureIndex == 13 then
+									color = "horde"
+								else
+									color = "info1"
+								end
+								break
+							end
+						end
 					else
-						color = "info1"
+						SetMapByID(708)
+						for i = 1, GetNumMapLandmarks() do
+							local _, _, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
+							if poiID == 2485 then -- Baradin Hold central POI
+								if textureIndex == 46 then
+									color = "alliance"
+								elseif textureIndex == 48 then
+									color = "horde"
+								else
+									color = "info1"
+								end
+								break
+							end
+						end
 					end
 					SetMapByID(currentmapid)
 					if color ~= "info1" then
 						bar = nil
 						prevColor = color
 					end
+					_, localizedName, _, _, startTime = GetWorldPVPAreaInfo(i)
 				end
 
 				if not bar or startTime > bar.remaining+5 or startTime < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
@@ -390,13 +413,13 @@ do
 				wasInBG = true
 				func(self)
 				UpdateZoneMapVisibility()
+				StartWorldTimers()
 			else
 				if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then
 					bgmap:Hide()
 				end
 			end
 		end
-		StartWorldTimers()
 		self:ModMap()
 	end
 end
