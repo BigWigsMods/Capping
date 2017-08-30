@@ -7,7 +7,7 @@
 ## Notes-ruRU: Battleground timers and other PvP features.
 ## Notes-zhCN: Battleground timers and other PvP features.
 ## Notes-zhTW: Battleground timers and other PvP features.
-## Notes-koKR: 전장 타이머와 기타 PvP 기능입니다..
+## Notes-koKR: 전장 타이머와 기타 PvP 기능입니다.
 ## Notes-frFR: Battleground timers and other PvP features.
 ## Notes-esES: Battleground timers and other PvP features.
 ## Notes-esMX: Battleground timers and other PvP features.

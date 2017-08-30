@@ -65,9 +65,9 @@ addon.L = {
 	-- AV
 	 -- patterns
 	["Upgrade to"] = "추가 전리품", -- the option to upgrade units in AV
-	---["Wicked, wicked, mortals!"] = true, -- what Ivus says after being summoned
+	["Wicked, wicked, mortals!"] = "사악하디 사악한 필멸의 생명체들이여, 숲이 울부짖는구나!", -- what Ivus says after being summoned
 	["Ivus begins moving"] = "이부스 이동 시작",
-	---["WHO DARES SUMMON LOKHOLAR"] = true, -- what Lok says after being summoned
+	["WHO DARES SUMMON LOKHOLAR"] = "누가 감히 이 로크홀라를 소환한 것이냐?", -- what Lok says after being summoned
 	["The Ice Lord has arrived!"] = "얼음 군주께서 당도하셨어요!",
 	["Lokholar begins moving"] = "로크홀라 이동 시작",
 
