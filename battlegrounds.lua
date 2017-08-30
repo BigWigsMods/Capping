@@ -698,14 +698,14 @@ do
 	local function Wintergrasp(self)
 		if not self.WinterAssault then
 			wallid = { -- wall section locations
-				["4308_1733"] = "NW ", ["4311_1940"] = "NW ", ["4481_2197"] = "NW ", ["4619_2206"] = "NW ",
-				["4689_2324"] = "SW ", ["4689_2523"] = "SW ", ["4861_2795"] = "S ",
-				["5144_2788"] = "S ", ["5314_2527"] = "SE ", ["5316_2320"] = "SE ",
-				["5391_2202"] = "NE ", ["5530_2204"] = "NE ", ["5709_1946"] = "NE ", ["5708_1733"] = "NE ",
-				["4770_1664"] = "Inner W ", ["4773_1882"] = "Inner W ", ["4772_2098"] = "Inner W ",
-				["4860_2205"] = "Inner S ", ["5004_2197"] = "Inner S ", ["5144_2200"] = "Inner S ",
-				["5235_2090"] = "Inner E ", ["5237_1880"] = "Inner E ", ["5232_1675"] = "Inner E ",
-				["5001_2793"] = "", ["5000_1623"] = "", -- front gate and fortress door
+				[2222] = "NW ", [2223] = "NW ", [2224] = "NW ", [2225] = "NW ",
+				[2226] = "SW ", [2227] = "SW ", [2228] = "S ",
+				[2230] = "S ", [2231] = "SE ", [2232] = "SE ",
+				[2233] = "NE ", [2234] = "NE ", [2235] = "NE ", [2236] = "NE ",
+				[2237] = "Inner W ", [2238] = "Inner W ", [2239] = "Inner W ",
+				[2240] = "Inner S ", [2241] = "Inner S ", [2242] = "Inner S ",
+				[2243] = "Inner E ", [2244] = "Inner E ", [2245] = "Inner E ",
+				[2229] = "", [2246] = "", -- front gate and fortress door
 			}
 
 			-- POI icon texture id
@@ -717,27 +717,25 @@ do
 				all[k], all[k + 1], all[k + 2] = true, true, true
 			end
 			function Capping:WinterAssault() -- scans POI landmarks for changes in wall textures
-				for i = 1, GetNumMapLandmarks(), 1 do
-					local name, _, textureIndex, x, y = C_WorldMap.GetMapLandmarkInfo(i)
-					local tindex = floor(x * 10000).."_"..floor(y * 10000)
-					local ti = walls[tindex]
-					if (ti and ti ~= textureIndex) or (not ti and wallid[tindex]) then
+				for i = 1, GetNumMapLandmarks() do
+					local _, name, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
+					local ti = walls[poiID]
+					if (ti and ti ~= textureIndex) or (not ti and wallid[poiID]) then
 						if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
-							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[tindex], name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
+							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[poiID], name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
 						elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[tindex], name, _G.ACTION_UNIT_DESTROYED))
+							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[poiID], name, _G.ACTION_UNIT_DESTROYED))
 						end
-						walls[tindex] = all[textureIndex] and textureIndex or ti
+						walls[poiID] = all[textureIndex] and textureIndex or ti
 					end
 				end
 			end
 		end
 		walls = { }
-		for i = 1, GetNumMapLandmarks(), 1 do
-			local _, _, textureIndex, x, y = C_WorldMap.GetMapLandmarkInfo(i)
-			local tindex = floor(x * 10000).."_"..floor(y * 10000)
-			if wallid[tindex] then
-				walls[tindex] = textureIndex
+		for i = 1, GetNumMapLandmarks() do
+			local _, _, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
+			if wallid[poiID] then
+				walls[poiID] = textureIndex
 			end
 		end
 		self:RegisterTempEvent("WORLD_MAP_UPDATE", "WinterAssault")
