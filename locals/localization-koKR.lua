@@ -32,6 +32,8 @@ addon.L = {
 	["Cancel Timer"] = "취소 타이머",
 	["Move Capture Bar"] = "점령시간 바 이동",
 	["Move Vehicle Seat"] = "차량 좌석 이동",
+	["Hide Capping Start Time"] = "Capping 시작 시간 숨기기",
+	["Hide Blizzard Start Timer"] = "블리자드 시작 타이머 숨기기",
 
 	-- etc timers
 	["Battle Begins"] = "전투 개시", -- bar text for bg gates opening
