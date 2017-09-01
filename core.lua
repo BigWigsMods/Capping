@@ -696,6 +696,8 @@ end
 ----------------------------------
 function Capping:UpdateCountText() -- roster counts
 ----------------------------------
+	if not AlwaysUpFrame2 then return end
+
 	local _, _, _, _, numHorde = GetBattlefieldTeamInfo(0)
 	local _, _, _, _, numAlliance = GetBattlefieldTeamInfo(1)
 
