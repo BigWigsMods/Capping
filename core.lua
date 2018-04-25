@@ -19,7 +19,13 @@ local GetTime, time = GetTime, time
 -- LOCAL VARS
 local db, wasInBG, bgmap, bgtab
 local activeBars, bars, bgdd = { }, { }, { }
-local av, ab, eots, wsg, winter, ioc = GetMapNameByID(401), GetMapNameByID(461), GetMapNameByID(813), GetMapNameByID(443), GetMapNameByID(501), GetMapNameByID(540)
+local av, ab, eots, wsg, winter, ioc
+if GetMapNameByID then -- XXX 8.0
+	av, ab, eots, wsg, winter, ioc = GetMapNameByID(401), GetMapNameByID(461), GetMapNameByID(813), GetMapNameByID(443), GetMapNameByID(501), GetMapNameByID(540)
+else
+	local GetMapInfo = C_Map.GetMapInfo
+	av, ab, eots, wsg, winter, ioc = GetMapInfo(91).name, GetMapInfo(93).name, GetMapInfo(397).name, GetMapInfo(92).name, GetMapInfo(123).name, GetMapInfo(169).name
+end
 local narrowed, borderhidden, ACountText, HCountText
 Capping.backdrop = { bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", }
 
