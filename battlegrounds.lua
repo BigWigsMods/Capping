@@ -112,28 +112,71 @@ do -- POI handling
 		[152] = "alliance",
 		[154] = "horde",
 	}
-	local GetNumMapLandmarks, GetMapLandmarkInfo, GetPOITextureCoords = GetNumMapLandmarks, C_WorldMap.GetMapLandmarkInfo, GetPOITextureCoords
+	local GetPOITextureCoords = GetPOITextureCoords
+	local GetAreaPOIForMap = C_AreaPoiInfo and C_AreaPoiInfo.GetAreaPOIForMap -- XXX 8.0
+	local GetAreaPOIInfo = C_AreaPoiInfo and C_AreaPoiInfo.GetAreaPOIInfo -- XXX 8.0
 	local capTime = 0
+	local curMapID = 0
 	local path = {136441}
 	GetIconData = function(icon)
 		path[2], path[3], path[4], path[5] = GetPOITextureCoords(icon)
 		return path
 	end
 	local landmarkCache = {}
-	SetupAssault = function(bgcaptime)
+	SetupAssault = function(bgcaptime, uiMapID)
 		capTime = bgcaptime -- cap time
+		curMapID = uiMapID -- current map
 		landmarkCache = {}
-		for i = 1, GetNumMapLandmarks() do
-			local _, name, _, icon = GetMapLandmarkInfo(i)
-			landmarkCache[name] = icon
+		if GetMapLandmarkInfo then -- XXX 8.0
+			for i = 1, GetNumMapLandmarks() do
+				local _, name, _, icon = GetMapLandmarkInfo(i)
+				landmarkCache[name] = icon
+			end
+			Capping:RegisterTempEvent("WORLD_MAP_UPDATE")
+		else
+			local pois = GetAreaPOIForMap(uiMapID)
+			for i = 1, #pois do
+				local tbl = GetAreaPOIInfo(uiMapID)
+				landmarkCache[tbl.name] = tbl.textureIndex
+			end
+			Capping:RegisterTempEvent("AREA_POIS_UPDATED")
 		end
-		Capping:RegisterTempEvent("WORLD_MAP_UPDATE")
 	end
 	-----------------------------------
-	function Capping:WORLD_MAP_UPDATE()
+	function Capping:WORLD_MAP_UPDATE() -- XXX 8.0 remove me
 	-----------------------------------
 		for i = 1, GetNumMapLandmarks() do
 			local _, name, _, icon = GetMapLandmarkInfo(i)
+			if landmarkCache[name] ~= icon then
+				landmarkCache[name] = icon
+				if iconDataConflict[icon] then
+					self:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
+					if icon == 137 or icon == 139 then -- Workshop in IoC
+						self:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
+					end
+				else
+					self:StopBar(name)
+					if icon == 136 or icon == 138 then -- Workshop in IoC
+						self:StartBar((GetSpellInfo(56661)), 181, 252187, icon == 136 and "alliance" or "horde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+					elseif icon == 2 or icon == 3 then
+						local _, _, _, id = UnitPosition("player")
+						if id == 30 then -- Alterac Valley
+							local bar = self:StartBar(name, 3600, GetIconData(icon), icon == 3 and "alliance" or "horde") -- Paused bar for mine status
+							bar:Pause()
+							bar:SetTimeVisibility(false)
+						end
+					end
+				end
+			end
+		end
+	end
+	-----------------------------------
+	function Capping:AREA_POIS_UPDATED()
+	-----------------------------------
+		local pois = GetAreaPOIForMap(curMapID)
+		for i = 1, #pois do
+			local tbl = GetAreaPOIInfo(uiMapID)
+			local name, icon = tbl.name, tbl.textureIndex
 			if landmarkCache[name] ~= icon then
 				landmarkCache[name] = icon
 				if iconDataConflict[icon] then
@@ -267,13 +310,13 @@ end
 do
 	------------------------------------------------ Arathi Basin -----------------------------------------------------
 	local function ArathiBasin()
-		SetupAssault(60)
+		SetupAssault(60, 93)
 		NewEstimator(1)
 	end
 	Capping:AddBG(529, ArathiBasin)
 
 	local function ArathiBasinSnowyPvPBrawl()
-		SetupAssault(60)
+		SetupAssault(60, 837)
 		NewEstimator(2)
 	end
 	Capping:AddBG(1681, ArathiBasinSnowyPvPBrawl)
@@ -282,7 +325,7 @@ end
 do
 	------------------------------------------------ Deepwind Gorge -----------------------------------------------------
 	local function DeepwindGorge()
-		SetupAssault(61)
+		SetupAssault(61, 519)
 		NewEstimator(4)
 	end
 	Capping:AddBG(1105, DeepwindGorge)
@@ -291,7 +334,7 @@ end
 do
 	------------------------------------------------ Gilneas -----------------------------------------------------
 	local function TheBattleForGilneas()
-		SetupAssault(60)
+		SetupAssault(60, 275)
 		NewEstimator(3)
 	end
 	Capping:AddBG(761, TheBattleForGilneas)
@@ -395,7 +438,7 @@ do
 			--end
 		end
 
-		SetupAssault(242)
+		SetupAssault(242, 91)
 		self:RegisterTempEvent("GOSSIP_SHOW")
 		self:RegisterTempEvent("QUEST_PROGRESS")
 		self:RegisterTempEvent("QUEST_COMPLETE")
@@ -519,7 +562,7 @@ do
 
 		-- setup for final score estimation (2 for EotS)
 		NewEstimator(2)
-		SetupAssault(60) -- In RBG the four points have flags that need to be assaulted, like AB
+		SetupAssault(60, 112) -- In RBG the four points have flags that need to be assaulted, like AB
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HFlagUpdate")
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AFlagUpdate")
 		self:RegisterTempEvent("RAID_BOSS_WHISPER", "CheckForGravity")
@@ -530,7 +573,7 @@ end
 do
 	------------------------------------------------ Isle of Conquest --------------------------------------
 	local function IsleOfConquest(self)
-		SetupAssault(61)
+		SetupAssault(61, 169)
 	end
 	Capping:AddBG(628, IsleOfConquest)
 end
