@@ -233,77 +233,162 @@ local NewEstimator
 do
 	local ascore, atime, abases, hscore, htime, hbases, updatetime, currentbg, prevText
 	NewEstimator = function(bg) -- resets estimator and sets new battleground
-		if not Capping.UPDATE_WORLD_STATES then
-			local f2 = L["Final: %d - %d"]
-			local lookup = {
-				[1] = { [0] = 0, [1] = 1, [2] = 1.5, [3] = 2, [4] = 3.5, [5] = 30, }, -- ab
-				[2] = { [0] = 0, [1] = 0.5, [2] = 1, [3] = 2.5, [4] = 5, }, -- eots
-				[3] = { [0] = 0, [1] = 1, [2] = 3, [3] = 30, }, -- gilneas
-				[4] = { [0] = 0, [1] = 8, [2] = 16, [3] = 32, }, -- Deepwind Gorge
-			}
-			local function getlscore(ltime, pps, currentscore, maxscore, awin) -- estimate loser's final score
-				if currentbg == 2 then -- EotS
-					ltime = floor(ltime * pps + currentscore + 0.5)
-					ltime = (ltime < maxscore and ltime) or (maxscore - 1)
-				else -- AB or Gilneas
-					ltime = 10 * floor((ltime * pps + currentscore + 5) * 0.1)
-					ltime = (ltime < maxscore and ltime) or (maxscore - 10)
+		if GetWorldStateUIInfo then -- XXX 8.0
+			if not Capping.UPDATE_WORLD_STATES then
+				local f2 = L["Final: %d - %d"]
+				local lookup = {
+					[1] = { [0] = 0, [1] = 1, [2] = 1.5, [3] = 2, [4] = 3.5, [5] = 30, }, -- ab
+					[2] = { [0] = 0, [1] = 0.5, [2] = 1, [3] = 2.5, [4] = 5, }, -- eots
+					[3] = { [0] = 0, [1] = 1, [2] = 3, [3] = 30, }, -- gilneas
+					[4] = { [0] = 0, [1] = 8, [2] = 16, [3] = 32, }, -- Deepwind Gorge
+				}
+				local function getlscore(ltime, pps, currentscore, maxscore, awin) -- estimate loser's final score
+					if currentbg == 2 then -- EotS
+						ltime = floor(ltime * pps + currentscore + 0.5)
+						ltime = (ltime < maxscore and ltime) or (maxscore - 1)
+					else -- AB or Gilneas
+						ltime = 10 * floor((ltime * pps + currentscore + 5) * 0.1)
+						ltime = (ltime < maxscore and ltime) or (maxscore - 10)
+					end
+					return (awin and format(f2, maxscore, ltime)) or format(f2, ltime, maxscore)
 				end
-				return (awin and format(f2, maxscore, ltime)) or format(f2, ltime, maxscore)
+				--------------------------------------
+				function Capping:UPDATE_WORLD_STATES()
+				--------------------------------------
+					local _, zType = GetInstanceInfo()
+					if zType ~= "pvp" then return end
+
+					local currenttime = GetTime()
+
+					local _, _, _, scoreStringA = GetWorldStateUIInfo(currentbg == 2 and 2 or 1) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
+					local base, score, smax = strmatch(scoreStringA, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
+					local ABases, AScore, MaxScore = tonumber(base), tonumber(score), tonumber(smax) or 2000
+					local _, _, _, scoreStringH = GetWorldStateUIInfo(currentbg == 2 and 3 or 2) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
+
+					base, score = strmatch(scoreStringH, "[^%d]+(%d+)[^%d]+(%d+)/") -- Bases: %d  Resources: %d/%d
+					local HBases, HScore = tonumber(base), tonumber(score)
+
+					if ABases and HBases then
+						abases, hbases = ABases, HBases
+						if ascore ~= AScore then
+							ascore, atime, updatetime = AScore, currenttime, true
+						end
+						if hscore ~= HScore then
+							hscore, htime, updatetime = HScore, currenttime, true
+						end
+					end
+
+					if not updatetime then return end
+					updatetime = nil
+
+					local apps, hpps = lookup[currentbg][abases], lookup[currentbg][hbases]
+					-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
+					local ATime = ((MaxScore - ascore) / (apps > 0 and apps or 0.000001)) - (currenttime - atime)
+					local HTime = ((MaxScore - hscore) / (hpps > 0 and hpps or 0.000001)) - (currenttime - htime)
+
+					if HTime < ATime then -- Horde is winning
+						local newText = getlscore(HTime, apps, ascore, MaxScore)
+						if newText ~= prevText then
+							self:StopBar(prevText)
+							self:StartBar(newText, HTime, GetIconData(48), "horde") -- 48 = Horde Insignia
+							prevText = newText
+						end
+					else -- Alliance is winning
+						local newText = getlscore(ATime, hpps, hscore, MaxScore, true)
+						if newText ~= prevText then
+							self:StopBar(prevText)
+							self:StartBar(newText, ATime, GetIconData(46), "alliance") -- 46 = Alliance Insignia
+							prevText = newText
+						end
+					end
+				end
 			end
-			--------------------------------------
-			function Capping:UPDATE_WORLD_STATES()
-			--------------------------------------
-				local _, zType = GetInstanceInfo()
-				if zType ~= "pvp" then return end
-
-				local currenttime = GetTime()
-
-				local _, _, _, scoreStringA = GetWorldStateUIInfo(currentbg == 2 and 2 or 1) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
-				local base, score, smax = strmatch(scoreStringA, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
-				local ABases, AScore, MaxScore = tonumber(base), tonumber(score), tonumber(smax) or 2000
-				local _, _, _, scoreStringH = GetWorldStateUIInfo(currentbg == 2 and 3 or 2) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
-
-				base, score = strmatch(scoreStringH, "[^%d]+(%d+)[^%d]+(%d+)/") -- Bases: %d  Resources: %d/%d
-				local HBases, HScore = tonumber(base), tonumber(score)
-
-				if ABases and HBases then
-					abases, hbases = ABases, HBases
-					if ascore ~= AScore then
-						ascore, atime, updatetime = AScore, currenttime, true
+			currentbg, updatetime, ascore, atime, abases, hscore, htime, hbases, prevText = bg, nil, 0, 0, 0, 0, 0, 0, ""
+			Capping:RegisterTempEvent("UPDATE_WORLD_STATES")
+		else
+			if not Capping.UPDATE_UI_WIDGET then
+				local f2 = L["Final: %d - %d"]
+				local lookup = {
+					[1] = { [0] = 0, [1] = 1, [2] = 1.5, [3] = 2, [4] = 3.5, [5] = 30, }, -- ab
+					[2] = { [0] = 0, [1] = 0.5, [2] = 1, [3] = 2.5, [4] = 5, }, -- eots
+					[3] = { [0] = 0, [1] = 1, [2] = 3, [3] = 30, }, -- gilneas
+					[4] = { [0] = 0, [1] = 8, [2] = 16, [3] = 32, }, -- Deepwind Gorge
+				}
+				local function getlscore(ltime, pps, currentscore, maxscore, awin) -- estimate loser's final score
+					if currentbg == 2 then -- EotS
+						ltime = floor(ltime * pps + currentscore + 0.5)
+						ltime = (ltime < maxscore and ltime) or (maxscore - 1)
+					else -- AB or Gilneas
+						ltime = 10 * floor((ltime * pps + currentscore + 5) * 0.1)
+						ltime = (ltime < maxscore and ltime) or (maxscore - 10)
 					end
-					if hscore ~= HScore then
-						hscore, htime, updatetime = HScore, currenttime, true
-					end
+					return (awin and format(f2, maxscore, ltime)) or format(f2, ltime, maxscore)
 				end
+				--------------------------------------
+				function Capping:UPDATE_UI_WIDGET()
+				--------------------------------------
+					local _, zType = GetInstanceInfo()
+					if zType ~= "pvp" then return end
 
-				if not updatetime then return end
-				updatetime = nil
+					local currenttime = GetTime()
 
-				local apps, hpps = lookup[currentbg][abases], lookup[currentbg][hbases]
-				-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
-				local ATime = ((MaxScore - ascore) / (apps > 0 and apps or 0.000001)) - (currenttime - atime)
-				local HTime = ((MaxScore - hscore) / (hpps > 0 and hpps or 0.000001)) - (currenttime - htime)
-
-				if HTime < ATime then -- Horde is winning
-					local newText = getlscore(HTime, apps, ascore, MaxScore)
-					if newText ~= prevText then
-						self:StopBar(prevText)
-						self:StartBar(newText, HTime, GetIconData(48), "horde") -- 48 = Horde Insignia
-						prevText = newText
+					local txt
+					for k, v in next, tbl do
+						if not txt then
+							txt = format("%s:%s", k, v)
+						else
+							txt = format("%s, %s:%s", txt, k, v)
+						end
 					end
-				else -- Alliance is winning
-					local newText = getlscore(ATime, hpps, hscore, MaxScore, true)
-					if newText ~= prevText then
-						self:StopBar(prevText)
-						self:StartBar(newText, ATime, GetIconData(46), "alliance") -- 46 = Alliance Insignia
-						prevText = newText
+					print(txt)
+					--[[
+					local _, _, _, scoreStringA = GetWorldStateUIInfo(currentbg == 2 and 2 or 1) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
+					local base, score, smax = strmatch(scoreStringA, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
+					local ABases, AScore, MaxScore = tonumber(base), tonumber(score), tonumber(smax) or 2000
+					local _, _, _, scoreStringH = GetWorldStateUIInfo(currentbg == 2 and 3 or 2) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
+
+					base, score = strmatch(scoreStringH, "[^%d]+(%d+)[^%d]+(%d+)/") -- Bases: %d  Resources: %d/%d
+					local HBases, HScore = tonumber(base), tonumber(score)
+
+					if ABases and HBases then
+						abases, hbases = ABases, HBases
+						if ascore ~= AScore then
+							ascore, atime, updatetime = AScore, currenttime, true
+						end
+						if hscore ~= HScore then
+							hscore, htime, updatetime = HScore, currenttime, true
+						end
 					end
+
+					if not updatetime then return end
+					updatetime = nil
+
+					local apps, hpps = lookup[currentbg][abases], lookup[currentbg][hbases]
+					-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
+					local ATime = ((MaxScore - ascore) / (apps > 0 and apps or 0.000001)) - (currenttime - atime)
+					local HTime = ((MaxScore - hscore) / (hpps > 0 and hpps or 0.000001)) - (currenttime - htime)
+
+					if HTime < ATime then -- Horde is winning
+						local newText = getlscore(HTime, apps, ascore, MaxScore)
+						if newText ~= prevText then
+							self:StopBar(prevText)
+							self:StartBar(newText, HTime, GetIconData(48), "horde") -- 48 = Horde Insignia
+							prevText = newText
+						end
+					else -- Alliance is winning
+						local newText = getlscore(ATime, hpps, hscore, MaxScore, true)
+						if newText ~= prevText then
+							self:StopBar(prevText)
+							self:StartBar(newText, ATime, GetIconData(46), "alliance") -- 46 = Alliance Insignia
+							prevText = newText
+						end
+					end
+					]]
 				end
 			end
+			currentbg, updatetime, ascore, atime, abases, hscore, htime, hbases, prevText = bg, nil, 0, 0, 0, 0, 0, 0, ""
+			Capping:RegisterTempEvent("UPDATE_UI_WIDGET")
 		end
-		currentbg, updatetime, ascore, atime, abases, hscore, htime, hbases, prevText = bg, nil, 0, 0, 0, 0, 0, 0, ""
-		Capping:RegisterTempEvent("UPDATE_WORLD_STATES")
 	end
 end
 
