@@ -94,74 +94,6 @@ local function NewText(parent, font, fontsize, justifyH, justifyV, overlay)
 	return t
 end
 
-local function StartWorldTimers()
-	-- GetNumWorldPVPAreas() = 3
-	-- 1) Wintergrasp, 2) Tol Barad, 3) Ashran (not timed)
-	for i = 1, 2 do
-		local _, localizedName, _, _, startTime = GetWorldPVPAreaInfo(i)
-		if localizedName then
-			db["worldname"..i] = localizedName
-		end
-		if db["world"..i] then
-			if startTime < 1 then
-				Capping:StopBar(localizedName)
-			elseif startTime then
-				local bar = Capping:GetBar(localizedName)
-				local prevColor = bar and bar:Get("capping:colorid") -- Force refresh the bar if we have capture data
-				local color
-				if not bar or prevColor == "info1" then
-					local currentmapid = GetCurrentMapAreaID()
-					if i == 1 then
-						SetMapByID(501)
-						for i = 1, GetNumMapLandmarks() do
-							local _, _, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
-							if poiID == 2266 then -- Graveyard
-								if textureIndex == 15 then
-									color = "alliance"
-								elseif textureIndex == 13 then
-									color = "horde"
-								else
-									color = "info1"
-								end
-								break
-							end
-						end
-					else
-						SetMapByID(708)
-						for i = 1, GetNumMapLandmarks() do
-							local _, _, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
-							if poiID == 2485 then -- Baradin Hold central POI
-								if textureIndex == 46 then
-									color = "alliance"
-								elseif textureIndex == 48 then
-									color = "horde"
-								else
-									color = "info1"
-								end
-								break
-							end
-						end
-					end
-					SetMapByID(currentmapid)
-					if color ~= "info1" then
-						bar = nil
-						prevColor = color
-					end
-					_, localizedName, _, _, startTime = GetWorldPVPAreaInfo(i)
-				end
-
-				if not bar or startTime > bar.remaining+5 or startTime < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
-					local icon = i == 1 and "Interface\\Icons\\INV_EssenceOfWintergrasp" or "Interface\\Icons\\achievement_zone_tolbarad"
-					bar = Capping:StartBar(localizedName, startTime, icon, prevColor or color, true)
-					--bar:Set("capping:onexpire", func)
-				end
-			end
-		else
-			Capping:StopBar(localizedName)
-		end
-	end
-end
-
 local function StartMoving(this) this:StartMoving() end
 local function CreateMover(oldframe, w, h, dragstopfunc)
 	local mover = oldframe or CreateFrame("Button", nil, UIParent)
@@ -283,7 +215,7 @@ function Capping:ADDON_LOADED(a1)
 		regal = true
 	end
 	if PVPUIFrame then
-		PVPUIFrame:HookScript("OnShow", StartWorldTimers)
+		--PVPUIFrame:HookScript("OnShow", StartWorldTimers)
 	else
 		regal = true
 	end
@@ -292,7 +224,7 @@ function Capping:ADDON_LOADED(a1)
 			if a1 == "Blizzard_BattlefieldMinimap" then
 				self:InitBGMap()
 			elseif a1 == "Blizzard_PVPUI" then
-				PVPUIFrame:HookScript("OnShow", StartWorldTimers)
+				--PVPUIFrame:HookScript("OnShow", StartWorldTimers)
 				if BattlefieldMinimap then
 					self:UnregisterEvent("ADDON_LOADED")
 					self.ADDON_LOADED = nofunc
@@ -425,7 +357,7 @@ do
 				wasInBG = true
 				func(self)
 				UpdateZoneMapVisibility()
-				StartWorldTimers()
+				--StartWorldTimers()
 			else
 				if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then
 					bgmap:Hide()
@@ -850,7 +782,7 @@ function ShowOptions(a1, id)
 			elseif k == "disablemap" then
 				ReloadUI()
 			else -- update visual options
-				StartWorldTimers()
+				--StartWorldTimers()
 				UpdateLook(k)
 			end
 		end
@@ -1008,14 +940,11 @@ function ShowOptions(a1, id)
 				if sub == "battlegrounds" then
 					AddToggle(lvl, av, "av")
 					AddToggle(lvl, " -"..L["Auto Quest Turnins"], "avquest")
-					AddExecute(lvl, " -"..L["Request Sync"], "syncav")
+					--AddExecute(lvl, " -"..L["Request Sync"], "syncav")
 					AddToggle(lvl, ab, "ab")
 					AddToggle(lvl, eots, "eots")
 					AddToggle(lvl, ioc, "ioc")
 					AddToggle(lvl, wsg, "wsg")
-					AddToggle(lvl, db.worldname1 or (_G.CHANNEL_CATEGORY_WORLD.." 1"), "world1")
-					AddToggle(lvl, db.worldname2 or (_G.CHANNEL_CATEGORY_WORLD.." 2"), "world2")
-					AddToggle(lvl, db.worldname3 or (_G.CHANNEL_CATEGORY_WORLD.." 3"), "world3")
 				elseif sub == "bars" then
 					AddList(lvl, L["Texture"], "texture")
 					AddList(lvl, L["Width"], "width")
