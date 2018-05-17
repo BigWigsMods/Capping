@@ -325,7 +325,7 @@ do
 					return (awin and format(f2, maxscore, ltime)) or format(f2, ltime, maxscore)
 				end
 				--------------------------------------
-				function Capping:UPDATE_UI_WIDGET()
+				function Capping:UPDATE_UI_WIDGET(tbl)
 				--------------------------------------
 					local _, zType = GetInstanceInfo()
 					if zType ~= "pvp" then return end
@@ -931,30 +931,32 @@ end
 
 do
 	------------------------------------------------ Arena ------------------------------------------
+	local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager and C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo -- XXX 8.0
 	local function Arena(self)
-		if not self.ArenaTimers then
-			function Capping:ArenaTimers()
-				for i = 1, GetNumWorldStateUI() do -- Not always at the same location, so check them all
-					local _, state, _, timeString = GetWorldStateUIInfo(i)
-					if state > 0 and timeString then -- Skip hidden states and states without text
-						local minutes, seconds = timeString:match("(%d+):(%d+)")
-						minutes = tonumber(minutes)
-						seconds = tonumber(seconds)
-						if minutes and seconds then
-							local remaining = seconds + (minutes*60) + 1
-							if remaining > 4 then
-								self:UnregisterEvent("WORLD_STATE_UI_TIMER_UPDATE")
-								local spell, _, icon = GetSpellInfo(34709)
-								self:StartBar(spell, 93, icon, "info2")
-								local text = gsub(_G.TIME_REMAINING, ":", "")
-								self:StartBar(text, remaining, nil, "info2")
+		if GetNumWorldStateUI then -- XXX 8.0
+			if not self.ArenaTimers then
+				function Capping:ArenaTimers()
+					for i = 1, GetNumWorldStateUI() do -- Not always at the same location, so check them all
+						local _, state, _, timeString = GetWorldStateUIInfo(i)
+						if state > 0 and timeString then -- Skip hidden states and states without text
+							local minutes, seconds = timeString:match("(%d+):(%d+)")
+							minutes = tonumber(minutes)
+							seconds = tonumber(seconds)
+							if minutes and seconds then
+								local remaining = seconds + (minutes*60) + 1
+								if remaining > 4 then
+									self:UnregisterEvent("WORLD_STATE_UI_TIMER_UPDATE")
+									local spell, _, icon = GetSpellInfo(34709)
+									self:StartBar(spell, 93, icon, "info2")
+									local text = gsub(_G.TIME_REMAINING, ":", "")
+									self:StartBar(text, remaining, nil, "info2")
+								end
 							end
 						end
 					end
 				end
 			end
-		end
-		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "ArenaTimers")
+			self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "ArenaTimers")
 		-- What we CAN'T use for Shadow Sight timer
 		-- COMBAT_LOG_EVENT_UNFILTERED for Arena Preparation removal event, it randomly removes and reapplies itself during the warmup
 		-- UPDATE_WORLD_STATES will sometimes fire during the warmup, so we can't assume the first time it fires is the doors opening
@@ -962,12 +964,39 @@ do
 		-- What we CAN use for Shadow Sight timer
 		-- CHAT_MSG_BG_SYSTEM_NEUTRAL#The Arena battle has begun! - Requires localization
 		-- WORLD_STATE_UI_TIMER_UPDATE The first event fired with a valid remaining time (the current chosen method)
+		else
+			if not self.ArenaTimers then
+				function Capping:ArenaTimers(tbl)
+					if tbl.widgetSetID == 1 and tbl.widgetType == 0 then
+						local id = tbl.widgetID
+						local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
+						if dataTbl and dataTbl.text and dataTbl.state == 1 then
+							local minutes, seconds = dataTbl.text:match("(%d+):(%d+)")
+							minutes = tonumber(minutes)
+							seconds = tonumber(seconds)
+							if minutes and seconds then
+								local remaining = seconds + (minutes*60) + 1
+								if remaining > 4 then
+									self:UnregisterEvent("UPDATE_UI_WIDGET")
+									local spell, _, icon = GetSpellInfo(34709)
+									self:StartBar(spell, 93, icon, "info2")
+									local text = gsub(_G.TIME_REMAINING, ":", "")
+									self:StartBar(text, remaining, nil, "info2")
+								end
+							end
+						end
+					end
+				end
+			end
+			self:RegisterTempEvent("UPDATE_UI_WIDGET", "ArenaTimers")
+		end
 	end
-	Capping:AddBG(559, Arena) -- Nagrand Arena
-	Capping:AddBG(562, Arena) -- Blade's Edge Arena
 	Capping:AddBG(572, Arena) -- Ruins of Lordaeron
 	Capping:AddBG(617, Arena) -- Dalaran Sewers
 	Capping:AddBG(980, Arena) -- Tol'Viron Arena
 	Capping:AddBG(1134, Arena) -- The Tiger's Peak
+	Capping:AddBG(1505, Arena) -- Nagrand Arena
+	Capping:AddBG(1552, Arena) -- Ashamane's Fall
+	Capping:AddBG(1825, Arena) -- Hook Point
 end
 

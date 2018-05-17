@@ -340,6 +340,8 @@ do
 			if func then
 				wasInBG = true
 				func(self)
+			else
+				print(("Capping found a new id '%d' at '%s' tell us on GitHub."):format(id, GetRealZoneText(id)))
 			end
 
 			if bgmap and bgmap:IsShown() and GetCVar("showBattlefieldMinimap") ~= "2" then
