@@ -136,7 +136,7 @@ do -- POI handling
 		else
 			local pois = GetAreaPOIForMap(uiMapID)
 			for i = 1, #pois do
-				local tbl = GetAreaPOIInfo(uiMapID)
+				local tbl = GetAreaPOIInfo(uiMapID, pois[i])
 				landmarkCache[tbl.name] = tbl.textureIndex
 			end
 			Capping:RegisterTempEvent("AREA_POIS_UPDATED")
@@ -175,7 +175,7 @@ do -- POI handling
 	-----------------------------------
 		local pois = GetAreaPOIForMap(curMapID)
 		for i = 1, #pois do
-			local tbl = GetAreaPOIInfo(uiMapID)
+			local tbl = GetAreaPOIInfo(uiMapID, pois[i])
 			local name, icon = tbl.name, tbl.textureIndex
 			if landmarkCache[name] ~= icon then
 				landmarkCache[name] = icon
@@ -823,52 +823,110 @@ end
 do
 	------------------------------------------------ Wintergrasp ------------------------------------------
 	local wallid, walls = nil, nil
+	local GetAreaPOIForMap = C_AreaPoiInfo and C_AreaPoiInfo.GetAreaPOIForMap -- XXX 8.0
+	local GetAreaPOIInfo = C_AreaPoiInfo and C_AreaPoiInfo.GetAreaPOIInfo -- XXX 8.0
 	local function Wintergrasp(self)
-		if not self.WinterAssault then
-			wallid = { -- wall section locations
-				[2222] = "NW ", [2223] = "NW ", [2224] = "NW ", [2225] = "NW ",
-				[2226] = "SW ", [2227] = "SW ", [2228] = "S ",
-				[2230] = "S ", [2231] = "SE ", [2232] = "SE ",
-				[2233] = "NE ", [2234] = "NE ", [2235] = "NE ", [2236] = "NE ",
-				[2237] = "Inner W ", [2238] = "Inner W ", [2239] = "Inner W ",
-				[2240] = "Inner S ", [2241] = "Inner S ", [2242] = "Inner S ",
-				[2243] = "Inner E ", [2244] = "Inner E ", [2245] = "Inner E ",
-				[2229] = "", [2246] = "", -- front gate and fortress door
-			}
+		if GetNumMapLandmarks then
+			if not self.WinterAssault then
+				wallid = { -- wall section locations
+					[2222] = "NW ", [2223] = "NW ", [2224] = "NW ", [2225] = "NW ",
+					[2226] = "SW ", [2227] = "SW ", [2228] = "S ",
+					[2230] = "S ", [2231] = "SE ", [2232] = "SE ",
+					[2233] = "NE ", [2234] = "NE ", [2235] = "NE ", [2236] = "NE ",
+					[2237] = "Inner W ", [2238] = "Inner W ", [2239] = "Inner W ",
+					[2240] = "Inner S ", [2241] = "Inner S ", [2242] = "Inner S ",
+					[2243] = "Inner E ", [2244] = "Inner E ", [2245] = "Inner E ",
+					[2229] = "", [2246] = "", -- front gate and fortress door
+				}
 
-			-- POI icon texture id
-			local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
-			local damaged, destroyed, all = { }, { }, { }
-			for k, v in pairs(intact) do
-				damaged[k + 1] = true
-				destroyed[k + 2] = true
-				all[k], all[k + 1], all[k + 2] = true, true, true
-			end
-			function Capping:WinterAssault() -- scans POI landmarks for changes in wall textures
-				for i = 1, GetNumMapLandmarks() do
-					local _, name, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
-					local ti = walls[poiID]
-					if (ti and ti ~= textureIndex) or (not ti and wallid[poiID]) then
-						if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
-							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[poiID], name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
-						elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[poiID], name, _G.ACTION_UNIT_DESTROYED))
+				-- POI icon texture id
+				local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
+				local damaged, destroyed, all = { }, { }, { }
+				for k, v in pairs(intact) do
+					damaged[k + 1] = true
+					destroyed[k + 2] = true
+					all[k], all[k + 1], all[k + 2] = true, true, true
+				end
+				function Capping:WinterAssault() -- scans POI landmarks for changes in wall textures
+					for i = 1, GetNumMapLandmarks() do
+						local _, name, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
+						local ti = walls[poiID]
+						if (ti and ti ~= textureIndex) or (not ti and wallid[poiID]) then
+							if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
+								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[poiID], name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
+							elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
+								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[poiID], name, _G.ACTION_UNIT_DESTROYED))
+							end
+							walls[poiID] = all[textureIndex] and textureIndex or ti
 						end
-						walls[poiID] = all[textureIndex] and textureIndex or ti
 					end
 				end
 			end
-		end
-		walls = { }
-		for i = 1, GetNumMapLandmarks() do
-			local _, _, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
-			if wallid[poiID] then
-				walls[poiID] = textureIndex
+			walls = { }
+			for i = 1, GetNumMapLandmarks() do
+				local _, _, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
+				if wallid[poiID] then
+					walls[poiID] = textureIndex
+				end
 			end
+			self:RegisterTempEvent("WORLD_MAP_UPDATE", "WinterAssault")
+		else
+			if not self.WinterAssault then
+				wallid = { -- wall section locations
+					[2222] = "NW ", [2223] = "NW ", [2224] = "NW ", [2225] = "NW ",
+					[2226] = "SW ", [2227] = "SW ", [2228] = "S ",
+					[2230] = "S ", [2231] = "SE ", [2232] = "SE ",
+					[2233] = "NE ", [2234] = "NE ", [2235] = "NE ", [2236] = "NE ",
+					[2237] = "Inner W ", [2238] = "Inner W ", [2239] = "Inner W ",
+					[2240] = "Inner S ", [2241] = "Inner S ", [2242] = "Inner S ",
+					[2243] = "Inner E ", [2244] = "Inner E ", [2245] = "Inner E ",
+					[2229] = "", [2246] = "", -- front gate and fortress door
+				}
+
+				-- POI icon texture id
+				local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
+				local damaged, destroyed, all = { }, { }, { }
+				for k, v in pairs(intact) do
+					damaged[k + 1] = true
+					destroyed[k + 2] = true
+					all[k], all[k + 1], all[k + 2] = true, true, true
+				end
+				function Capping:WinterAssault() -- scans POI landmarks for changes in wall textures
+					local pois = GetAreaPOIForMap(123) -- Wintergrasp
+					for i = 1, #pois do
+						local POI = pois[i]
+						local tbl = GetAreaPOIInfo(123, POI)
+						local ti = walls[POI]
+						local textureIndex = tbl.textureIndex
+						if tbl and ((ti and ti ~= textureIndex) or (not ti and wallid[POI])) then
+							if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
+								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
+							elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
+								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], name, _G.ACTION_UNIT_DESTROYED))
+							end
+							walls[POI] = all[textureIndex] and textureIndex or ti
+						end
+					end
+				end
+			end
+			walls = { }
+			local pois = GetAreaPOIForMap(123) -- Wintergrasp
+			for i = 1, #pois do
+				local POI = pois[i]
+				local tbl = GetAreaPOIInfo(123, POI)
+				if wallid[POI] and tbl.textureIndex then
+					walls[POI] = tbl.textureIndex
+				end
+			end
+			print"fire"
+			self:RegisterTempEvent("AREA_POIS_UPDATED")
 		end
-		self:RegisterTempEvent("WORLD_MAP_UPDATE", "WinterAssault")
 	end
-	Capping:AddBG(-501, Wintergrasp) -- map id
+	if not GetAreaPOIForMap then -- XXX 8.0
+		Capping:AddBG(-501, Wintergrasp) -- map id
+	else
+		Capping:AddBG(-123, Wintergrasp) -- map id
+	end
 end
 
 do
@@ -921,12 +979,9 @@ do
 		self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
 		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "AshranTimeLeft")
 	end
-	Capping:AddBG(-978, Ashran) -- map id
-end
-
-do
-	------------------------------------------------ Tol Barad ------------------------------------------
-	Capping:AddBG(-708, function() end) -- map id
+	if GetWorldStateUIInfo then -- XXX 8.0
+		Capping:AddBG(-978, Ashran) -- map id
+	end
 end
 
 do
@@ -995,8 +1050,10 @@ do
 	Capping:AddBG(617, Arena) -- Dalaran Sewers
 	Capping:AddBG(980, Arena) -- Tol'Viron Arena
 	Capping:AddBG(1134, Arena) -- The Tiger's Peak
+	Capping:AddBG(1504, Arena) -- Black Rook Hold Arena
 	Capping:AddBG(1505, Arena) -- Nagrand Arena
 	Capping:AddBG(1552, Arena) -- Ashamane's Fall
+	Capping:AddBG(1672, Arena) -- Blade's Edge Arena
 	Capping:AddBG(1825, Arena) -- Hook Point
 end
 
