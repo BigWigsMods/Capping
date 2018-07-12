@@ -8,7 +8,7 @@ local pname
 local floor = math.floor
 local strmatch, strlower, pairs, format, tonumber = strmatch, strlower, pairs, format, tonumber
 local UnitIsEnemy, UnitName, GetTime, SendAddonMessage = UnitIsEnemy, UnitName, GetTime, SendAddonMessage
-local GetWorldStateUIInfo = GetWorldStateUIInfo
+local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager and C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo -- XXX 8.0
 local assaulted, claimed, defended, taken = L["has assaulted"], L["claims the"], L["has defended the"], L["has taken the"]
 local GetNumGroupMembers = GetNumGroupMembers
 
@@ -175,7 +175,7 @@ do -- POI handling
 	-----------------------------------
 		local pois = GetAreaPOIForMap(curMapID)
 		for i = 1, #pois do
-			local tbl = GetAreaPOIInfo(uiMapID, pois[i])
+			local tbl = GetAreaPOIInfo(curMapID, pois[i])
 			local name, icon = tbl.name, tbl.textureIndex
 			if landmarkCache[name] ~= icon then
 				landmarkCache[name] = icon
@@ -231,8 +231,12 @@ end
 -- initialize or update a final score estimation bar (AB and EotS uses this)
 local NewEstimator
 do
-	local ascore, atime, abases, hscore, htime, hbases, updatetime, currentbg, prevText
-	NewEstimator = function(bg) -- resets estimator and sets new battleground
+	local ascore, atime, abases, hscore, htime, hbases, currentbg, prevText
+	local allianceWidget, hordeWidget = 0, 0
+	local ppsTable
+	NewEstimator = function(bg, aW, hW, pointsPerSecond) -- resets estimator and sets new battleground
+		allianceWidget, hordeWidget = aW, hW
+		ppsTable = pointsPerSecond
 		if GetWorldStateUIInfo then -- XXX 8.0
 			if not Capping.UPDATE_WORLD_STATES then
 				local f2 = L["Final: %d - %d"]
@@ -259,6 +263,7 @@ do
 					if zType ~= "pvp" then return end
 
 					local currenttime = GetTime()
+					local updatetime = false
 
 					local _, _, _, scoreStringA = GetWorldStateUIInfo(currentbg == 2 and 2 or 1) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
 					local base, score, smax = strmatch(scoreStringA, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
@@ -279,7 +284,6 @@ do
 					end
 
 					if not updatetime then return end
-					updatetime = nil
 
 					local apps, hpps = lookup[currentbg][abases], lookup[currentbg][hbases]
 					-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
@@ -303,90 +307,80 @@ do
 					end
 				end
 			end
-			currentbg, updatetime, ascore, atime, abases, hscore, htime, hbases, prevText = bg, nil, 0, 0, 0, 0, 0, 0, ""
+			currentbg, ascore, atime, abases, hscore, htime, hbases, prevText = bg, 0, 0, 0, 0, 0, 0, ""
 			Capping:RegisterTempEvent("UPDATE_WORLD_STATES")
 		else
 			if not Capping.UPDATE_UI_WIDGET then
 				local f2 = L["Final: %d - %d"]
-				local lookup = {
-					[1] = { [0] = 0, [1] = 1, [2] = 1.5, [3] = 2, [4] = 3.5, [5] = 30, }, -- ab
-					[2] = { [0] = 0, [1] = 0.5, [2] = 1, [3] = 2.5, [4] = 5, }, -- eots
-					[3] = { [0] = 0, [1] = 1, [2] = 3, [3] = 30, }, -- gilneas
-					[4] = { [0] = 0, [1] = 8, [2] = 16, [3] = 32, }, -- Deepwind Gorge
-				}
-				local function getlscore(ltime, pps, currentscore, maxscore, awin) -- estimate loser's final score
-					if currentbg == 2 then -- EotS
-						ltime = floor(ltime * pps + currentscore + 0.5)
-						ltime = (ltime < maxscore and ltime) or (maxscore - 1)
-					else -- AB or Gilneas
-						ltime = 10 * floor((ltime * pps + currentscore + 5) * 0.1)
-						ltime = (ltime < maxscore and ltime) or (maxscore - 10)
-					end
-					return (awin and format(f2, maxscore, ltime)) or format(f2, ltime, maxscore)
-				end
 				--------------------------------------
 				function Capping:UPDATE_UI_WIDGET(tbl)
 				--------------------------------------
-					local _, zType = GetInstanceInfo()
-					if zType ~= "pvp" then return end
 
-					local currenttime = GetTime()
+					local updateBases = false
+					local t = GetTime()
+					local id = tbl.widgetID
+					local MaxScore = 1500
 
-					local txt
-					for k, v in next, tbl do
-						if not txt then
-							txt = format("%s:%s", k, v)
-						else
-							txt = format("%s, %s:%s", txt, k, v)
+					if id == allianceWidget then
+						local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
+						local base, score, smax = strmatch(dataTbl.text, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
+						local ABases, AScore = tonumber(base), tonumber(score)
+						MaxScore = tonumber(smax) or MaxScore
+
+						if ABases then
+							if abases ~= ABases then
+								abases = ABases
+								updateBases = true
+							end
+							ascore = AScore
 						end
+					elseif id == hordeWidget then
+						local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
+						local base, score, smax = strmatch(dataTbl.text, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
+						local HBases, HScore = tonumber(base), tonumber(score)
+						MaxScore = tonumber(smax) or MaxScore
+
+						if HBases then
+							if hbases ~= HBases then
+								hbases = HBases
+								updateBases = true
+							end
+							hscore = HScore
+						end
+					else
+						local data = GetIconAndTextWidgetVisualizationInfo(id)
+						print("Capping: Found a new id - ", id, data.tooltip)
 					end
-					print(txt)
-					--[[
-					local _, _, _, scoreStringA = GetWorldStateUIInfo(currentbg == 2 and 2 or 1) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
-					local base, score, smax = strmatch(scoreStringA, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
-					local ABases, AScore, MaxScore = tonumber(base), tonumber(score), tonumber(smax) or 2000
-					local _, _, _, scoreStringH = GetWorldStateUIInfo(currentbg == 2 and 3 or 2) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
 
-					base, score = strmatch(scoreStringH, "[^%d]+(%d+)[^%d]+(%d+)/") -- Bases: %d  Resources: %d/%d
-					local HBases, HScore = tonumber(base), tonumber(score)
+					-- Conditions:
+					-- 1) Amount of owned bases changed
+					-- 2) Two updates happened in a short space of time and we want the data from the 2nd update (latest score info)
+					-- This happens when both teams have bases, the first update (alliance) will be incomplete, the second update (horde) will give us a complete outlook of final scores
+					if updateBases or (t - prevTime) < 0.8 then
+						prevTime = t
+						local apps, hpps = ppsTable[abases], ppsTable[hbases]
 
-					if ABases and HBases then
-						abases, hbases = ABases, HBases
-						if ascore ~= AScore then
-							ascore, atime, updatetime = AScore, currenttime, true
-						end
-						if hscore ~= HScore then
-							hscore, htime, updatetime = HScore, currenttime, true
-						end
-					end
+						-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
+						local ATime = apps and ((MaxScore - ascore) / apps) or 1000000
+						local HTime = hpps and ((MaxScore - hscore) / hpps) or 1000000
 
-					if not updatetime then return end
-					updatetime = nil
-
-					local apps, hpps = lookup[currentbg][abases], lookup[currentbg][hbases]
-					-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
-					local ATime = ((MaxScore - ascore) / (apps > 0 and apps or 0.000001)) - (currenttime - atime)
-					local HTime = ((MaxScore - hscore) / (hpps > 0 and hpps or 0.000001)) - (currenttime - htime)
-
-					if HTime < ATime then -- Horde is winning
-						local newText = getlscore(HTime, apps, ascore, MaxScore)
-						if newText ~= prevText then
+						if HTime < ATime then -- Horde is winning
+							local score = apps and (ascore + floor(apps * HTime)) or ascore
+							local txt = format(f2, score, MaxScore)
 							self:StopBar(prevText)
-							self:StartBar(newText, HTime, GetIconData(48), "horde") -- 48 = Horde Insignia
-							prevText = newText
-						end
-					else -- Alliance is winning
-						local newText = getlscore(ATime, hpps, hscore, MaxScore, true)
-						if newText ~= prevText then
+							self:StartBar(txt, HTime, GetIconData(48), "horde") -- 48 = Horde Insignia
+							prevText = txt
+						else -- Alliance is winning
+							local score = hpps and (hscore + floor(hpps * ATime)) or hscore
+							local txt = format(f2, MaxScore, score)
 							self:StopBar(prevText)
-							self:StartBar(newText, ATime, GetIconData(46), "alliance") -- 46 = Alliance Insignia
-							prevText = newText
+							self:StartBar(txt, ATime, GetIconData(46), "alliance") -- 46 = Alliance Insignia
+							prevText = txt
 						end
 					end
-					]]
 				end
 			end
-			currentbg, updatetime, ascore, atime, abases, hscore, htime, hbases, prevText = bg, nil, 0, 0, 0, 0, 0, 0, ""
+			ascore, abases, hscore, hbases, prevText, prevTime = 0, 0, 0, 0, "", 0
 			Capping:RegisterTempEvent("UPDATE_UI_WIDGET")
 		end
 	end
@@ -394,9 +388,11 @@ end
 
 do
 	------------------------------------------------ Arathi Basin -----------------------------------------------------
+	local pointsPerSecond = {1, 1.5, 2, 3.5, 30} -- Updates every 2 seconds
+
 	local function ArathiBasin()
 		SetupAssault(60, 93)
-		NewEstimator(1)
+		NewEstimator(1, 495, 496, pointsPerSecond) -- BG table, alliance score widget, horde score widget
 	end
 	Capping:AddBG(529, ArathiBasin)
 
@@ -409,20 +405,24 @@ end
 
 do
 	------------------------------------------------ Deepwind Gorge -----------------------------------------------------
+	local pointsPerSecond = {1.6, 3.2, 6.4} -- Updates every 5 seconds
+
 	local function DeepwindGorge()
 		SetupAssault(61, 519)
-		NewEstimator(4)
+		NewEstimator(4, 734, 735, pointsPerSecond) -- BG table, alliance score widget, horde score widget
 	end
 	Capping:AddBG(1105, DeepwindGorge)
 end
 
 do
 	------------------------------------------------ Gilneas -----------------------------------------------------
+	local pointsPerSecond = {1, 3, 30} -- Updates every 1 second
+
 	local function TheBattleForGilneas()
-		SetupAssault(60, 275)
-		NewEstimator(3)
+		SetupAssault(60, 275) -- Base cap time, uiMapID
+		NewEstimator(3, 699, 700, pointsPerSecond) -- BG table, alliance score widget, horde score widget
 	end
-	Capping:AddBG(761, TheBattleForGilneas)
+	Capping:AddBG(761, TheBattleForGilneas) -- Instance ID
 end
 
 do
@@ -536,20 +536,22 @@ end
 
 do
 	------------------------------------------------ Eye of the Storm -------------------------------------------------
+	local pointsPerSecond = {1, 1.5, 2, 6} -- Updates every 2 seconds
+
 	local ef, ResetCarrier
 	local function EyeOfTheStorm(self)
 		if not ef then
 			local eficon, eftext, carrier, cclass
 			-- handles secure stuff
 			local function SetEotSCarrierAttribute()
-				ef:SetFrameStrata("HIGH")
-				ef:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() - 14, AlwaysUpFrame1:GetBottom() + 8.5)
-				if UnitExists("arena1") then
-					SecureUnitButton_OnLoad(ef, "arena1")
-				elseif UnitExists("arena2") then
-					SecureUnitButton_OnLoad(ef, "arena2")
-				end
-				UnregisterUnitWatch(ef)
+				--ef:SetFrameStrata("HIGH")
+				--ef:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() - 14, AlwaysUpFrame1:GetBottom() + 8.5)
+				--if UnitExists("arena1") then
+				--	SecureUnitButton_OnLoad(ef, "arena1")
+				--elseif UnitExists("arena2") then
+				--	SecureUnitButton_OnLoad(ef, "arena2")
+				--end
+				--UnregisterUnitWatch(ef)
 			end
 			-- resets carrier display
 			ResetCarrier = function(captured)
@@ -646,7 +648,7 @@ do
 		ResetCarrier()
 
 		-- setup for final score estimation (2 for EotS)
-		NewEstimator(2)
+		NewEstimator(2, 523, 524, pointsPerSecond) -- BG table, alliance score widget, horde score widget
 		SetupAssault(60, 112) -- In RBG the four points have flags that need to be assaulted, like AB
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HFlagUpdate")
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AFlagUpdate")
@@ -918,8 +920,7 @@ do
 					walls[POI] = tbl.textureIndex
 				end
 			end
-			print"fire"
-			self:RegisterTempEvent("AREA_POIS_UPDATED")
+			self:RegisterTempEvent("AREA_POIS_UPDATED", "WinterAssault")
 		end
 	end
 	if not GetAreaPOIForMap then -- XXX 8.0
@@ -986,7 +987,6 @@ end
 
 do
 	------------------------------------------------ Arena ------------------------------------------
-	local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager and C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo -- XXX 8.0
 	local function Arena(self)
 		if GetNumWorldStateUI then -- XXX 8.0
 			if not self.ArenaTimers then
