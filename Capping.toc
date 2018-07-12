@@ -13,8 +13,7 @@
 ## Notes-esMX: Battleground timers and other PvP features.
 ## Notes-itIT: Battleground timers and other PvP features.
 ## Notes-ptBR: Battleground timers and other PvP features.
-## SavedVariables: CappingDB
-## SavedVariablesPerCharacter: CappingCharDB
+## SavedVariables: CappingDB, CappingSettingsTmp
 
 ## X-Category: Battlegrounds/PvP
 ## X-Credits: TotalPackage

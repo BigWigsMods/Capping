@@ -1,6 +1,31 @@
 
 local addonName, Capping = ...
 
+do
+	local frame = CreateFrame("Frame", "CappingFrame", UIParent)
+	frame:SetPoint("CENTER", UIParent, "CENTER")
+	frame:SetWidth(180)
+	frame:SetHeight(15)
+	frame:SetMovable(true)
+	frame:EnableMouse(true)
+	frame:RegisterForDrag("LeftButton")
+	frame:SetClampedToScreen(true)
+	frame:Hide()
+	frame:SetScript("OnDragStart", function(f) f:StartMoving() end)
+	frame:SetScript("OnDragStop", function(f) f:StopMovingOrSizing() end)
+	local function openOpts()
+		LoadAddOn("Capping_Options")
+		LibStub("AceConfigDialog-3.0"):Open(addonName)
+	end
+	SlashCmdList.Capping = openOpts
+	SLASH_Capping1 = "/cpz"
+	frame:SetScript("OnMouseUp", function(_, btn)
+		if btn == "RightButton" then
+			openOpts()
+		end
+	end)
+end
+
 -- HEADER
 local anchor = CreateFrame("Button", "CappingAnchor", UIParent)
 local L = Capping.L
@@ -148,8 +173,30 @@ function Capping:ADDON_LOADED(a1)
 	if a1 ~= addonName then return end
 
 	-- saved variables database setup
+	if type(CappingSettingsTmp) ~= "table" then
+		CappingSettingsTmp = {
+			fontSize = 10,
+			barTexture = "Blizzard Raid Bar",
+			outline = "NONE",
+			font = media:GetDefault("font"),
+			width = 200,
+			height = 20,
+			icon = true,
+			timeText = true,
+			spacing = 0,
+			alignText = "LEFT",
+			alignTime = "RIGHT",
+			alignIcon = "LEFT",
+			colorText = {1,1,1,1},
+			--colorComplete = {0,1,0,1},
+			--colorIncomplete = {1,0,0,1},
+			--colorNext = {0.25,0.33,0.68,1},
+			colorBarBackground = {0,0,0,0.75},
+		}
+	end
+	CappingFrame.db = CappingSettingsTmp
 	CappingDB = CappingDB or {}
-	db = CappingCharDB or (CappingDB.profiles and CappingDB.profiles.Default) or CappingDB
+	db = (CappingDB.profiles and CappingDB.profiles.Default) or CappingDB
 	self.db = db
 	if db.dbinit ~= 7 then
 		db.dbinit = 7
@@ -775,12 +822,7 @@ function ShowOptions(a1, id)
 					Capping:ZONE_CHANGED_NEW_AREA()
 				end
 			elseif k == "perchar" then
-				if CappingCharDB then
-					CappingCharDB = nil
-				else
-					CappingCharDB = db
-				end
-				ReloadUI()
+
 			elseif k == "disablemap" then
 				ReloadUI()
 			else -- update visual options
@@ -822,7 +864,7 @@ function ShowOptions(a1, id)
 			info.arg1 = value
 			info.func = Set
 			if value == "perchar" then
-				info.checked = CappingCharDB and true
+				
 			else
 				info.checked = db[value]
 			end

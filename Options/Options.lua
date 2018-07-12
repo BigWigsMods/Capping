@@ -2,7 +2,7 @@
 local acr = LibStub("AceConfigRegistry-3.0")
 local acd = LibStub("AceConfigDialog-3.0")
 local media = LibStub("LibSharedMedia-3.0")
-local lit = LegionInvasionTimer
+local cap = CappingFrame
 local L
 do
 	local _, mod = ...
@@ -11,28 +11,28 @@ end
 
 local function updateFlags()
 	local flags = nil
-	if lit.db.monochrome and lit.db.outline ~= "NONE" then
-		flags = "MONOCHROME," .. lit.db.outline
-	elseif lit.db.monochrome then
+	if cap.db.monochrome and cap.db.outline ~= "NONE" then
+		flags = "MONOCHROME," .. cap.db.outline
+	elseif cap.db.monochrome then
 		flags = "MONOCHROME"
-	elseif lit.db.outline ~= "NONE" then
-		flags = lit.db.outline
+	elseif cap.db.outline ~= "NONE" then
+		flags = cap.db.outline
 	end
 	return flags
 end
 
 local function disabled()
-	return lit.db.mode == 2
+	return cap.db.mode == 2
 end
 
 local acOptions = {
 	type = "group",
 	name = "Capping",
 	get = function(info)
-		return lit.db[info[#info]]
+		return cap.db[info[#info]]
 	end,
 	set = function(info, value)
-		lit.db[info[#info]] = value
+		cap.db[info[#info]] = value
 	end,
 	args = {
 		lock = {
@@ -40,15 +40,15 @@ local acOptions = {
 			name = L.lock,
 			order = 1,
 			set = function(info, value)
-				lit.db.lock = value
+				cap.db.lock = value
 				if value then
-					lit:EnableMouse(false)
-					lit.bg:Hide()
-					lit.header:Hide()
+					cap:EnableMouse(false)
+					cap.bg:Hide()
+					cap.header:Hide()
 				else
-					lit:EnableMouse(true)
-					lit.bg:Show()
-					lit.header:Show()
+					cap:EnableMouse(true)
+					cap.bg:Show()
+					cap.header:Show()
 				end
 			end,
 			disabled = disabled,
@@ -58,8 +58,8 @@ local acOptions = {
 			name = L.barIcon,
 			order = 2,
 			set = function(info, value)
-				lit.db.icon = value
-				for bar in next, lit.bars do
+				cap.db.icon = value
+				for bar in next, cap.bars do
 					bar:SetIcon(value and 236292) -- Interface\\Icons\\Ability_Warlock_DemonicEmpowerment
 				end
 			end,
@@ -70,8 +70,8 @@ local acOptions = {
 			name = L.showTime,
 			order = 3,
 			set = function(info, value)
-				lit.db.timeText = value
-				for bar in next, lit.bars do
+				cap.db.timeText = value
+				for bar in next, cap.bars do
 					bar:SetTimeVisibility(value)
 				end
 			end,
@@ -82,8 +82,8 @@ local acOptions = {
 			name = L.fillBar,
 			order = 4,
 			set = function(info, value)
-				lit.db.fill = value
-				for bar in next, lit.bars do
+				cap.db.fill = value
+				for bar in next, cap.bars do
 					bar:SetFill(value)
 				end
 			end,
@@ -97,16 +97,16 @@ local acOptions = {
 			itemControl = "DDI-Font",
 			get = function()
 				for i, v in next, media:List("font") do
-					if v == lit.db.font then return i end
+					if v == cap.db.font then return i end
 				end
 			end,
 			set = function(info, value)
 				local list = media:List("font")
 				local font = list[value]
-				lit.db.font = font
-				for bar in next, lit.bars do
-					bar.candyBarLabel:SetFont(media:Fetch("font", font), lit.db.fontSize, updateFlags())
-					bar.candyBarDuration:SetFont(media:Fetch("font", font), lit.db.fontSize, updateFlags())
+				cap.db.font = font
+				for bar in next, cap.bars do
+					bar.candyBarLabel:SetFont(media:Fetch("font", font), cap.db.fontSize, updateFlags())
+					bar.candyBarDuration:SetFont(media:Fetch("font", font), cap.db.fontSize, updateFlags())
 				end
 			end,
 			disabled = disabled,
@@ -119,10 +119,10 @@ local acOptions = {
 			min = 1,
 			step = 1,
 			set = function(info, value)
-				lit.db.fontSize = value
-				for bar in next, lit.bars do
-					bar.candyBarLabel:SetFont(media:Fetch("font", lit.db.font), value, updateFlags())
-					bar.candyBarDuration:SetFont(media:Fetch("font", lit.db.font), value, updateFlags())
+				cap.db.fontSize = value
+				for bar in next, cap.bars do
+					bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.font), value, updateFlags())
+					bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.font), value, updateFlags())
 				end
 			end,
 			disabled = disabled,
@@ -132,10 +132,10 @@ local acOptions = {
 			name = L.monochrome,
 			order = 7,
 			set = function(info, value)
-				lit.db.monochrome = value
-				for bar in next, lit.bars do
-					bar.candyBarLabel:SetFont(media:Fetch("font", lit.db.font), lit.db.fontSize, updateFlags())
-					bar.candyBarDuration:SetFont(media:Fetch("font", lit.db.font), lit.db.fontSize, updateFlags())
+				cap.db.monochrome = value
+				for bar in next, cap.bars do
+					bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.font), cap.db.fontSize, updateFlags())
+					bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.font), cap.db.fontSize, updateFlags())
 				end
 			end,
 			disabled = disabled,
@@ -150,10 +150,10 @@ local acOptions = {
 				THICKOUTLINE = L.thick,
 			},
 			set = function(info, value)
-				lit.db.outline = value
-				for bar in next, lit.bars do
-					bar.candyBarLabel:SetFont(media:Fetch("font", lit.db.font), lit.db.fontSize, updateFlags())
-					bar.candyBarDuration:SetFont(media:Fetch("font", lit.db.font), lit.db.fontSize, updateFlags())
+				cap.db.outline = value
+				for bar in next, cap.bars do
+					bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.font), cap.db.fontSize, updateFlags())
+					bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.font), cap.db.fontSize, updateFlags())
 				end
 			end,
 			disabled = disabled,
@@ -167,14 +167,14 @@ local acOptions = {
 			width = "full",
 			get = function()
 				for i, v in next, media:List("statusbar") do
-					if v == lit.db.barTexture then return i end
+					if v == cap.db.barTexture then return i end
 				end
 			end,
 			set = function(info, value)
 				local list = media:List("statusbar")
 				local texture = list[value]
-				lit.db.barTexture = texture
-				for bar in next, lit.bars do
+				cap.db.barTexture = texture
+				for bar in next, cap.bars do
 					bar:SetTexture(media:Fetch("statusbar", texture))
 				end
 			end,
@@ -188,8 +188,8 @@ local acOptions = {
 			min = 10,
 			step = 1,
 			set = function(info, value)
-				lit.db.width = value
-				for bar in next, lit.bars do
+				cap.db.width = value
+				for bar in next, cap.bars do
 					bar:SetWidth(value)
 				end
 			end,
@@ -203,8 +203,8 @@ local acOptions = {
 			min = 5,
 			step = 1,
 			set = function(info, value)
-				lit.db.height = value
-				for bar in next, lit.bars do
+				cap.db.height = value
+				for bar in next, cap.bars do
 					bar:SetHeight(value)
 				end
 			end,
@@ -219,12 +219,12 @@ local acOptions = {
 				RIGHT = L.right,
 			},
 			set = function(info, value)
-				lit.db.alignIcon = value
-				for bar in next, lit.bars do
+				cap.db.alignIcon = value
+				for bar in next, cap.bars do
 					bar:SetIconPosition(value)
 				end
 			end,
-			disabled = function() return disabled() or not lit.db.icon end,
+			disabled = function() return disabled() or not cap.db.icon end,
 		},
 		spacing = {
 			type = "range",
@@ -234,14 +234,14 @@ local acOptions = {
 			min = 0,
 			step = 1,
 			set = function(info, value)
-				lit.db.spacing = value
-				lit.RearrangeBars()
+				cap.db.spacing = value
+				cap.RearrangeBars()
 			end,
 			disabled = disabled,
 		},
-		alignZone = {
+		alignText = {
 			type = "select",
-			name = L.alignZone,
+			name = "Align Text", -- XXX
 			order = 14,
 			values = {
 				LEFT = L.left,
@@ -249,8 +249,8 @@ local acOptions = {
 				RIGHT = L.right,
 			},
 			set = function(info, value)
-				lit.db.alignZone = value
-				for bar in next, lit.bars do
+				cap.db.alignText = value
+				for bar in next, cap.bars do
 					bar.candyBarLabel:SetJustifyH(value)
 				end
 			end,
@@ -266,8 +266,8 @@ local acOptions = {
 				RIGHT = L.right,
 			},
 			set = function(info, value)
-				lit.db.alignTime = value
-				for bar in next, lit.bars do
+				cap.db.alignTime = value
+				for bar in next, cap.bars do
 					bar.candyBarDuration:SetJustifyH(value)
 				end
 			end,
@@ -278,8 +278,8 @@ local acOptions = {
 			name = L.growUpwards,
 			order = 16,
 			set = function(info, value)
-				lit.db.growUp = value
-				lit.RearrangeBars()
+				cap.db.growUp = value
+				cap.RearrangeBars()
 			end,
 			disabled = disabled,
 		},
@@ -289,11 +289,11 @@ local acOptions = {
 			hasAlpha = true,
 			order = 17,
 			get = function()
-				return unpack(lit.db.colorText)
+				return unpack(cap.db.colorText)
 			end,
 			set = function(info, r, g, b, a)
-				lit.db.colorText = {r, g, b, a}
-				for bar in next, lit.bars do
+				cap.db.colorText = {r, g, b, a}
+				for bar in next, cap.bars do
 					bar:SetTextColor(r, g, b, a)
 				end
 			end,
@@ -305,11 +305,11 @@ local acOptions = {
 			hasAlpha = true,
 			order = 18,
 			get = function()
-				return unpack(lit.db.colorComplete)
+				return unpack(cap.db.colorComplete)
 			end,
 			set = function(info, r, g, b, a)
-				lit.db.colorComplete = {r, g, b, a}
-				for bar in next, lit.bars do
+				cap.db.colorComplete = {r, g, b, a}
+				for bar in next, cap.bars do
 					if bar:Get("LegionInvasionTimer:complete") == 1 then
 						bar:SetColor(r, g, b, a)
 					end
@@ -323,11 +323,11 @@ local acOptions = {
 			hasAlpha = true,
 			order = 19,
 			get = function()
-				return unpack(lit.db.colorIncomplete)
+				return unpack(cap.db.colorIncomplete)
 			end,
 			set = function(info, r, g, b, a)
-				lit.db.colorIncomplete = {r, g, b, a}
-				for bar in next, lit.bars do
+				cap.db.colorIncomplete = {r, g, b, a}
+				for bar in next, cap.bars do
 					if bar:Get("LegionInvasionTimer:complete") == 0 then
 						bar:SetColor(r, g, b, a)
 					end
@@ -341,11 +341,11 @@ local acOptions = {
 			hasAlpha = true,
 			order = 20,
 			get = function()
-				return unpack(lit.db.colorNext)
+				return unpack(cap.db.colorNext)
 			end,
 			set = function(info, r, g, b, a)
-				lit.db.colorNext = {r, g, b, a}
-				for bar in next, lit.bars do
+				cap.db.colorNext = {r, g, b, a}
+				for bar in next, cap.bars do
 					local tag = bar:Get("LegionInvasionTimer:complete")
 					if tag ~= 0 and tag ~= 1 then
 						bar:SetColor(r, g, b, a)
@@ -360,11 +360,11 @@ local acOptions = {
 			hasAlpha = true,
 			order = 21,
 			get = function()
-				return unpack(lit.db.colorBarBackground)
+				return unpack(cap.db.colorBarBackground)
 			end,
 			set = function(info, r, g, b, a)
-				lit.db.colorBarBackground = {r, g, b, a}
-				for bar in next, lit.bars do
+				cap.db.colorBarBackground = {r, g, b, a}
+				for bar in next, cap.bars do
 					if bar then
 						bar.candyBarBackground:SetVertexColor(r, g, b, a)
 					end
@@ -372,64 +372,64 @@ local acOptions = {
 			end,
 			disabled = disabled,
 		},
-		tooltipHeader = {
-			type = "header",
-			name = L.tooltipHeader,
-			order = 22,
-		},
-		tooltip12hr = {
-			type = "toggle",
-			name = L.tooltip12hr,
-			order = 23,
-		},
-		tooltipHideAchiev = {
-			type = "toggle",
-			name = L.tooltipHideAchiev,
-			order = 24,
-		},
-		tooltipHideNethershard = {
-			type = "toggle",
-			name = L.hide:format((GetCurrencyInfo(1226))),
-			order = 25,
-		},
-		tooltipHideWarSupplies = {
-			type = "toggle",
-			name = L.hide:format((GetCurrencyInfo(1342))),
-			order = 26,
-		},
-		miscSeparator = {
-			type = "header",
-			name = "",
-			order = 27,
-		},
-		hideInRaid = {
-			type = "toggle",
-			name = L.hideInRaid,
-			order = 28,
-			disabled = function() 
-				return lit.db.mode == 2 or lit.db.mode == 3
-			end,
-		},
-		mode = {
-			type = "select",
-			name = L.mode,
-			order = 29,
-			values = {
-				[1] = L.modeBar,
-				[2] = L.modeBroker,
-				[3] = L.modeBarOnMap,
-			},
-			set = function(info, value)
-				lit.db.mode = value
-				if value == 2 then
-					lit.db.lock = true
-				end
-				if value == 3 then
-					lit.db.hideInRaid = nil
-				end
-				ReloadUI()
-			end,
-		},
+		--tooltipHeader = {
+		--	type = "header",
+		--	name = L.tooltipHeader,
+		--	order = 22,
+		--},
+		--tooltip12hr = {
+		--	type = "toggle",
+		--	name = L.tooltip12hr,
+		--	order = 23,
+		--},
+		--tooltipHideAchiev = {
+		--	type = "toggle",
+		--	name = L.tooltipHideAchiev,
+		--	order = 24,
+		--},
+		--tooltipHideNethershard = {
+		--	type = "toggle",
+		--	name = L.hide:format((GetCurrencyInfo(1226))),
+		--	order = 25,
+		--},
+		--tooltipHideWarSupplies = {
+		--	type = "toggle",
+		--	name = L.hide:format((GetCurrencyInfo(1342))),
+		--	order = 26,
+		--},
+		--miscSeparator = {
+		--	type = "header",
+		--	name = "",
+		--	order = 27,
+		--},
+		--hideInRaid = {
+		--	type = "toggle",
+		--	name = L.hideInRaid,
+		--	order = 28,
+		--	disabled = function() 
+		--		return cap.db.mode == 2 or cap.db.mode == 3
+		--	end,
+		--},
+		--mode = {
+		--	type = "select",
+		--	name = L.mode,
+		--	order = 29,
+		--	values = {
+		--		[1] = L.modeBar,
+		--		[2] = L.modeBroker,
+		--		[3] = L.modeBarOnMap,
+		--	},
+		--	set = function(info, value)
+		--		cap.db.mode = value
+		--		if value == 2 then
+		--			cap.db.lock = true
+		--		end
+		--		if value == 3 then
+		--			cap.db.hideInRaid = nil
+		--		end
+		--		ReloadUI()
+		--	end,
+		--},
 	},
 }
 
