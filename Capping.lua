@@ -276,13 +276,11 @@ do -- estimated wait timer and port timer
 	end
 end
 
-function mod:Test()
-	-- 236396 = Interface/Icons/Achievement_BG_winWSG
-	mod:StartBar(L["Test"].." - ".._G.OTHER.."1", 100, 236396, "colorQueue")
-	mod:StartBar(L["Test"].." - ".._G.OTHER.."2", 75, 236396, "colorOther")
-	mod:StartBar(L["Test"].." - ".._G.FACTION_ALLIANCE, 45, 236396, "colorAlliance")
-	mod:StartBar(L["Test"].." - ".._G.FACTION_HORDE, 100, 236396, "colorHorde")
-	mod:StartBar(L["Test"], 75, 236396, "colorOther")
+function mod:Test(locale)
+	mod:StartBar(locale.queueBars, 100, 236396, "colorQueue") -- Interface/Icons/Achievement_BG_winWSG
+	mod:StartBar(locale.otherBars, 75, 1582141, "colorOther") -- Interface/Icons/Achievement_PVP_Legion03
+	mod:StartBar(locale.allianceBars, 45, 132486, "colorAlliance") -- Interface/Icons/INV_BannerPVP_02
+	mod:StartBar(locale.hordeBars, 25, 132485, "colorHorde") -- Interface/Icons/INV_BannerPVP_01
 end
 frame.Test = mod.Test
 

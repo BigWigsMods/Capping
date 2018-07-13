@@ -42,7 +42,7 @@ local acOptions = {
 					order = 0.1,
 					width = 2,
 					func = function()
-						cap:Test()
+						cap:Test(L)
 					end,
 				},
 				lock = {
