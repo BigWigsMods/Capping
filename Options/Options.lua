@@ -11,434 +11,442 @@ end
 
 local function updateFlags()
 	local flags = nil
-	if cap.db.monochrome and cap.db.outline ~= "NONE" then
-		flags = "MONOCHROME," .. cap.db.outline
-	elseif cap.db.monochrome then
+	if cap.db.profile.monochrome and cap.db.profile.outline ~= "NONE" then
+		flags = "MONOCHROME," .. cap.db.profile.outline
+	elseif cap.db.profile.monochrome then
 		flags = "MONOCHROME"
-	elseif cap.db.outline ~= "NONE" then
-		flags = cap.db.outline
+	elseif cap.db.profile.outline ~= "NONE" then
+		flags = cap.db.profile.outline
 	end
 	return flags
 end
 
 local acOptions = {
 	type = "group",
+	childGroups = "tab",
 	name = "Capping",
 	get = function(info)
-		return cap.db[info[#info]]
+		return cap.db.profile[info[#info]]
 	end,
 	set = function(info, value)
-		cap.db[info[#info]] = value
+		cap.db.profile[info[#info]] = value
 	end,
 	args = {
-		test = {
-			type = "execute",
-			name = "TEST", -- XXX
-			order = 0.1,
-			width = "full",
-			func = function()
-				cap:Test()
-			end,
-		},
-		lock = {
-			type = "toggle",
-			name = L.lock,
-			order = 1,
-			set = function(info, value)
-				cap.db.lock = value
-				if value then
-					cap:EnableMouse(false)
-					cap.bg:Hide()
-					cap.header:Hide()
-				else
-					cap:EnableMouse(true)
-					cap.bg:Show()
-					cap.header:Show()
-				end
-			end,
-		},
-		icon = {
-			type = "toggle",
-			name = L.barIcon,
-			order = 2,
-			set = function(info, value)
-				cap.db.icon = value
-				for bar in next, cap.bars do
-					if value then
-						bar:SetIcon(bar:Get("capping:iconoptionrestore") or 236396) -- Interface/Icons/Achievement_BG_winWSG
-					else
-						bar:Set("capping:iconoptionrestore", bar:GetIcon())
-						bar:SetIcon(nil)
-					end
-				end
-			end,
-		},
-		timeText = {
-			type = "toggle",
-			name = L.showTime,
-			order = 3,
-			set = function(info, value)
-				cap.db.timeText = value
-				for bar in next, cap.bars do
-					bar:SetTimeVisibility(value)
-				end
-			end,
-		},
-		fill = {
-			type = "toggle",
-			name = L.fillBar,
-			order = 4,
-			set = function(info, value)
-				cap.db.fill = value
-				for bar in next, cap.bars do
-					bar:SetFill(value)
-				end
-			end,
-		},
-		font = {
-			type = "select",
-			name = L.font,
-			order = 5,
-			values = media:List("font"),
-			itemControl = "DDI-Font",
-			get = function()
-				for i, v in next, media:List("font") do
-					if v == cap.db.font then return i end
-				end
-			end,
-			set = function(info, value)
-				local list = media:List("font")
-				local font = list[value]
-				cap.db.font = font
-				for bar in next, cap.bars do
-					bar.candyBarLabel:SetFont(media:Fetch("font", font), cap.db.fontSize, updateFlags())
-					bar.candyBarDuration:SetFont(media:Fetch("font", font), cap.db.fontSize, updateFlags())
-				end
-			end,
-		},
-		fontSize = {
-			type = "range",
-			name = L.fontSize,
-			order = 6,
-			max = 200,
-			min = 1,
-			step = 1,
-			set = function(info, value)
-				cap.db.fontSize = value
-				for bar in next, cap.bars do
-					bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.font), value, updateFlags())
-					bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.font), value, updateFlags())
-				end
-			end,
-		},
-		monochrome = {
-			type = "toggle",
-			name = L.monochrome,
-			order = 7,
-			set = function(info, value)
-				cap.db.monochrome = value
-				for bar in next, cap.bars do
-					bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.font), cap.db.fontSize, updateFlags())
-					bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.font), cap.db.fontSize, updateFlags())
-				end
-			end,
-		},
-		outline = {
-			type = "select",
-			name = L.outline,
-			order = 8,
-			values = {
-				NONE = L.none,
-				OUTLINE = L.thin,
-				THICKOUTLINE = L.thick,
+		general = {
+			name = "GENERAL",
+			order = 1, type = "group",
+			args = {
+				test = {
+					type = "execute",
+					name = "TEST", -- XXX
+					order = 0.1,
+					width = 2,
+					func = function()
+						cap:Test()
+					end,
+				},
+				lock = {
+					type = "toggle",
+					name = L.lock,
+					order = 1,
+					set = function(info, value)
+						cap.db.profile.lock = value
+						if value then
+							cap:EnableMouse(false)
+							cap.bg:Hide()
+							cap.header:Hide()
+						else
+							cap:EnableMouse(true)
+							cap.bg:Show()
+							cap.header:Show()
+						end
+					end,
+				},
+				icon = {
+					type = "toggle",
+					name = L.barIcon,
+					order = 2,
+					set = function(info, value)
+						cap.db.profile.icon = value
+						for bar in next, cap.bars do
+							if value then
+								bar:SetIcon(bar:Get("capping:iconoptionrestore") or 236396) -- Interface/Icons/Achievement_BG_winWSG
+							else
+								bar:Set("capping:iconoptionrestore", bar:GetIcon())
+								bar:SetIcon(nil)
+							end
+						end
+					end,
+				},
+				timeText = {
+					type = "toggle",
+					name = L.showTime,
+					order = 3,
+					set = function(info, value)
+						cap.db.profile.timeText = value
+						for bar in next, cap.bars do
+							bar:SetTimeVisibility(value)
+						end
+					end,
+				},
+				fill = {
+					type = "toggle",
+					name = L.fillBar,
+					order = 4,
+					set = function(info, value)
+						cap.db.profile.fill = value
+						for bar in next, cap.bars do
+							bar:SetFill(value)
+						end
+					end,
+				},
+				font = {
+					type = "select",
+					name = L.font,
+					order = 5,
+					values = media:List("font"),
+					itemControl = "DDI-Font",
+					get = function()
+						for i, v in next, media:List("font") do
+							if v == cap.db.profile.font then return i end
+						end
+					end,
+					set = function(info, value)
+						local list = media:List("font")
+						local font = list[value]
+						cap.db.profile.font = font
+						for bar in next, cap.bars do
+							bar.candyBarLabel:SetFont(media:Fetch("font", font), cap.db.profile.fontSize, updateFlags())
+							bar.candyBarDuration:SetFont(media:Fetch("font", font), cap.db.profile.fontSize, updateFlags())
+						end
+					end,
+				},
+				fontSize = {
+					type = "range",
+					name = L.fontSize,
+					order = 6,
+					max = 200,
+					min = 1,
+					step = 1,
+					set = function(info, value)
+						cap.db.profile.fontSize = value
+						for bar in next, cap.bars do
+							bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.profile.font), value, updateFlags())
+							bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.profile.font), value, updateFlags())
+						end
+					end,
+				},
+				monochrome = {
+					type = "toggle",
+					name = L.monochrome,
+					order = 7,
+					set = function(info, value)
+						cap.db.profile.monochrome = value
+						for bar in next, cap.bars do
+							bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.profile.font), cap.db.profile.fontSize, updateFlags())
+							bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.profile.font), cap.db.profile.fontSize, updateFlags())
+						end
+					end,
+				},
+				outline = {
+					type = "select",
+					name = L.outline,
+					order = 8,
+					values = {
+						NONE = L.none,
+						OUTLINE = L.thin,
+						THICKOUTLINE = L.thick,
+					},
+					set = function(info, value)
+						cap.db.profile.outline = value
+						for bar in next, cap.bars do
+							bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.profile.font), cap.db.profile.fontSize, updateFlags())
+							bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.profile.font), cap.db.profile.fontSize, updateFlags())
+						end
+					end,
+				},
+				barTexture = {
+					type = "select",
+					name = L.texture,
+					order = 9,
+					values = media:List("statusbar"),
+					itemControl = "DDI-Statusbar",
+					width = 2,
+					get = function()
+						for i, v in next, media:List("statusbar") do
+							if v == cap.db.profile.barTexture then return i end
+						end
+					end,
+					set = function(info, value)
+						local list = media:List("statusbar")
+						local texture = list[value]
+						cap.db.profile.barTexture = texture
+						for bar in next, cap.bars do
+							bar:SetTexture(media:Fetch("statusbar", texture))
+						end
+					end,
+				},
+				width = {
+					type = "range",
+					name = L.barWidth,
+					order = 10,
+					max = 2000,
+					min = 10,
+					step = 1,
+					set = function(info, value)
+						cap.db.profile.width = value
+						for bar in next, cap.bars do
+							bar:SetWidth(value)
+						end
+					end,
+				},
+				height = {
+					type = "range",
+					name = L.barHeight,
+					order = 11,
+					max = 100,
+					min = 5,
+					step = 1,
+					set = function(info, value)
+						cap.db.profile.height = value
+						for bar in next, cap.bars do
+							bar:SetHeight(value)
+						end
+					end,
+				},
+				alignIcon = {
+					type = "select",
+					name = L.alignIcon,
+					order = 12,
+					values = {
+						LEFT = L.left,
+						RIGHT = L.right,
+					},
+					set = function(info, value)
+						cap.db.profile.alignIcon = value
+						for bar in next, cap.bars do
+							bar:SetIconPosition(value)
+						end
+					end,
+					disabled = function() return not cap.db.profile.icon end,
+				},
+				spacing = {
+					type = "range",
+					name = L.barSpacing,
+					order = 13,
+					max = 100,
+					min = 0,
+					step = 1,
+					set = function(info, value)
+						cap.db.profile.spacing = value
+						cap.RearrangeBars()
+					end,
+				},
+				alignText = {
+					type = "select",
+					name = "Align Text", -- XXX
+					order = 14,
+					values = {
+						LEFT = L.left,
+						CENTER = L.center,
+						RIGHT = L.right,
+					},
+					set = function(info, value)
+						cap.db.profile.alignText = value
+						for bar in next, cap.bars do
+							bar.candyBarLabel:SetJustifyH(value)
+						end
+					end,
+				},
+				alignTime = {
+					type = "select",
+					name = L.alignTime,
+					order = 15,
+					values = {
+						LEFT = L.left,
+						CENTER = L.center,
+						RIGHT = L.right,
+					},
+					set = function(info, value)
+						cap.db.profile.alignTime = value
+						for bar in next, cap.bars do
+							bar.candyBarDuration:SetJustifyH(value)
+						end
+					end,
+				},
+				growUp = {
+					type = "toggle",
+					name = L.growUpwards,
+					order = 16,
+					set = function(info, value)
+						cap.db.profile.growUp = value
+						cap.RearrangeBars()
+					end,
+				},
+				colorText = {
+					name = L.textColor,
+					type = "color",
+					hasAlpha = true,
+					order = 17,
+					get = function()
+						return unpack(cap.db.profile.colorText)
+					end,
+					set = function(info, r, g, b, a)
+						cap.db.profile.colorText = {r, g, b, a}
+						for bar in next, cap.bars do
+							bar:SetTextColor(r, g, b, a)
+						end
+					end,
+				},
+				colorAlliance = {
+					name = "Alliance Bars", -- XXX
+					type = "color",
+					hasAlpha = true,
+					order = 18,
+					get = function()
+						return unpack(cap.db.profile.colorAlliance)
+					end,
+					set = function(info, r, g, b, a)
+						cap.db.profile.colorAlliance = {r, g, b, a}
+						for bar in next, cap.bars do
+							if bar:Get("capping:colorid") == "colorAlliance" then
+								bar:SetColor(r, g, b, a)
+							end
+						end
+					end,
+				},
+				colorHorde = {
+					name = "Horde Bars", -- XXX
+					type = "color",
+					hasAlpha = true,
+					order = 19,
+					get = function()
+						return unpack(cap.db.profile.colorHorde)
+					end,
+					set = function(info, r, g, b, a)
+						cap.db.profile.colorHorde = {r, g, b, a}
+						for bar in next, cap.bars do
+							if bar:Get("capping:colorid") == "colorHorde" then
+								bar:SetColor(r, g, b, a)
+							end
+						end
+					end,
+				},
+				colorQueue = {
+					name = "Queue Bars", -- XXX
+					type = "color",
+					hasAlpha = true,
+					order = 20,
+					get = function()
+						return unpack(cap.db.profile.colorQueue)
+					end,
+					set = function(info, r, g, b, a)
+						cap.db.profile.colorQueue = {r, g, b, a}
+						for bar in next, cap.bars do
+							if bar:Get("capping:colorid") == "colorQueue" then
+								bar:SetColor(r, g, b, a)
+							end
+						end
+					end,
+				},
+				colorOther = {
+					name = "Other Bars", -- XXX
+					type = "color",
+					hasAlpha = true,
+					order = 20.1,
+					get = function()
+						return unpack(cap.db.profile.colorOther)
+					end,
+					set = function(info, r, g, b, a)
+						cap.db.profile.colorOther = {r, g, b, a}
+						for bar in next, cap.bars do
+							if bar:Get("capping:colorid") == "colorOther" then
+								bar:SetColor(r, g, b, a)
+							end
+						end
+					end,
+				},
+				colorBarBackground = {
+					name = L.barBackground,
+					type = "color",
+					hasAlpha = true,
+					order = 21,
+					get = function()
+						return unpack(cap.db.profile.colorBarBackground)
+					end,
+					set = function(info, r, g, b, a)
+						cap.db.profile.colorBarBackground = {r, g, b, a}
+						for bar in next, cap.bars do
+							if bar then
+								bar.candyBarBackground:SetVertexColor(r, g, b, a)
+							end
+						end
+					end,
+				},
+				--tooltipHeader = {
+				--	type = "header",
+				--	name = L.tooltipHeader,
+				--	order = 22,
+				--},
+				--tooltip12hr = {
+				--	type = "toggle",
+				--	name = L.tooltip12hr,
+				--	order = 23,
+				--},
+				--tooltipHideAchiev = {
+				--	type = "toggle",
+				--	name = L.tooltipHideAchiev,
+				--	order = 24,
+				--},
+				--tooltipHideNethershard = {
+				--	type = "toggle",
+				--	name = L.hide:format((GetCurrencyInfo(1226))),
+				--	order = 25,
+				--},
+				--tooltipHideWarSupplies = {
+				--	type = "toggle",
+				--	name = L.hide:format((GetCurrencyInfo(1342))),
+				--	order = 26,
+				--},
+				--miscSeparator = {
+				--	type = "header",
+				--	name = "",
+				--	order = 27,
+				--},
+				--hideInRaid = {
+				--	type = "toggle",
+				--	name = L.hideInRaid,
+				--	order = 28,
+				--	disabled = function() 
+				--		return cap.db.profile.mode == 2 or cap.db.profile.mode == 3
+				--	end,
+				--},
+				--mode = {
+				--	type = "select",
+				--	name = L.mode,
+				--	order = 29,
+				--	values = {
+				--		[1] = L.modeBar,
+				--		[2] = L.modeBroker,
+				--		[3] = L.modeBarOnMap,
+				--	},
+				--	set = function(info, value)
+				--		cap.db.profile.mode = value
+				--		if value == 2 then
+				--			cap.db.profile.lock = true
+				--		end
+				--		if value == 3 then
+				--			cap.db.profile.hideInRaid = nil
+				--		end
+				--		ReloadUI()
+				--	end,
+				--},
 			},
-			set = function(info, value)
-				cap.db.outline = value
-				for bar in next, cap.bars do
-					bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.font), cap.db.fontSize, updateFlags())
-					bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.font), cap.db.fontSize, updateFlags())
-				end
-			end,
 		},
-		barTexture = {
-			type = "select",
-			name = L.texture,
-			order = 9,
-			values = media:List("statusbar"),
-			itemControl = "DDI-Statusbar",
-			width = "full",
-			get = function()
-				for i, v in next, media:List("statusbar") do
-					if v == cap.db.barTexture then return i end
-				end
-			end,
-			set = function(info, value)
-				local list = media:List("statusbar")
-				local texture = list[value]
-				cap.db.barTexture = texture
-				for bar in next, cap.bars do
-					bar:SetTexture(media:Fetch("statusbar", texture))
-				end
-			end,
-		},
-		width = {
-			type = "range",
-			name = L.barWidth,
-			order = 10,
-			max = 2000,
-			min = 10,
-			step = 1,
-			set = function(info, value)
-				cap.db.width = value
-				for bar in next, cap.bars do
-					bar:SetWidth(value)
-				end
-			end,
-		},
-		height = {
-			type = "range",
-			name = L.barHeight,
-			order = 11,
-			max = 100,
-			min = 5,
-			step = 1,
-			set = function(info, value)
-				cap.db.height = value
-				for bar in next, cap.bars do
-					bar:SetHeight(value)
-				end
-			end,
-		},
-		alignIcon = {
-			type = "select",
-			name = L.alignIcon,
-			order = 12,
-			values = {
-				LEFT = L.left,
-				RIGHT = L.right,
-			},
-			set = function(info, value)
-				cap.db.alignIcon = value
-				for bar in next, cap.bars do
-					bar:SetIconPosition(value)
-				end
-			end,
-			disabled = function() return not cap.db.icon end,
-		},
-		spacing = {
-			type = "range",
-			name = L.barSpacing,
-			order = 13,
-			max = 100,
-			min = 0,
-			step = 1,
-			set = function(info, value)
-				cap.db.spacing = value
-				cap.RearrangeBars()
-			end,
-		},
-		alignText = {
-			type = "select",
-			name = "Align Text", -- XXX
-			order = 14,
-			values = {
-				LEFT = L.left,
-				CENTER = L.center,
-				RIGHT = L.right,
-			},
-			set = function(info, value)
-				cap.db.alignText = value
-				for bar in next, cap.bars do
-					bar.candyBarLabel:SetJustifyH(value)
-				end
-			end,
-		},
-		alignTime = {
-			type = "select",
-			name = L.alignTime,
-			order = 15,
-			values = {
-				LEFT = L.left,
-				CENTER = L.center,
-				RIGHT = L.right,
-			},
-			set = function(info, value)
-				cap.db.alignTime = value
-				for bar in next, cap.bars do
-					bar.candyBarDuration:SetJustifyH(value)
-				end
-			end,
-		},
-		growUp = {
-			type = "toggle",
-			name = L.growUpwards,
-			order = 16,
-			set = function(info, value)
-				cap.db.growUp = value
-				cap.RearrangeBars()
-			end,
-		},
-		colorText = {
-			name = L.textColor,
-			type = "color",
-			hasAlpha = true,
-			order = 17,
-			get = function()
-				return unpack(cap.db.colorText)
-			end,
-			set = function(info, r, g, b, a)
-				cap.db.colorText = {r, g, b, a}
-				for bar in next, cap.bars do
-					bar:SetTextColor(r, g, b, a)
-				end
-			end,
-		},
-		colorAlliance = {
-			name = "Alliance Bars", -- XXX
-			type = "color",
-			hasAlpha = true,
-			order = 18,
-			get = function()
-				return unpack(cap.db.colorAlliance)
-			end,
-			set = function(info, r, g, b, a)
-				cap.db.colorAlliance = {r, g, b, a}
-				for bar in next, cap.bars do
-					if bar:Get("capping:colorid") == "colorAlliance" then
-						bar:SetColor(r, g, b, a)
-					end
-				end
-			end,
-		},
-		colorHorde = {
-			name = "Horde Bars", -- XXX
-			type = "color",
-			hasAlpha = true,
-			order = 19,
-			get = function()
-				return unpack(cap.db.colorHorde)
-			end,
-			set = function(info, r, g, b, a)
-				cap.db.colorHorde = {r, g, b, a}
-				for bar in next, cap.bars do
-					if bar:Get("capping:colorid") == "colorHorde" then
-						bar:SetColor(r, g, b, a)
-					end
-				end
-			end,
-		},
-		colorQueue = {
-			name = "Queue Bars", -- XXX
-			type = "color",
-			hasAlpha = true,
-			order = 20,
-			get = function()
-				return unpack(cap.db.colorQueue)
-			end,
-			set = function(info, r, g, b, a)
-				cap.db.colorQueue = {r, g, b, a}
-				for bar in next, cap.bars do
-					if bar:Get("capping:colorid") == "colorQueue" then
-						bar:SetColor(r, g, b, a)
-					end
-				end
-			end,
-		},
-		colorOther = {
-			name = "Other Bars", -- XXX
-			type = "color",
-			hasAlpha = true,
-			order = 20.1,
-			get = function()
-				return unpack(cap.db.colorOther)
-			end,
-			set = function(info, r, g, b, a)
-				cap.db.colorOther = {r, g, b, a}
-				for bar in next, cap.bars do
-					if bar:Get("capping:colorid") == "colorOther" then
-						bar:SetColor(r, g, b, a)
-					end
-				end
-			end,
-		},
-		colorBarBackground = {
-			name = L.barBackground,
-			type = "color",
-			hasAlpha = true,
-			order = 21,
-			get = function()
-				return unpack(cap.db.colorBarBackground)
-			end,
-			set = function(info, r, g, b, a)
-				cap.db.colorBarBackground = {r, g, b, a}
-				for bar in next, cap.bars do
-					if bar then
-						bar.candyBarBackground:SetVertexColor(r, g, b, a)
-					end
-				end
-			end,
-		},
-		--tooltipHeader = {
-		--	type = "header",
-		--	name = L.tooltipHeader,
-		--	order = 22,
-		--},
-		--tooltip12hr = {
-		--	type = "toggle",
-		--	name = L.tooltip12hr,
-		--	order = 23,
-		--},
-		--tooltipHideAchiev = {
-		--	type = "toggle",
-		--	name = L.tooltipHideAchiev,
-		--	order = 24,
-		--},
-		--tooltipHideNethershard = {
-		--	type = "toggle",
-		--	name = L.hide:format((GetCurrencyInfo(1226))),
-		--	order = 25,
-		--},
-		--tooltipHideWarSupplies = {
-		--	type = "toggle",
-		--	name = L.hide:format((GetCurrencyInfo(1342))),
-		--	order = 26,
-		--},
-		--miscSeparator = {
-		--	type = "header",
-		--	name = "",
-		--	order = 27,
-		--},
-		--hideInRaid = {
-		--	type = "toggle",
-		--	name = L.hideInRaid,
-		--	order = 28,
-		--	disabled = function() 
-		--		return cap.db.mode == 2 or cap.db.mode == 3
-		--	end,
-		--},
-		--mode = {
-		--	type = "select",
-		--	name = L.mode,
-		--	order = 29,
-		--	values = {
-		--		[1] = L.modeBar,
-		--		[2] = L.modeBroker,
-		--		[3] = L.modeBarOnMap,
-		--	},
-		--	set = function(info, value)
-		--		cap.db.mode = value
-		--		if value == 2 then
-		--			cap.db.lock = true
-		--		end
-		--		if value == 3 then
-		--			cap.db.hideInRaid = nil
-		--		end
-		--		ReloadUI()
-		--	end,
-		--},
+		profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(cap.db),
 	},
 }
 
 acr:RegisterOptionsTable(acOptions.name, acOptions, true)
-acd:SetDefaultSize(acOptions.name, 400, 640)
+acd:SetDefaultSize(acOptions.name, 420, 640)
 

@@ -56,7 +56,7 @@ end
 function mod:START_TIMER(timerType, timeSeconds, totalTime)
 	local _, t = GetInstanceInfo()
 	if t == "pvp" or t == "arena" then
-		--if db.hideblizztime then
+		--if db.profile.hideblizztime then
 		--	for a, timer in pairs(TimerTracker.timerList) do
 		--		timer:Hide()
 		--	end
@@ -109,7 +109,7 @@ function mod:PLAYER_LOGIN()
 	header:SetText(addonName)
 	frame.header = header
 
-	if db.lock then
+	if db.profile.lock then
 		frame:EnableMouse(false)
 		frame.bg:Hide()
 		frame.header:Hide()
@@ -199,7 +199,7 @@ do -- estimated wait timer and port timer
 	end
 
 	function mod:UPDATE_BATTLEFIELD_STATUS(queueId)
-		--if not db.port and not db.wait then return end
+		--if not db.profile.port and not db.profile.wait then return end
 
 		local status, map, _, _, _, size = GetBattlefieldStatus(queueId)
 		if size == "ARENASKIRMISH" then
@@ -213,11 +213,11 @@ do -- estimated wait timer and port timer
 				bar = nil
 			end
 
-			if not bar then --and db.port then
+			if not bar then --and db.profile.port then
 				bar = self:StartBar(map, GetBattlefieldPortExpiration(queueId), 132327, "colorOther", true) -- 132327 = Interface/Icons/Ability_TownWatch
 				bar:Set("capping:queueid", queueId)
 			end
-		elseif status == "queued" then --and db.wait then -- Waiting for BG to pop
+		elseif status == "queued" then --and db.profile.wait then -- Waiting for BG to pop
 			if size == "ARENASKIRMISH" then
 				cleanupQueue()
 			end
@@ -328,10 +328,10 @@ do
 			end
 			table.sort(tmp, barSorter)
 			local lastBar = nil
-			local up = db.growUp
+			local up = db.profile.growUp
 			for i = 1, #tmp do
 				local bar = tmp[i]
-				local spacing = db.spacing
+				local spacing = db.profile.spacing
 				bar:ClearAllPoints()
 				if up then
 					if lastBar then -- Growing from a bar
@@ -357,7 +357,7 @@ do
 
 	function mod:StartBar(name, remaining, icon, colorid, priority)
 		self:StopBar(name)
-		local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
+		local bar = candy:New(media:Fetch("statusbar", db.profile.texture), db.profile.width, db.profile.height)
 		activeBars[bar] = true
 
 		bar:Set("capping:colorid", colorid)
@@ -367,32 +367,32 @@ do
 
 		bar:SetParent(frame)
 		bar:SetLabel(name)
-		bar.candyBarLabel:SetJustifyH(db.alignText)
-		bar.candyBarDuration:SetJustifyH(db.alignTime)
+		bar.candyBarLabel:SetJustifyH(db.profile.alignText)
+		bar.candyBarDuration:SetJustifyH(db.profile.alignTime)
 		bar:SetDuration(remaining)
-		bar:SetColor(unpack(db[colorid]))
-		bar.candyBarBackground:SetVertexColor(unpack(db.colorBarBackground))
-		bar:SetTextColor(unpack(db.colorText))
-		if db.icon then
+		bar:SetColor(unpack(db.profile[colorid]))
+		bar.candyBarBackground:SetVertexColor(unpack(db.profile.colorBarBackground))
+		bar:SetTextColor(unpack(db.profile.colorText))
+		if db.profile.icon then
 			if type(icon) == "table" then
 				bar:SetIcon(icon[1], icon[2], icon[3], icon[4], icon[5])
 			else
 				bar:SetIcon(icon)
 			end
-			bar:SetIconPosition(db.alignIcon)
+			bar:SetIconPosition(db.profile.alignIcon)
 		end
-		bar:SetTimeVisibility(db.timeText)
-		bar:SetFill(db.fill)
+		bar:SetTimeVisibility(db.profile.timeText)
+		bar:SetFill(db.profile.fill)
 		local flags = nil
-		if db.monochrome and db.outline ~= "NONE" then
-			flags = "MONOCHROME," .. db.outline
-		elseif db.monochrome then
+		if db.profile.monochrome and db.profile.outline ~= "NONE" then
+			flags = "MONOCHROME," .. db.profile.outline
+		elseif db.profile.monochrome then
 			flags = "MONOCHROME"
-		elseif db.outline ~= "NONE" then
-			flags = db.outline
+		elseif db.profile.outline ~= "NONE" then
+			flags = db.profile.outline
 		end
-		bar.candyBarLabel:SetFont(media:Fetch("font", db.font), db.fontSize, flags)
-		bar.candyBarDuration:SetFont(media:Fetch("font", db.font), db.fontSize, flags)
+		bar.candyBarLabel:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
+		bar.candyBarDuration:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 		bar:SetScript("OnMouseUp", BarOnClick)
 		bar:Start()
 		RearrangeBars()
