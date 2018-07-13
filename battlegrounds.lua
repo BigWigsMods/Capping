@@ -231,7 +231,7 @@ end
 -- initialize or update a final score estimation bar (AB and EotS uses this)
 local NewEstimator
 do
-	local ascore, atime, abases, hscore, htime, hbases, currentbg, prevText
+	local ascore, atime, abases, hscore, htime, hbases, currentbg, prevText, prevTime
 	local allianceWidget, hordeWidget = 0, 0
 	local ppsTable
 	NewEstimator = function(bg, aW, hW, pointsPerSecond) -- resets estimator and sets new battleground
@@ -659,7 +659,7 @@ end
 
 do
 	------------------------------------------------ Isle of Conquest --------------------------------------
-	local function IsleOfConquest(self)
+	local function IsleOfConquest()
 		SetupAssault(61, 169)
 	end
 	Capping:AddBG(628, IsleOfConquest)
@@ -727,7 +727,7 @@ do
 				end
 				Capping:CheckCombat(SetWSGCarrierAttribute)
 			end
-			local function CarrierOnClick(this) -- sends basic carrier info to battleground chat
+			local function CarrierOnClick() -- sends basic carrier info to battleground chat
 
 			end
 			local function CreateWSGFrame() -- create all frames
@@ -743,7 +743,7 @@ do
 				af, aftext, aftexthp = CreateCarrierFrame("Alliance")
 				hf, hftext, hftexthp = CreateCarrierFrame("Horde")
 
-				af:SetScript("OnUpdate", function(this, a1)
+				af:SetScript("OnUpdate", function(_, a1)
 					elap = elap + a1
 					if elap > 0.25 then -- health check and display
 						elap, togunit = 0, not togunit
@@ -902,9 +902,9 @@ do
 						local textureIndex = tbl.textureIndex
 						if tbl and ((ti and ti ~= textureIndex) or (not ti and wallid[POI])) then
 							if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
-								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
+								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
 							elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], name, _G.ACTION_UNIT_DESTROYED))
+								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, _G.ACTION_UNIT_DESTROYED))
 							end
 							walls[POI] = all[textureIndex] and textureIndex or ti
 						end
@@ -934,7 +934,7 @@ do
 	------------------------------------------------ Ashran ------------------------------------------
 	local function Ashran(self)
 		if not self.AshranControl then
-			function Capping:AshranControl(msg, ...)
+			function Capping:AshranControl(msg)
 				--print(msg, ...)
 				--Ashran Herald yells: The Horde controls the Market Graveyard for 15 minutes!
 				local faction, point, timeString = strmatch(msg, "The (.+) controls the (.+) for (%d+) minutes!")
@@ -946,7 +946,7 @@ do
 			end
 		end
 		if not self.AshranEvents then
-			function Capping:AshranEvents(msg, ...)
+			function Capping:AshranEvents(msg)
 				local idString = strmatch(msg, "spell:(%d+)")
 				local id = tonumber(idString)
 				--print(msg:gsub("|", "||"), ...)

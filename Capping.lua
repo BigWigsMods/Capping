@@ -38,7 +38,7 @@ end
 
 -- GLOBALS MADE LOCAL
 local _G = getfenv(0)
-local format, strmatch, strlower, type = format, strmatch, strlower, type
+local format, type = format, type
 local min, floor, math_sin, math_pi, tonumber = min, floor, math.sin, math.pi, tonumber
 local GetTime, time = GetTime, time
 
@@ -55,7 +55,7 @@ end
 
 -- EVENT HANDLERS
 local elist = {}
-frame:SetScript("OnEvent", function(frame, event, ...)
+frame:SetScript("OnEvent", function(_, event, ...)
 	mod[elist[event] or event](mod, ...)
 end)
 function mod:RegisterTempEvent(event, other)
@@ -306,7 +306,7 @@ do
 			if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
 			SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
 		end
-		function BarOnClick(bar, button)
+		function BarOnClick(bar)
 			if IsShiftKeyDown() then
 				ReportBar(bar, "SAY")
 			elseif IsControlKeyDown() then
@@ -338,7 +338,8 @@ do
 			table.sort(tmp, barSorter)
 			local lastBar = nil
 			local up = db.growUp
-			for i, bar in next, tmp do
+			for i = 1, #tmp do
+				local bar = tmp[i]
 				local spacing = db.spacing
 				bar:ClearAllPoints()
 				if up then
@@ -424,7 +425,7 @@ do
 		if dirty then RearrangeBars() end
 	end
 
-	candy.RegisterCallback(mod, "LibCandyBar_Stop", function(event, bar)
+	candy.RegisterCallback(mod, "LibCandyBar_Stop", function(_, bar)
 		if activeBars[bar] then
 			activeBars[bar] = nil
 			RearrangeBars()
