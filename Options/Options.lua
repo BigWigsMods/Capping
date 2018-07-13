@@ -299,11 +299,28 @@ local acOptions = {
 						end
 					end,
 				},
+				colorBarBackground = {
+					name = L.barBackground,
+					type = "color",
+					hasAlpha = true,
+					order = 18,
+					get = function()
+						return unpack(cap.db.profile.colorBarBackground)
+					end,
+					set = function(info, r, g, b, a)
+						cap.db.profile.colorBarBackground = {r, g, b, a}
+						for bar in next, cap.bars do
+							if bar then
+								bar.candyBarBackground:SetVertexColor(r, g, b, a)
+							end
+						end
+					end,
+				},
 				colorAlliance = {
 					name = L.allianceBars,
 					type = "color",
 					hasAlpha = true,
-					order = 18,
+					order = 19,
 					get = function()
 						return unpack(cap.db.profile.colorAlliance)
 					end,
@@ -320,7 +337,7 @@ local acOptions = {
 					name = L.hordeBars,
 					type = "color",
 					hasAlpha = true,
-					order = 19,
+					order = 20,
 					get = function()
 						return unpack(cap.db.profile.colorHorde)
 					end,
@@ -337,7 +354,7 @@ local acOptions = {
 					name = L.queueBars,
 					type = "color",
 					hasAlpha = true,
-					order = 20,
+					order = 21,
 					get = function()
 						return unpack(cap.db.profile.colorQueue)
 					end,
@@ -354,7 +371,7 @@ local acOptions = {
 					name = L.otherBars,
 					type = "color",
 					hasAlpha = true,
-					order = 20.1,
+					order = 22,
 					get = function()
 						return unpack(cap.db.profile.colorOther)
 					end,
@@ -363,23 +380,6 @@ local acOptions = {
 						for bar in next, cap.bars do
 							if bar:Get("capping:colorid") == "colorOther" then
 								bar:SetColor(r, g, b, a)
-							end
-						end
-					end,
-				},
-				colorBarBackground = {
-					name = L.barBackground,
-					type = "color",
-					hasAlpha = true,
-					order = 21,
-					get = function()
-						return unpack(cap.db.profile.colorBarBackground)
-					end,
-					set = function(info, r, g, b, a)
-						cap.db.profile.colorBarBackground = {r, g, b, a}
-						for bar in next, cap.bars do
-							if bar then
-								bar.candyBarBackground:SetVertexColor(r, g, b, a)
 							end
 						end
 					end,

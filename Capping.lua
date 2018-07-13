@@ -3,6 +3,9 @@ local addonName, mod = ...
 local frame = CreateFrame("Frame", "CappingFrame", UIParent)
 local L = mod.L
 
+local format, type = format, type
+local db
+
 local activeBars = { }
 frame.bars = activeBars
 
@@ -20,7 +23,14 @@ do
 	frame:SetClampedToScreen(true)
 	frame:Show()
 	frame:SetScript("OnDragStart", function(f) f:StartMoving() end)
-	frame:SetScript("OnDragStop", function(f) f:StopMovingOrSizing() end)
+	frame:SetScript("OnDragStop", function(f)
+		f:StopMovingOrSizing()
+		local a, _, b, c, d = f:GetPoint()
+		db.profile.position[1] = a
+		db.profile.position[2] = b
+		db.profile.position[3] = c
+		db.profile.position[4] = d
+	end)
 	local function openOpts()
 		LoadAddOn("Capping_Options")
 		LibStub("AceConfigDialog-3.0"):Open(addonName)
@@ -33,9 +43,6 @@ do
 		end
 	end)
 end
-
-local format, type = format, type
-local db
 
 -- Event Handlers
 local elist = {}
@@ -77,6 +84,7 @@ function mod:PLAYER_LOGIN()
 	local defaults = {
 		profile = {
 			lock = false,
+			position = {"CENTER", "CENTER", 0, 0},
 			fontSize = 10,
 			barTexture = "Blizzard Raid Bar",
 			outline = "NONE",
@@ -97,9 +105,11 @@ function mod:PLAYER_LOGIN()
 			colorBarBackground = {0,0,0,0.75},
 		},
 	}
-	db = LibStub("AceDB-3.0"):New("CappingSettingsTmp2", defaults, true)
+	db = LibStub("AceDB-3.0"):New("CappingSettings", defaults, true)
 	CappingFrame.db = db
 
+	frame:ClearAllPoints()
+	frame:SetPoint(db.profile.position[1], UIParent, db.profile.position[2], db.profile.position[3], db.profile.position[4])
 	local bg = frame:CreateTexture(nil, "PARENT")
 	bg:SetAllPoints(frame)
 	bg:SetColorTexture(0, 1, 0, 0.3)
