@@ -33,12 +33,12 @@ local acOptions = {
 	end,
 	args = {
 		general = {
-			name = "GENERAL",
+			name = L.general,
 			order = 1, type = "group",
 			args = {
 				test = {
 					type = "execute",
-					name = "TEST", -- XXX
+					name = L.test,
 					order = 0.1,
 					width = 2,
 					func = function()
@@ -244,7 +244,7 @@ local acOptions = {
 				},
 				alignText = {
 					type = "select",
-					name = "Align Text", -- XXX
+					name = L.alignText,
 					order = 14,
 					values = {
 						LEFT = L.left,
@@ -278,6 +278,7 @@ local acOptions = {
 					type = "toggle",
 					name = L.growUpwards,
 					order = 16,
+					width = 2,
 					set = function(info, value)
 						cap.db.profile.growUp = value
 						cap.RearrangeBars()
@@ -299,7 +300,7 @@ local acOptions = {
 					end,
 				},
 				colorAlliance = {
-					name = "Alliance Bars", -- XXX
+					name = L.allianceBars,
 					type = "color",
 					hasAlpha = true,
 					order = 18,
@@ -316,7 +317,7 @@ local acOptions = {
 					end,
 				},
 				colorHorde = {
-					name = "Horde Bars", -- XXX
+					name = L.hordeBars,
 					type = "color",
 					hasAlpha = true,
 					order = 19,
@@ -333,7 +334,7 @@ local acOptions = {
 					end,
 				},
 				colorQueue = {
-					name = "Queue Bars", -- XXX
+					name = L.queueBars,
 					type = "color",
 					hasAlpha = true,
 					order = 20,
@@ -350,7 +351,7 @@ local acOptions = {
 					end,
 				},
 				colorOther = {
-					name = "Other Bars", -- XXX
+					name = L.otherBars,
 					type = "color",
 					hasAlpha = true,
 					order = 20.1,
@@ -383,64 +384,6 @@ local acOptions = {
 						end
 					end,
 				},
-				--tooltipHeader = {
-				--	type = "header",
-				--	name = L.tooltipHeader,
-				--	order = 22,
-				--},
-				--tooltip12hr = {
-				--	type = "toggle",
-				--	name = L.tooltip12hr,
-				--	order = 23,
-				--},
-				--tooltipHideAchiev = {
-				--	type = "toggle",
-				--	name = L.tooltipHideAchiev,
-				--	order = 24,
-				--},
-				--tooltipHideNethershard = {
-				--	type = "toggle",
-				--	name = L.hide:format((GetCurrencyInfo(1226))),
-				--	order = 25,
-				--},
-				--tooltipHideWarSupplies = {
-				--	type = "toggle",
-				--	name = L.hide:format((GetCurrencyInfo(1342))),
-				--	order = 26,
-				--},
-				--miscSeparator = {
-				--	type = "header",
-				--	name = "",
-				--	order = 27,
-				--},
-				--hideInRaid = {
-				--	type = "toggle",
-				--	name = L.hideInRaid,
-				--	order = 28,
-				--	disabled = function() 
-				--		return cap.db.profile.mode == 2 or cap.db.profile.mode == 3
-				--	end,
-				--},
-				--mode = {
-				--	type = "select",
-				--	name = L.mode,
-				--	order = 29,
-				--	values = {
-				--		[1] = L.modeBar,
-				--		[2] = L.modeBroker,
-				--		[3] = L.modeBarOnMap,
-				--	},
-				--	set = function(info, value)
-				--		cap.db.profile.mode = value
-				--		if value == 2 then
-				--			cap.db.profile.lock = true
-				--		end
-				--		if value == 3 then
-				--			cap.db.profile.hideInRaid = nil
-				--		end
-				--		ReloadUI()
-				--	end,
-				--},
 			},
 		},
 		profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(cap.db),
