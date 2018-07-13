@@ -78,38 +78,38 @@ do -- POI handling
 
 	local iconDataConflict = {
 		-- Graveyard
-		[4] = "alliance",
-		[14] = "horde",
+		[4] = "colorAlliance",
+		[14] = "colorHorde",
 		-- Tower
-		[9] = "alliance",
-		[12] = "horde",
+		[9] = "colorAlliance",
+		[12] = "colorHorde",
 		-- Mine/Stone
-		[17] = "alliance",
-		[19] = "horde",
+		[17] = "colorAlliance",
+		[19] = "colorHorde",
 		-- Lumber/Wood
-		[22] = "alliance",
-		[24] = "horde",
+		[22] = "colorAlliance",
+		[24] = "colorHorde",
 		-- Blacksmith/Anvil
-		[27] = "alliance",
-		[29] = "horde",
+		[27] = "colorAlliance",
+		[29] = "colorHorde",
 		-- Farm/House
-		[32] = "alliance",
-		[34] = "horde",
+		[32] = "colorAlliance",
+		[34] = "colorHorde",
 		-- Stables/Horse
-		[37] = "alliance",
-		[39] = "horde",
+		[37] = "colorAlliance",
+		[39] = "colorHorde",
 		-- Workshop/Tent
-		[137] = "alliance",
-		[139] = "horde",
+		[137] = "colorAlliance",
+		[139] = "colorHorde",
 		-- Hangar/Mushroom
-		[142] = "alliance",
-		[144] = "horde",
+		[142] = "colorAlliance",
+		[144] = "colorHorde",
 		-- Docks/Anchor
-		[147] = "alliance",
-		[149] = "horde",
+		[147] = "colorAlliance",
+		[149] = "colorHorde",
 		-- Oil/Refinery
-		[152] = "alliance",
-		[154] = "horde",
+		[152] = "colorAlliance",
+		[154] = "colorHorde",
 	}
 	local GetPOITextureCoords = GetPOITextureCoords
 	local GetAreaPOIForMap = C_AreaPoiInfo and C_AreaPoiInfo.GetAreaPOIForMap -- XXX 8.0
