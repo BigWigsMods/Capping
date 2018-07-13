@@ -74,8 +74,8 @@ end
 
 function mod:PLAYER_LOGIN()
 	-- saved variables database setup
-	if type(CappingSettingsTmp) ~= "table" then
-		CappingSettingsTmp = {
+	local defaults = {
+		profile = {
 			lock = false,
 			fontSize = 10,
 			barTexture = "Blizzard Raid Bar",
@@ -95,9 +95,9 @@ function mod:PLAYER_LOGIN()
 			colorQueue = {0.6,0.6,0.6,1},
 			colorOther = {1,1,0,1},
 			colorBarBackground = {0,0,0,0.75},
-		}
-	end
-	db = CappingSettingsTmp2
+		},
+	}
+	db = LibStub("AceDB-3.0"):New("CappingSettingsTmp2", defaults, true)
 	CappingFrame.db = db
 
 	local bg = frame:CreateTexture(nil, "PARENT")
