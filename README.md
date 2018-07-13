@@ -13,4 +13,4 @@
 * Other - Port expiration timers, queue wait timers, scoreboard/capture bar/vehicle seat repositioning
 
 ## Download
-https://mods.curse.com/addons/wow/capping-bg-timers
+<https://www.curseforge.com/wow/addons/capping-bg-timers>
