@@ -504,13 +504,13 @@ do
 			end
 			-- resets carrier display
 			ResetCarrier = function(captured)
-				carrier, ef.faction, ef.car = nil, nil, nil
-				eftext:SetText("")
-				eficon:Hide()
+				--carrier, ef.faction, ef.car = nil, nil, nil
+				--eftext:SetText("")
+				--eficon:Hide()
 				if captured then
 					self:StartBar(L["Flag respawns"], 21, GetIconData(45), "colorOther") -- 45 = White flag
 				end
-				self:CheckCombat(SetEotSCarrierAttribute)
+				--self:CheckCombat(SetEotSCarrierAttribute)
 			end
 			local function CarrierOnClick(this)
 				if IsControlKeyDown() and carrier then
@@ -524,13 +524,13 @@ do
 					if found == "L'Alliance" then -- frFR
 						ResetCarrier(true)
 					else
-						cclass = GetClassByName(name, faction)
-						carrier, ef.car = name, true
-						ef.faction = (faction == 0 and _G.FACTION_HORDE) or _G.FACTION_ALLIANCE
-						eftext:SetFormattedText("|cff%s%s|r", classcolor[cclass or "PRIEST"] or classcolor.PRIEST, name or "")
-						eficon:SetTexture(faction == 0 and 137218 or 137200) --137218-"Interface\\WorldStateFrame\\HordeFlag" || 137200-"Interface\\WorldStateFrame\\AllianceFlag"
-						eficon:Show()
-						self:CheckCombat(SetEotSCarrierAttribute)
+						--cclass = GetClassByName(name, faction)
+						--carrier, ef.car = name, true
+						--ef.faction = (faction == 0 and _G.FACTION_HORDE) or _G.FACTION_ALLIANCE
+						--eftext:SetFormattedText("|cff%s%s|r", classcolor[cclass or "PRIEST"] or classcolor.PRIEST, name or "")
+						--eficon:SetTexture(faction == 0 and 137218 or 137200) --137218-"Interface\\WorldStateFrame\\HordeFlag" || 137200-"Interface\\WorldStateFrame\\AllianceFlag"
+						--eficon:Show()
+						--self:CheckCombat(SetEotSCarrierAttribute)
 					end
 				elseif strmatch(a1, L["dropped"]) then
 					ResetCarrier()
@@ -582,18 +582,18 @@ do
 				end
 			end
 
-			ef = self:CreateCarrierButton("CappingEotSFrame", CarrierOnClick)
-			eficon = ef:CreateTexture(nil, "ARTWORK") -- flag icon
-			eficon:SetPoint("TOPLEFT", ef, "TOPLEFT", 0, 1)
-			eficon:SetPoint("BOTTOMRIGHT", ef, "BOTTOMLEFT", 20, -1)
+			--ef = self:CreateCarrierButton("CappingEotSFrame", CarrierOnClick)
+			--eficon = ef:CreateTexture(nil, "ARTWORK") -- flag icon
+			--eficon:SetPoint("TOPLEFT", ef, "TOPLEFT", 0, 1)
+			--eficon:SetPoint("BOTTOMRIGHT", ef, "BOTTOMLEFT", 20, -1)
 
-			eftext = self:CreateText(ef, 13, "LEFT", eficon, 22, 0, ef, 0, 0) -- carrier text
-			ef.text = eftext
+			--eftext = self:CreateText(ef, 13, "LEFT", eficon, 22, 0, ef, 0, 0) -- carrier text
+			--ef.text = eftext
 
-			self:AddFrameToHide(ef) -- add to the tohide list to hide when bg is over
+			--self:AddFrameToHide(ef) -- add to the tohide list to hide when bg is over
 		end
 
-		ef:Show()
+		--ef:Show()
 		ResetCarrier()
 
 		-- setup for final score estimation (2 for EotS)
@@ -627,116 +627,117 @@ do
 
 			-- props to "Fedos" and the ICU mod
 			-- updates a carrier's frame secure stuff, button will be slightly transparent if button cannot update (in combat)
-			local function SetWSGCarrierAttribute()
-				if not af:GetAttribute("unit") or not hf:GetAttribute("unit") then
-					if acarrier == "arena1" or hcarrier == "arena2" then
-						SecureUnitButton_OnLoad(af, "arena1")
-						SecureUnitButton_OnLoad(hf, "arena2")
-					elseif acarrier or hcarrier then
-						SecureUnitButton_OnLoad(af, "arena2")
-						SecureUnitButton_OnLoad(hf, "arena1")
-					end
-					UnregisterUnitWatch(af)
-					UnregisterUnitWatch(hf)
-				end
-				if AlwaysUpFrame1 then
-					af:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() + 38, AlwaysUpFrame1:GetTop())
-					hf:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame2:GetRight() + 38, AlwaysUpFrame2:GetTop())
-				end
-			end
-			local function SetCarrier(faction, carrier, class, u) -- setup carrier frames
-				if faction == "Horde" then
-					hcarrier, hclass, hf.car = carrier, class, carrier
-					hftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
-					local hhealth_before = hhealth
-					hhealth = min(floor(100 * UnitHealth(u)/UnitHealthMax(u)), 100)
-					hftexthp:SetFormattedText("|cff%s%d%%|r", (hhealth < hhealth_before and "ff2222") or "dddddd", hhealth)
-					hcarrier = u
-					hftext.unit = u
-					return hhealth
-				elseif faction == "Alliance" then
-					acarrier, aclass, af.car = carrier, class, carrier
-					aftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
-					ahealth = 0
-					aftexthp:SetText((carrier and unknownhp) or "")
-					local ahealth_before = ahealth
-					ahealth = min(floor(100 * UnitHealth(u)/UnitHealthMax(u)), 100)
-					aftexthp:SetFormattedText("|cff%s%d%%|r", (ahealth < ahealth_before and "ff2222") or "dddddd", ahealth)
-					acarrier = u
-					aftext.unit = u
-					return ahealth
-				elseif aftext.unit == faction then
-					aftext:SetText("")
-					aftexthp:SetText("")
-					acarrier, aclass, af.car = "", "", nil
-				elseif hftext.unit == faction then
-					hftext:SetText("")
-					hftexthp:SetText("")
-					hcarrier, hclass, hf.car = "", "", nil
-				end
-				mod:CheckCombat(SetWSGCarrierAttribute)
-			end
-			local function CarrierOnClick() -- sends basic carrier info to battleground chat
-
-			end
-			local function CreateWSGFrame() -- create all frames
-				local function CreateCarrierFrame(faction) -- create carriers' frames
-					local b = self:CreateCarrierButton("CappingTarget"..faction, CarrierOnClick)
-					local text = self:CreateText(b, 14, "LEFT", b, 29, 0, b, 0, 0)
-					local texthp = self:CreateText(b, 10, "RIGHT", b, -4, 0, b, 28 - b:GetWidth(), 0)
-					b.faction = (faction == "Alliance" and _G.FACTION_ALLIANCE) or _G.FACTION_HORDE
-					b.text = text
-					self:AddFrameToHide(b)
-					return b, text, texthp
-				end
-				af, aftext, aftexthp = CreateCarrierFrame("Alliance")
-				hf, hftext, hftexthp = CreateCarrierFrame("Horde")
-
-				af:SetScript("OnUpdate", function(_, a1)
-					elap = elap + a1
-					if elap > 0.25 then -- health check and display
-						elap, togunit = 0, not togunit
-						if togunit then
-							if UnitExists("arena1") then
-								local faction = UnitFactionGroup("arena1")
-								local name = GetUnitName("arena1", true)
-								local health = UnitHealth("arena1")
-								local _, class = UnitClass("arena1")
-								SetCarrier(faction, name, class, "arena1")
-							else
-								SetCarrier("arena1")
-							end
-						else
-							if UnitExists("arena2") then
-								local faction = UnitFactionGroup("arena2")
-								local name = GetUnitName("arena2", true)
-								local health = UnitHealth("arena2")
-								local _, class = UnitClass("arena2")
-								SetCarrier(faction, name, class, "arena2")
-							else
-								SetCarrier("arena2")
-							end
-						end
-					end
-				end)
-				CreateCarrierFrame, CreateWSGFrame = nil, nil
-			end
+			--local function SetWSGCarrierAttribute()
+			--	if not af:GetAttribute("unit") or not hf:GetAttribute("unit") then
+			--		if acarrier == "arena1" or hcarrier == "arena2" then
+			--			SecureUnitButton_OnLoad(af, "arena1")
+			--			SecureUnitButton_OnLoad(hf, "arena2")
+			--		elseif acarrier or hcarrier then
+			--			SecureUnitButton_OnLoad(af, "arena2")
+			--			SecureUnitButton_OnLoad(hf, "arena1")
+			--		end
+			--		UnregisterUnitWatch(af)
+			--		UnregisterUnitWatch(hf)
+			--	end
+			--	if AlwaysUpFrame1 then
+			--		af:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() + 38, AlwaysUpFrame1:GetTop())
+			--		hf:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame2:GetRight() + 38, AlwaysUpFrame2:GetTop())
+			--	end
+			--end
+			--local function SetCarrier(faction, carrier, class, u) -- setup carrier frames
+			--	if faction == "Horde" then
+			--		hcarrier, hclass, hf.car = carrier, class, carrier
+			--		hftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
+			--		local hhealth_before = hhealth
+			--		hhealth = min(floor(100 * UnitHealth(u)/UnitHealthMax(u)), 100)
+			--		hftexthp:SetFormattedText("|cff%s%d%%|r", (hhealth < hhealth_before and "ff2222") or "dddddd", hhealth)
+			--		hcarrier = u
+			--		hftext.unit = u
+			--		return hhealth
+			--	elseif faction == "Alliance" then
+			--		acarrier, aclass, af.car = carrier, class, carrier
+			--		aftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
+			--		ahealth = 0
+			--		aftexthp:SetText((carrier and unknownhp) or "")
+			--		local ahealth_before = ahealth
+			--		ahealth = min(floor(100 * UnitHealth(u)/UnitHealthMax(u)), 100)
+			--		aftexthp:SetFormattedText("|cff%s%d%%|r", (ahealth < ahealth_before and "ff2222") or "dddddd", ahealth)
+			--		acarrier = u
+			--		aftext.unit = u
+			--		return ahealth
+			--	elseif aftext.unit == faction then
+			--		aftext:SetText("")
+			--		aftexthp:SetText("")
+			--		acarrier, aclass, af.car = "", "", nil
+			--	elseif hftext.unit == faction then
+			--		hftext:SetText("")
+			--		hftexthp:SetText("")
+			--		hcarrier, hclass, hf.car = "", "", nil
+			--	end
+			--	mod:CheckCombat(SetWSGCarrierAttribute)
+			--end
+			--local function CarrierOnClick() -- sends basic carrier info to battleground chat
+            --
+			--end
+			--local function CreateWSGFrame() -- create all frames
+			--	local function CreateCarrierFrame(faction) -- create carriers' frames
+			--		local b = self:CreateCarrierButton("CappingTarget"..faction, CarrierOnClick)
+			--		local text = self:CreateText(b, 14, "LEFT", b, 29, 0, b, 0, 0)
+			--		local texthp = self:CreateText(b, 10, "RIGHT", b, -4, 0, b, 28 - b:GetWidth(), 0)
+			--		b.faction = (faction == "Alliance" and _G.FACTION_ALLIANCE) or _G.FACTION_HORDE
+			--		b.text = text
+			--		self:AddFrameToHide(b)
+			--		return b, text, texthp
+			--	end
+			--	af, aftext, aftexthp = CreateCarrierFrame("Alliance")
+			--	hf, hftext, hftexthp = CreateCarrierFrame("Horde")
+            --
+			--	af:SetScript("OnUpdate", function(_, a1)
+			--		elap = elap + a1
+			--		if elap > 0.25 then -- health check and display
+			--			elap, togunit = 0, not togunit
+			--			if togunit then
+			--				if UnitExists("arena1") then
+			--					local faction = UnitFactionGroup("arena1")
+			--					local name = GetUnitName("arena1", true)
+			--					local health = UnitHealth("arena1")
+			--					local _, class = UnitClass("arena1")
+			--					SetCarrier(faction, name, class, "arena1")
+			--				else
+			--					SetCarrier("arena1")
+			--				end
+			--			else
+			--				if UnitExists("arena2") then
+			--					local faction = UnitFactionGroup("arena2")
+			--					local name = GetUnitName("arena2", true)
+			--					local health = UnitHealth("arena2")
+			--					local _, class = UnitClass("arena2")
+			--					SetCarrier(faction, name, class, "arena2")
+			--				else
+			--					SetCarrier("arena2")
+			--				end
+			--			end
+			--		end
+			--	end)
+			--	CreateCarrierFrame, CreateWSGFrame = nil, nil
+			--end
 			self.WSGBulk = function() -- stuff to do at the beginning of every wsg, but after combat
-				af:Show()
-				hf:Show()
-				SetCarrier()
+				--af:Show()
+				--hf:Show()
+				--SetCarrier()
 
+				prevtime = nil
 				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "WSGFlagCarrier")
 				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "WSGFlagCarrier")
 				self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "WSGEnd")
-				prevtime = nil
+				
 				self:WSGEnd()
 			end
 			--------------------------------------------
 			function mod:WSGFlagCarrier(a1) -- carrier detection and setup
 			--------------------------------------------
 				if strmatch(a1, L["captured the"]) then -- flag was captured, reset all carriers
-					SetCarrier()
+					--SetCarrier()
 					self:StartBar(L["Flag respawns"], 12, GetIconData(45), "colorOther") -- White flag
 				end
 			end
@@ -760,12 +761,12 @@ do
 				end
 			end
 
-			playerfaction = UnitFactionGroup("player")
-			wsgicon = strlower(playerfaction)
-			self:CheckCombat(CreateWSGFrame)
+			--playerfaction = UnitFactionGroup("player")
+			--wsgicon = strlower(playerfaction)
+			--self:CheckCombat(CreateWSGFrame)
 		end
 
-		self:CheckCombat(self.WSGBulk)
+		self:WSGBulk()
 	end
 	mod:AddBG(489, WarsongGulch)
 	mod:AddBG(726, WarsongGulch) -- Twin Peaks
