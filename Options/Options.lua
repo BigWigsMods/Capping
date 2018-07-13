@@ -21,10 +21,6 @@ local function updateFlags()
 	return flags
 end
 
-local function disabled()
-	return cap.db.mode == 2
-end
-
 local acOptions = {
 	type = "group",
 	name = "Capping",
@@ -35,6 +31,15 @@ local acOptions = {
 		cap.db[info[#info]] = value
 	end,
 	args = {
+		test = {
+			type = "execute",
+			name = "TEST", -- XXX
+			order = 0.1,
+			width = "full",
+			func = function()
+				cap:Test()
+			end,
+		},
 		lock = {
 			type = "toggle",
 			name = L.lock,
@@ -51,7 +56,6 @@ local acOptions = {
 					cap.header:Show()
 				end
 			end,
-			disabled = disabled,
 		},
 		icon = {
 			type = "toggle",
@@ -60,10 +64,14 @@ local acOptions = {
 			set = function(info, value)
 				cap.db.icon = value
 				for bar in next, cap.bars do
-					bar:SetIcon(value and 236292) -- Interface\\Icons\\Ability_Warlock_DemonicEmpowerment
+					if value then
+						bar:SetIcon(bar:Get("capping:iconoptionrestore") or 236396) -- Interface/Icons/Achievement_BG_winWSG
+					else
+						bar:Set("capping:iconoptionrestore", bar:GetIcon())
+						bar:SetIcon(nil)
+					end
 				end
 			end,
-			disabled = disabled,
 		},
 		timeText = {
 			type = "toggle",
@@ -75,7 +83,6 @@ local acOptions = {
 					bar:SetTimeVisibility(value)
 				end
 			end,
-			disabled = disabled,
 		},
 		fill = {
 			type = "toggle",
@@ -87,7 +94,6 @@ local acOptions = {
 					bar:SetFill(value)
 				end
 			end,
-			disabled = disabled,
 		},
 		font = {
 			type = "select",
@@ -109,7 +115,6 @@ local acOptions = {
 					bar.candyBarDuration:SetFont(media:Fetch("font", font), cap.db.fontSize, updateFlags())
 				end
 			end,
-			disabled = disabled,
 		},
 		fontSize = {
 			type = "range",
@@ -125,7 +130,6 @@ local acOptions = {
 					bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.font), value, updateFlags())
 				end
 			end,
-			disabled = disabled,
 		},
 		monochrome = {
 			type = "toggle",
@@ -138,7 +142,6 @@ local acOptions = {
 					bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.font), cap.db.fontSize, updateFlags())
 				end
 			end,
-			disabled = disabled,
 		},
 		outline = {
 			type = "select",
@@ -156,7 +159,6 @@ local acOptions = {
 					bar.candyBarDuration:SetFont(media:Fetch("font", cap.db.font), cap.db.fontSize, updateFlags())
 				end
 			end,
-			disabled = disabled,
 		},
 		barTexture = {
 			type = "select",
@@ -178,7 +180,6 @@ local acOptions = {
 					bar:SetTexture(media:Fetch("statusbar", texture))
 				end
 			end,
-			disabled = disabled,
 		},
 		width = {
 			type = "range",
@@ -193,7 +194,6 @@ local acOptions = {
 					bar:SetWidth(value)
 				end
 			end,
-			disabled = disabled,
 		},
 		height = {
 			type = "range",
@@ -208,7 +208,6 @@ local acOptions = {
 					bar:SetHeight(value)
 				end
 			end,
-			disabled = disabled,
 		},
 		alignIcon = {
 			type = "select",
@@ -224,7 +223,7 @@ local acOptions = {
 					bar:SetIconPosition(value)
 				end
 			end,
-			disabled = function() return disabled() or not cap.db.icon end,
+			disabled = function() return not cap.db.icon end,
 		},
 		spacing = {
 			type = "range",
@@ -237,7 +236,6 @@ local acOptions = {
 				cap.db.spacing = value
 				cap.RearrangeBars()
 			end,
-			disabled = disabled,
 		},
 		alignText = {
 			type = "select",
@@ -254,7 +252,6 @@ local acOptions = {
 					bar.candyBarLabel:SetJustifyH(value)
 				end
 			end,
-			disabled = disabled,
 		},
 		alignTime = {
 			type = "select",
@@ -271,7 +268,6 @@ local acOptions = {
 					bar.candyBarDuration:SetJustifyH(value)
 				end
 			end,
-			disabled = disabled,
 		},
 		growUp = {
 			type = "toggle",
@@ -281,7 +277,6 @@ local acOptions = {
 				cap.db.growUp = value
 				cap.RearrangeBars()
 			end,
-			disabled = disabled,
 		},
 		colorText = {
 			name = L.textColor,
@@ -297,62 +292,74 @@ local acOptions = {
 					bar:SetTextColor(r, g, b, a)
 				end
 			end,
-			disabled = disabled,
 		},
-		colorComplete = {
-			name = L.completedBar,
+		colorAlliance = {
+			name = "Alliance", -- XXX
 			type = "color",
 			hasAlpha = true,
 			order = 18,
 			get = function()
-				return unpack(cap.db.colorComplete)
+				return unpack(cap.db.colorAlliance)
 			end,
 			set = function(info, r, g, b, a)
-				cap.db.colorComplete = {r, g, b, a}
+				cap.db.colorAlliance = {r, g, b, a}
 				for bar in next, cap.bars do
-					if bar:Get("LegionInvasionTimer:complete") == 1 then
+					if bar:Get("capping:colorid") == "colorAlliance" then
 						bar:SetColor(r, g, b, a)
 					end
 				end
 			end,
-			disabled = disabled,
 		},
-		colorIncomplete = {
-			name = L.incompleteBar,
+		colorHorde = {
+			name = "Horde", -- XXX
 			type = "color",
 			hasAlpha = true,
 			order = 19,
 			get = function()
-				return unpack(cap.db.colorIncomplete)
+				return unpack(cap.db.colorHorde)
 			end,
 			set = function(info, r, g, b, a)
-				cap.db.colorIncomplete = {r, g, b, a}
+				cap.db.colorHorde = {r, g, b, a}
 				for bar in next, cap.bars do
-					if bar:Get("LegionInvasionTimer:complete") == 0 then
+					if bar:Get("capping:colorid") == "colorHorde" then
 						bar:SetColor(r, g, b, a)
 					end
 				end
 			end,
-			disabled = disabled,
 		},
-		colorNext = {
-			name = L.nextBar,
+		colorQueueWait = {
+			name = "Queue", -- XXX
 			type = "color",
 			hasAlpha = true,
 			order = 20,
 			get = function()
-				return unpack(cap.db.colorNext)
+				return unpack(cap.db.colorQueueWait)
 			end,
 			set = function(info, r, g, b, a)
-				cap.db.colorNext = {r, g, b, a}
+				cap.db.colorQueueWait = {r, g, b, a}
 				for bar in next, cap.bars do
-					local tag = bar:Get("LegionInvasionTimer:complete")
-					if tag ~= 0 and tag ~= 1 then
+					if bar:Get("capping:colorid") == "colorQueueWait" then
 						bar:SetColor(r, g, b, a)
 					end
 				end
 			end,
-			disabled = disabled,
+		},
+		colorQueueReady = {
+			name = "Queue Ready", -- XXX
+			type = "color",
+			hasAlpha = true,
+			order = 20.1,
+			get = function()
+				return unpack(cap.db.colorQueueReady)
+			end,
+			set = function(info, r, g, b, a)
+				cap.db.colorQueueReady = {r, g, b, a}
+				for bar in next, cap.bars do
+					if bar:Get("capping:colorid") == "colorQueueReady" then
+						bar:SetColor(r, g, b, a)
+					end
+				end
+			end,
 		},
 		colorBarBackground = {
 			name = L.barBackground,
@@ -370,7 +377,6 @@ local acOptions = {
 					end
 				end
 			end,
-			disabled = disabled,
 		},
 		--tooltipHeader = {
 		--	type = "header",
