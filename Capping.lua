@@ -34,26 +34,10 @@ do
 	end)
 end
 
-
-
--- GLOBALS MADE LOCAL
-local _G = getfenv(0)
 local format, type = format, type
-local min, floor, math_sin, math_pi, tonumber = min, floor, math.sin, math.pi, tonumber
-local GetTime, time = GetTime, time
+local db
 
--- LOCAL VARS
-local db, wasInBG, bgmap, bgtab
-
-
-function mod:RegisterEvent(event)
-	frame:RegisterEvent(event)
-end
-function mod:UnregisterEvent(event)
-	frame:UnregisterEvent(event)
-end
-
--- EVENT HANDLERS
+-- Event Handlers
 local elist = {}
 frame:SetScript("OnEvent", function(_, event, ...)
 	mod[elist[event] or event](mod, ...)
@@ -61,6 +45,12 @@ end)
 function mod:RegisterTempEvent(event, other)
 	frame:RegisterEvent(event)
 	elist[event] = other or event
+end
+function mod:RegisterEvent(event)
+	frame:RegisterEvent(event)
+end
+function mod:UnregisterEvent(event)
+	frame:UnregisterEvent(event)
 end
 
 function mod:START_TIMER(timerType, timeSeconds, totalTime)
@@ -75,15 +65,13 @@ function mod:START_TIMER(timerType, timeSeconds, totalTime)
 		if faction and faction ~= "Neutral" then
 			local bar = self:GetBar(L["Battle Begins"])
 			if not bar or timeSeconds > bar.remaining+3 or timeSeconds < bar.remaining-3 then -- Don't restart bars for subtle changes +/- 3s
-				mod:StartBar(L["Battle Begins"], timeSeconds, "Interface\\Timer\\"..faction.."-Logo", "info2")
+				-- 516953 = Interface/Timer/Horde-Logo || 516949 = Interface/Timer/Alliance-Logo
+				mod:StartBar(L["Battle Begins"], timeSeconds, faction == "Horde" and 516953 or 516949, "colorOther")
 			end
 		end
 	end
 end
-mod:RegisterEvent("START_TIMER")
 
-
-mod:RegisterEvent("PLAYER_LOGIN")
 function mod:PLAYER_LOGIN()
 	-- saved variables database setup
 	if type(CappingSettingsTmp) ~= "table" then
@@ -104,13 +92,13 @@ function mod:PLAYER_LOGIN()
 			colorText = {1,1,1,1},
 			colorAlliance = {0,0,1,1},
 			colorHorde = {1,0,0,1},
-			colorQueueWait = {0.6,0.6,0.6,1},
-			colorQueueReady = {1,1,0,1},
+			colorQueue = {0.6,0.6,0.6,1},
+			colorOther = {1,1,0,1},
 			colorBarBackground = {0,0,0,0.75},
 		}
 	end
-	CappingFrame.db = CappingSettingsTmp
-	db = CappingSettingsTmp
+	db = CappingSettingsTmp2
+	CappingFrame.db = db
 
 	local bg = frame:CreateTexture(nil, "PARENT")
 	bg:SetAllPoints(frame)
@@ -129,8 +117,10 @@ function mod:PLAYER_LOGIN()
 
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
+	self:RegisterEvent("START_TIMER")
 	self:ZONE_CHANGED_NEW_AREA()
 end
+mod:RegisterEvent("PLAYER_LOGIN")
 
 do
 	local zoneIds = {}
@@ -138,6 +128,7 @@ do
 		zoneIds[id] = func
 	end
 
+	local wasInBG = false
 	local GetBestMapForUnit = C_Map and C_Map.GetBestMapForUnit -- XXX 8.0
 	function mod:ZONE_CHANGED_NEW_AREA()
 		if wasInBG then
@@ -167,7 +158,7 @@ do
 				wasInBG = true
 				func(self)
 			else
-				print(("Capping found a new id '%d' at '%s' tell us on GitHub."):format(id, GetRealZoneText(id)))
+				print(format("Capping found a new id '%d' at '%s' tell us on GitHub.", id, GetRealZoneText(id)))
 			end
 		else
 			local id
@@ -212,18 +203,18 @@ do -- estimated wait timer and port timer
 
 		local status, map, _, _, _, size = GetBattlefieldStatus(queueId)
 		if size == "ARENASKIRMISH" then
-			map = ("%s (%d)"):format(ARENA, queueId) -- No size or name distinction given for casual arena 2v2/3v3, separate them manually. Messy :(
+			map = format("%s (%d)", ARENA, queueId) -- No size or name distinction given for casual arena 2v2/3v3, separate them manually. Messy :(
 		end
 
 		if status == "confirm" then -- BG has popped, time until cancelled
 			local bar = self:GetBar(map)
-			if bar and bar:Get("capping:colorid") == "info1" then
+			if bar and bar:Get("capping:colorid") == "colorQueue" then
 				self:StopBar(map)
 				bar = nil
 			end
 
 			if not bar then --and db.port then
-				bar = self:StartBar(map, GetBattlefieldPortExpiration(queueId), "Interface\\Icons\\Ability_TownWatch", "info2", true)
+				bar = self:StartBar(map, GetBattlefieldPortExpiration(queueId), 132327, "colorOther", true) -- 132327 = Interface/Icons/Ability_TownWatch
 				bar:Set("capping:queueid", queueId)
 			end
 		elseif status == "queued" then --and db.wait then -- Waiting for BG to pop
@@ -249,7 +240,7 @@ do -- estimated wait timer and port timer
 							break
 						end
 					end
-					bar = self:StartBar(map, estremain, icon or "Interface\\Icons\\inv_misc_questionmark", "info1", true) -- Question mark icon for random battleground
+					bar = self:StartBar(map, estremain, icon or 134400, "colorQueue", true) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
 					bar:Set("capping:queueid", queueId)
 				end
 			else -- Negative queue (in queue longer than estimated time) or 0 queue (paused)
@@ -262,7 +253,7 @@ do -- estimated wait timer and port timer
 							break
 						end
 					end
-					bar = self:StartBar(map, 1, icon or "Interface\\Icons\\inv_misc_questionmark", "info1", true) -- Question mark icon for random battleground
+					bar = self:StartBar(map, 1, icon or 134400, "colorQueue", true) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
 					bar:Pause()
 					bar.remaining = 1
 					bar:SetTimeVisibility(false)
@@ -287,11 +278,11 @@ end
 
 function mod:Test()
 	-- 236396 = Interface/Icons/Achievement_BG_winWSG
-	mod:StartBar(L["Test"].." - ".._G.OTHER.."1", 100, 236396, "info1")
-	mod:StartBar(L["Test"].." - ".._G.OTHER.."2", 75, 236396, "info2")
-	mod:StartBar(L["Test"].." - ".._G.FACTION_ALLIANCE, 45, 236396, "alliance")
-	mod:StartBar(L["Test"].." - ".._G.FACTION_HORDE, 100, 236396, "horde")
-	mod:StartBar(L["Test"], 75, 236396, "info2")
+	mod:StartBar(L["Test"].." - ".._G.OTHER.."1", 100, 236396, "colorQueue")
+	mod:StartBar(L["Test"].." - ".._G.OTHER.."2", 75, 236396, "colorOther")
+	mod:StartBar(L["Test"].." - ".._G.FACTION_ALLIANCE, 45, 236396, "colorAlliance")
+	mod:StartBar(L["Test"].." - ".._G.FACTION_HORDE, 100, 236396, "colorHorde")
+	mod:StartBar(L["Test"], 75, 236396, "colorOther")
 end
 frame.Test = mod.Test
 
@@ -301,7 +292,7 @@ do
 		local function ReportBar(bar, channel)
 			if not activeBars[bar] then return end
 			local colorid = bar:Get("capping:colorid")
-			local faction = colorid == "horde" and _G.FACTION_HORDE or colorid == "alliance" and _G.FACTION_ALLIANCE or ""
+			local faction = colorid == "colorHorde" and _G.FACTION_HORDE or colorid == "colorAlliance" and _G.FACTION_ALLIANCE or ""
 			local timeLeft = bar.candyBarDuration:GetText()
 			if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
 			SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
@@ -364,18 +355,12 @@ do
 		frame.RearrangeBars = RearrangeBars
 	end
 
-	local tmpTblC = {
-		info1 = "colorQueueWait",
-		info2 = "colorQueueReady",
-		alliance = "colorAlliance",
-		horde = "colorHorde",
-	}
 	function mod:StartBar(name, remaining, icon, colorid, priority)
 		self:StopBar(name)
 		local bar = candy:New(media:Fetch("statusbar", db.texture), db.width, db.height)
 		activeBars[bar] = true
 
-		bar:Set("capping:colorid", tmpTblC[colorid])
+		bar:Set("capping:colorid", colorid)
 		if priority then
 			bar:Set("capping:priority", priority)
 		end
@@ -385,7 +370,7 @@ do
 		bar.candyBarLabel:SetJustifyH(db.alignText)
 		bar.candyBarDuration:SetJustifyH(db.alignTime)
 		bar:SetDuration(remaining)
-		bar:SetColor(unpack(db[tmpTblC[colorid]]))
+		bar:SetColor(unpack(db[colorid]))
 		bar.candyBarBackground:SetVertexColor(unpack(db.colorBarBackground))
 		bar:SetTextColor(unpack(db.colorText))
 		if db.icon then

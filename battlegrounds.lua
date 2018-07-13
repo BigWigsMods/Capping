@@ -1,13 +1,12 @@
 
-local addonName, Capping = ...
+local addonName, mod = ...
 
-local L = Capping.L
+local L = mod.L
 local _G = getfenv(0)
 
-local pname
 local floor = math.floor
 local strmatch, strlower, pairs, format, tonumber = strmatch, strlower, pairs, format, tonumber
-local UnitIsEnemy, UnitName, GetTime, SendAddonMessage = UnitIsEnemy, UnitName, GetTime, SendAddonMessage
+local UnitIsEnemy, UnitName, GetTime = UnitIsEnemy, UnitName, GetTime
 local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager and C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo -- XXX 8.0
 local assaulted, claimed, defended, taken = L["has assaulted"], L["claims the"], L["has defended the"], L["has taken the"]
 local GetNumGroupMembers = GetNumGroupMembers
@@ -132,18 +131,18 @@ do -- POI handling
 				local _, name, _, icon = GetMapLandmarkInfo(i)
 				landmarkCache[name] = icon
 			end
-			Capping:RegisterTempEvent("WORLD_MAP_UPDATE")
+			mod:RegisterTempEvent("WORLD_MAP_UPDATE")
 		else
 			local pois = GetAreaPOIForMap(uiMapID)
 			for i = 1, #pois do
 				local tbl = GetAreaPOIInfo(uiMapID, pois[i])
 				landmarkCache[tbl.name] = tbl.textureIndex
 			end
-			Capping:RegisterTempEvent("AREA_POIS_UPDATED")
+			mod:RegisterTempEvent("AREA_POIS_UPDATED")
 		end
 	end
 	-----------------------------------
-	function Capping:WORLD_MAP_UPDATE() -- XXX 8.0 remove me
+	function mod:WORLD_MAP_UPDATE() -- XXX 8.0 remove me
 	-----------------------------------
 		for i = 1, GetNumMapLandmarks() do
 			local _, name, _, icon = GetMapLandmarkInfo(i)
@@ -157,11 +156,11 @@ do -- POI handling
 				else
 					self:StopBar(name)
 					if icon == 136 or icon == 138 then -- Workshop in IoC
-						self:StartBar((GetSpellInfo(56661)), 181, 252187, icon == 136 and "alliance" or "horde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+						self:StartBar((GetSpellInfo(56661)), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
 					elseif icon == 2 or icon == 3 then
 						local _, _, _, id = UnitPosition("player")
 						if id == 30 then -- Alterac Valley
-							local bar = self:StartBar(name, 3600, GetIconData(icon), icon == 3 and "alliance" or "horde") -- Paused bar for mine status
+							local bar = self:StartBar(name, 3600, GetIconData(icon), icon == 3 and "colorAlliance" or "colorHorde") -- Paused bar for mine status
 							bar:Pause()
 							bar:SetTimeVisibility(false)
 						end
@@ -171,7 +170,7 @@ do -- POI handling
 		end
 	end
 	-----------------------------------
-	function Capping:AREA_POIS_UPDATED()
+	function mod:AREA_POIS_UPDATED()
 	-----------------------------------
 		local pois = GetAreaPOIForMap(curMapID)
 		for i = 1, #pois do
@@ -187,11 +186,11 @@ do -- POI handling
 				else
 					self:StopBar(name)
 					if icon == 136 or icon == 138 then -- Workshop in IoC
-						self:StartBar((GetSpellInfo(56661)), 181, 252187, icon == 136 and "alliance" or "horde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+						self:StartBar((GetSpellInfo(56661)), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
 					elseif icon == 2 or icon == 3 then
 						local _, _, _, id = UnitPosition("player")
 						if id == 30 then -- Alterac Valley
-							local bar = self:StartBar(name, 3600, GetIconData(icon), icon == 3 and "alliance" or "horde") -- Paused bar for mine status
+							local bar = self:StartBar(name, 3600, GetIconData(icon), icon == 3 and "colorAlliance" or "colorHorde") -- Paused bar for mine status
 							bar:Pause()
 							bar:SetTimeVisibility(false)
 						end
@@ -200,32 +199,29 @@ do -- POI handling
 			end
 		end
 	end
-	function Capping:TestNode()
-		self:StartBar("Test", 20, GetIconData(7), random(1,2) == 1 and "alliance" or "horde") -- 7 = flag icon
-	end
 end
 
 -----------------------------------------------------------
-function Capping:CreateCarrierButton(name, postclick) -- create common secure button
+function mod:CreateCarrierButton(name, postclick) -- create common secure button
 -----------------------------------------------------------
-	self.CarrierOnEnter = self.CarrierOnEnter or function(this)
-		if not this.car then return end
-		local c = self.db.colors[strlower(this.faction)] or self.db.colors.info1
-		this:SetBackdropColor(c.r, c.g, c.b, 0.4)
-	end
-	self.CarrierOnLeave = self.CarrierOnLeave or function(this)
-		this:SetBackdropColor(0, 0, 0, 0)
-	end
-	local b = CreateFrame("Button", name, UIParent, "SecureUnitButtonTemplate")
-	b:SetWidth(200)
-	b:SetHeight(20)
-	b:RegisterForClicks("AnyUp")
-	b:SetBackdrop(self.backdrop)
-	b:SetBackdropColor(0, 0, 0, 0)
-	b:SetScript("PostClick", postclick)
-	b:SetScript("OnEnter", self.CarrierOnEnter)
-	b:SetScript("OnLeave", self.CarrierOnLeave)
-	return b
+	--self.CarrierOnEnter = self.CarrierOnEnter or function(this)
+	--	if not this.car then return end
+	--	local c = self.db.colors[strlower(this.faction)] or self.db.colors.info1
+	--	this:SetBackdropColor(c.r, c.g, c.b, 0.4)
+	--end
+	--self.CarrierOnLeave = self.CarrierOnLeave or function(this)
+	--	this:SetBackdropColor(0, 0, 0, 0)
+	--end
+	--local b = CreateFrame("Button", name, UIParent, "SecureUnitButtonTemplate")
+	--b:SetWidth(200)
+	--b:SetHeight(20)
+	--b:RegisterForClicks("AnyUp")
+	--b:SetBackdrop(self.backdrop)
+	--b:SetBackdropColor(0, 0, 0, 0)
+	--b:SetScript("PostClick", postclick)
+	--b:SetScript("OnEnter", self.CarrierOnEnter)
+	--b:SetScript("OnLeave", self.CarrierOnLeave)
+	--return b
 end
 
 -- initialize or update a final score estimation bar (AB and EotS uses this)
@@ -238,7 +234,7 @@ do
 		allianceWidget, hordeWidget = aW, hW
 		ppsTable = pointsPerSecond
 		if GetWorldStateUIInfo then -- XXX 8.0
-			if not Capping.UPDATE_WORLD_STATES then
+			if not mod.UPDATE_WORLD_STATES then
 				local f2 = L["Final: %d - %d"]
 				local lookup = {
 					[1] = { [0] = 0, [1] = 1, [2] = 1.5, [3] = 2, [4] = 3.5, [5] = 30, }, -- ab
@@ -257,7 +253,7 @@ do
 					return (awin and format(f2, maxscore, ltime)) or format(f2, ltime, maxscore)
 				end
 				--------------------------------------
-				function Capping:UPDATE_WORLD_STATES()
+				function mod:UPDATE_WORLD_STATES()
 				--------------------------------------
 					local _, zType = GetInstanceInfo()
 					if zType ~= "pvp" then return end
@@ -294,26 +290,26 @@ do
 						local newText = getlscore(HTime, apps, ascore, MaxScore)
 						if newText ~= prevText then
 							self:StopBar(prevText)
-							self:StartBar(newText, HTime, GetIconData(48), "horde") -- 48 = Horde Insignia
+							self:StartBar(newText, HTime, GetIconData(48), "colorHorde") -- 48 = Horde Insignia
 							prevText = newText
 						end
 					else -- Alliance is winning
 						local newText = getlscore(ATime, hpps, hscore, MaxScore, true)
 						if newText ~= prevText then
 							self:StopBar(prevText)
-							self:StartBar(newText, ATime, GetIconData(46), "alliance") -- 46 = Alliance Insignia
+							self:StartBar(newText, ATime, GetIconData(46), "colorAlliance") -- 46 = Alliance Insignia
 							prevText = newText
 						end
 					end
 				end
 			end
 			currentbg, ascore, atime, abases, hscore, htime, hbases, prevText = bg, 0, 0, 0, 0, 0, 0, ""
-			Capping:RegisterTempEvent("UPDATE_WORLD_STATES")
+			mod:RegisterTempEvent("UPDATE_WORLD_STATES")
 		else
-			if not Capping.UPDATE_UI_WIDGET then
+			if not mod.UPDATE_UI_WIDGET then
 				local f2 = L["Final: %d - %d"]
 				--------------------------------------
-				function Capping:UPDATE_UI_WIDGET(tbl)
+				function mod:UPDATE_UI_WIDGET(tbl)
 				--------------------------------------
 
 					local updateBases = false
@@ -368,20 +364,20 @@ do
 							local score = apps and (ascore + floor(apps * HTime)) or ascore
 							local txt = format(f2, score, MaxScore)
 							self:StopBar(prevText)
-							self:StartBar(txt, HTime, GetIconData(48), "horde") -- 48 = Horde Insignia
+							self:StartBar(txt, HTime, GetIconData(48), "colorHorde") -- 48 = Horde Insignia
 							prevText = txt
 						else -- Alliance is winning
 							local score = hpps and (hscore + floor(hpps * ATime)) or hscore
 							local txt = format(f2, MaxScore, score)
 							self:StopBar(prevText)
-							self:StartBar(txt, ATime, GetIconData(46), "alliance") -- 46 = Alliance Insignia
+							self:StartBar(txt, ATime, GetIconData(46), "colorAlliance") -- 46 = Alliance Insignia
 							prevText = txt
 						end
 					end
 				end
 			end
 			ascore, abases, hscore, hbases, prevText, prevTime = 0, 0, 0, 0, "", 0
-			Capping:RegisterTempEvent("UPDATE_UI_WIDGET")
+			mod:RegisterTempEvent("UPDATE_UI_WIDGET")
 		end
 	end
 end
@@ -394,13 +390,13 @@ do
 		SetupAssault(60, 93)
 		NewEstimator(1, 495, 496, pointsPerSecond) -- BG table, alliance score widget, horde score widget
 	end
-	Capping:AddBG(529, ArathiBasin)
+	mod:AddBG(529, ArathiBasin)
 
 	local function ArathiBasinSnowyPvPBrawl()
 		SetupAssault(60, 837)
 		NewEstimator(2)
 	end
-	Capping:AddBG(1681, ArathiBasinSnowyPvPBrawl)
+	mod:AddBG(1681, ArathiBasinSnowyPvPBrawl)
 end
 
 do
@@ -411,7 +407,7 @@ do
 		SetupAssault(61, 519)
 		NewEstimator(4, 734, 735, pointsPerSecond) -- BG table, alliance score widget, horde score widget
 	end
-	Capping:AddBG(1105, DeepwindGorge)
+	mod:AddBG(1105, DeepwindGorge)
 end
 
 do
@@ -422,116 +418,69 @@ do
 		SetupAssault(60, 275) -- Base cap time, uiMapID
 		NewEstimator(3, 699, 700, pointsPerSecond) -- BG table, alliance score widget, horde score widget
 	end
-	Capping:AddBG(761, TheBattleForGilneas) -- Instance ID
+	mod:AddBG(761, TheBattleForGilneas) -- Instance ID
 end
 
 do
 	------------------------------------------------ Alterac Valley ---------------------------------------------------
 	local function AlteracValley(self)
-		if not self.AVAssaults then
-			pname = pname or UnitName("player")
-
-			function Capping:GOSSIP_SHOW()
-				if self.db.avquest then
-					local target = UnitGUID("target")
-					if target then
-						local _, _, _, _, _, id = strsplit("-", target)
-						local mobId = tonumber(id)
-						if mobId == 13176 or mobId == 13257 then -- Smith Regzar, Murgot Deepforge
-							-- Open Quest to Smith or Murgot
-							if GetGossipOptions() and strmatch(GetGossipOptions(), L["Upgrade to"] ) then
-								SelectGossipOption(1)
-							elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
-								SelectGossipAvailableQuest(1)
-							end
-						elseif mobId == 13617 or mobId == 13616 then -- Stormpike Stable Master, Frostwolf Stable Master
-							if GetGossipOptions() then
-								SelectGossipOption(1)
-							end
-						elseif mobId == 13236 then -- Primalist Thurloga
-							local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
-							if num >= 5 then
-								SelectGossipAvailableQuest(2)
-							elseif num > 0 then
-								SelectGossipAvailableQuest(1)
-							end
-						elseif mobId == 13442 then -- Arch Druid Renferal
-							local num = GetItemCount(17423) -- Storm Crystal 17423
-							if num >= 5 then
-								SelectGossipAvailableQuest(2)
-							elseif num > 0 then
-								SelectGossipAvailableQuest(1)
-							end
-						elseif mobId == 13577 then -- Stormpike Ram Rider Commander
-							if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
-								SelectGossipAvailableQuest(1)
-							end
-						elseif mobId == 13441 then -- Frostwolf Wolf Rider Commander
-							if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
-								SelectGossipAvailableQuest(1)
-							end
-						end
+		function mod:AVTurnIn()
+			local target = UnitGUID("npc")
+			if target then
+				local _, _, _, _, _, id = strsplit("-", target)
+				local mobId = tonumber(id)
+				if mobId == 13176 or mobId == 13257 then -- Smith Regzar, Murgot Deepforge
+					-- Open Quest to Smith or Murgot
+					if GetGossipOptions() and strmatch(GetGossipOptions(), L["Upgrade to"] ) then
+						SelectGossipOption(1)
+					elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
+						SelectGossipAvailableQuest(1)
+					end
+				elseif mobId == 13617 or mobId == 13616 then -- Stormpike Stable Master, Frostwolf Stable Master
+					if GetGossipOptions() then
+						SelectGossipOption(1)
+					end
+				elseif mobId == 13236 then -- Primalist Thurloga
+					local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
+					if num >= 5 then
+						SelectGossipAvailableQuest(2)
+					elseif num > 0 then
+						SelectGossipAvailableQuest(1)
+					end
+				elseif mobId == 13442 then -- Arch Druid Renferal
+					local num = GetItemCount(17423) -- Storm Crystal 17423
+					if num >= 5 then
+						SelectGossipAvailableQuest(2)
+					elseif num > 0 then
+						SelectGossipAvailableQuest(1)
+					end
+				elseif mobId == 13577 then -- Stormpike Ram Rider Commander
+					if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
+						SelectGossipAvailableQuest(1)
+					end
+				elseif mobId == 13441 then -- Frostwolf Wolf Rider Commander
+					if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
+						SelectGossipAvailableQuest(1)
 					end
 				end
 			end
-			function Capping:QUEST_PROGRESS()
-				if self.db.avquest then
-					self:GOSSIP_SHOW()
-					if IsQuestCompletable() then
-						CompleteQuest()
-					end
-				end
+		end
+		function mod:AVTurnInProgress()
+			self:AVTurnIn()
+			if IsQuestCompletable() then
+				CompleteQuest()
 			end
-			function Capping:QUEST_COMPLETE()
-				if self.db.avquest then
-					GetQuestReward(0)
-				end
-			end
-
-			------------------------------------------------------
-			--function Capping:AVSync(prefix, message, chan, sender)
-			------------------------------------------------------
-			--	if prefix ~= "cap" or sender == pname then return end
-			--	if message == "r" then
-			--		for value, color in pairs(Capping.activebars) do
-			--			local f = Capping:GetBar(value)
-			--			if f and f:IsShown() then
-			--				SendAddonMessage("cap", format("%s@%d@%d@%s", value, f.duration, f.duration - f.remaining, color), "WHISPER", sender)
-			--			end
-			--		end
-			--	else
-			--		local name, duration, elapsed, color = strmatch(message, "^(.+)@(%d+)@(%d+)@(%a+)$")
-			--		local f = self:GetBar(name)
-			--		if name and elapsed and (not f or not f:IsShown()) then
-			--			local icon
-			--			if name == L["Ivus begins moving"] then
-			--				icon = "Interface\\Icons\\Spell_Nature_NaturesBlessing"
-			--			elseif name == L["Lokholar begins moving"] then
-			--				icon = "Interface\\Icons\\Spell_Frost_Glacier"
-			--			else
-			--				icon = GetIconData(color, strmatch(nodestates[name] or "symbol0", "(%a+)(%d+)") or "symbol")
-			--			end
-			--			duration = tonumber(duration) or 245
-			--			self:StartBar(name, duration - (tonumber(elapsed) or 245), icon, color or "info2")
-			--		end
-			--	end
-			--end
-			---------------------------
-			--function Capping:SyncAV()
-			---------------------------
-			--	SendAddonMessage("cap", "r", "INSTANCE_CHAT")
-			--end
+		end
+		function mod:AVTurnInComplete()
+			GetQuestReward(0)
 		end
 
 		SetupAssault(242, 91)
-		self:RegisterTempEvent("GOSSIP_SHOW")
-		self:RegisterTempEvent("QUEST_PROGRESS")
-		self:RegisterTempEvent("QUEST_COMPLETE")
-
-		--self:RegisterTempEvent("CHAT_MSG_ADDON", "AVSync")
-		--self:SyncAV()
+		self:RegisterTempEvent("GOSSIP_SHOW", "AVTurnIn")
+		self:RegisterTempEvent("QUEST_PROGRESS", "AVTurnInProgress")
+		self:RegisterTempEvent("QUEST_COMPLETE", "AVTurnInComplete")
 	end
-	Capping:AddBG(30, AlteracValley)
+	mod:AddBG(30, AlteracValley)
 end
 
 do
@@ -559,7 +508,7 @@ do
 				eftext:SetText("")
 				eficon:Hide()
 				if captured then
-					self:StartBar(L["Flag respawns"], 21, GetIconData(45), "info2") -- 45 = White flag
+					self:StartBar(L["Flag respawns"], 21, GetIconData(45), "colorOther") -- 45 = White flag
 				end
 				self:CheckCombat(SetEotSCarrierAttribute)
 			end
@@ -589,10 +538,10 @@ do
 					ResetCarrier(true)
 				end
 			end
-			function Capping:HFlagUpdate(msg, _, _, _, name)
+			function mod:HFlagUpdate(msg, _, _, _, name)
 				EotSFlag(msg, 0, name)
 			end
-			function Capping:AFlagUpdate(msg, _, _, _, name)
+			function mod:AFlagUpdate(msg, _, _, _, name)
 				EotSFlag(msg, 1, name)
 			end
 			-- EotS PvP Brawl: Gravity Lapse
@@ -610,19 +559,19 @@ do
 				if id == 566 then -- Check the game isn't over
 					local name = GetSpellInfo(44224) -- Gravity Lapse
 					local icon = GetSpellTexture(44224)
-					self:StartBar(name, 55, icon, "info2")
+					self:StartBar(name, 55, icon, "colorOther")
 					ticker1 = C_Timer.NewTicker(55, StartNextGravTimer, 1) -- Compensate for being dead (you don't get the message)
 					ticker2 = C_Timer.NewTicker(50, PrintExtraMessage, 1)
 				end
 			end
-			function Capping:CheckForGravity(msg)
+			function mod:CheckForGravity(msg)
 				if msg:find("15", nil, true) then
 					if not extraMsg then
 						extraMsg = msg:gsub("1", "")
 					end
 					local name = GetSpellInfo(44224) -- Gravity Lapse
 					local icon = GetSpellTexture(44224)
-					self:StartBar(name, 15, icon, "info2")
+					self:StartBar(name, 15, icon, "colorOther")
 					C_Timer.After(15, StartNextGravTimer)
 					C_Timer.After(10, PrintExtraMessage)
 					if ticker1 then
@@ -654,7 +603,7 @@ do
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AFlagUpdate")
 		self:RegisterTempEvent("RAID_BOSS_WHISPER", "CheckForGravity")
 	end
-	Capping:AddBG(566, EyeOfTheStorm)
+	mod:AddBG(566, EyeOfTheStorm)
 end
 
 do
@@ -662,7 +611,7 @@ do
 	local function IsleOfConquest()
 		SetupAssault(61, 169)
 	end
-	Capping:AddBG(628, IsleOfConquest)
+	mod:AddBG(628, IsleOfConquest)
 end
 
 do
@@ -725,7 +674,7 @@ do
 					hftexthp:SetText("")
 					hcarrier, hclass, hf.car = "", "", nil
 				end
-				Capping:CheckCombat(SetWSGCarrierAttribute)
+				mod:CheckCombat(SetWSGCarrierAttribute)
 			end
 			local function CarrierOnClick() -- sends basic carrier info to battleground chat
 
@@ -784,15 +733,15 @@ do
 				self:WSGEnd()
 			end
 			--------------------------------------------
-			function Capping:WSGFlagCarrier(a1) -- carrier detection and setup
+			function mod:WSGFlagCarrier(a1) -- carrier detection and setup
 			--------------------------------------------
 				if strmatch(a1, L["captured the"]) then -- flag was captured, reset all carriers
 					SetCarrier()
-					self:StartBar(L["Flag respawns"], 12, GetIconData(45), "info2") -- White flag
+					self:StartBar(L["Flag respawns"], 12, GetIconData(45), "colorOther") -- White flag
 				end
 			end
 			-------------------------
-			function Capping:WSGEnd() -- timer for last 5 minutes of WSG
+			function mod:WSGEnd() -- timer for last 5 minutes of WSG
 			-------------------------
 				local _, _, _, timeString = GetWorldStateUIInfo(4)
 				if timeString then
@@ -804,7 +753,7 @@ do
 						local text = gsub(_G.TIME_REMAINING, ":", "")
 						local bar = self:GetBar(text)
 						if remaining > 3 and remaining < 600 and (not bar or bar.remaining > remaining+5 or bar.remaining < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
-							self:StartBar(text, remaining, "Interface\\Icons\\INV_Misc_Rune_07", "info2")
+							self:StartBar(text, remaining, 134420, "colorOther") -- Interface/Icons/INV_Misc_Rune_07
 						end
 						prevtime = remaining
 					end
@@ -818,8 +767,8 @@ do
 
 		self:CheckCombat(self.WSGBulk)
 	end
-	Capping:AddBG(489, WarsongGulch)
-	Capping:AddBG(726, WarsongGulch) -- Twin Peaks
+	mod:AddBG(489, WarsongGulch)
+	mod:AddBG(726, WarsongGulch) -- Twin Peaks
 end
 
 do
@@ -849,7 +798,7 @@ do
 					destroyed[k + 2] = true
 					all[k], all[k + 1], all[k + 2] = true, true, true
 				end
-				function Capping:WinterAssault() -- scans POI landmarks for changes in wall textures
+				function mod:WinterAssault() -- scans POI landmarks for changes in wall textures
 					for i = 1, GetNumMapLandmarks() do
 						local _, name, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
 						local ti = walls[poiID]
@@ -893,7 +842,7 @@ do
 					destroyed[k + 2] = true
 					all[k], all[k + 1], all[k + 2] = true, true, true
 				end
-				function Capping:WinterAssault() -- scans POI landmarks for changes in wall textures
+				function mod:WinterAssault() -- scans POI landmarks for changes in wall textures
 					local pois = GetAreaPOIForMap(123) -- Wintergrasp
 					for i = 1, #pois do
 						local POI = pois[i]
@@ -924,9 +873,9 @@ do
 		end
 	end
 	if not GetAreaPOIForMap then -- XXX 8.0
-		Capping:AddBG(-501, Wintergrasp) -- map id
+		mod:AddBG(-501, Wintergrasp) -- map id
 	else
-		Capping:AddBG(-123, Wintergrasp) -- map id
+		mod:AddBG(-123, Wintergrasp) -- map id
 	end
 end
 
@@ -934,30 +883,29 @@ do
 	------------------------------------------------ Ashran ------------------------------------------
 	local function Ashran(self)
 		if not self.AshranControl then
-			function Capping:AshranControl(msg)
+			function mod:AshranControl(msg)
 				--print(msg, ...)
 				--Ashran Herald yells: The Horde controls the Market Graveyard for 15 minutes!
 				local faction, point, timeString = strmatch(msg, "The (.+) controls the (.+) for (%d+) minutes!")
 				local timeLeft = tonumber(timeString)
-				faction = faction == "Horde" and "horde" or "alliance"
 				if faction and point and timeLeft then
-					self:StartBar(point, timeLeft*60, GetIconData(faction == "horde" and 14 or 4), faction)
+					self:StartBar(point, timeLeft*60, GetIconData(faction == "Horde" and 14 or 4), faction == "Horde" and "colorHorde" or "colorAlliance")
 				end
 			end
 		end
 		if not self.AshranEvents then
-			function Capping:AshranEvents(msg)
+			function mod:AshranEvents(msg)
 				local idString = strmatch(msg, "spell:(%d+)")
 				local id = tonumber(idString)
 				--print(msg:gsub("|", "||"), ...)
 				if id and id ~= 168506 then -- 168506 = Ancient Artifact
 					local name, _, icon = GetSpellInfo(id)
-					self:StartBar(name, 180, icon, "info2")
+					self:StartBar(name, 180, icon, "colorOther")
 				end
 			end
 		end
 		if not self.AshranTimeLeft then
-			function Capping:AshranTimeLeft()
+			function mod:AshranTimeLeft()
 				local _, _, _, timeString = GetWorldStateUIInfo(12)
 				if timeString then
 					local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
@@ -969,7 +917,7 @@ do
 							local text = _G.NEXT_BATTLE_LABEL
 							local bar = self:GetBar(text)
 							if not bar or remaining > bar.remaining+5 or remaining < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
-								self:StartBar(text, remaining, "Interface\\Icons\\achievement_zone_ashran", "info2")
+								self:StartBar(text, remaining, 1031537, "colorOther") -- Interface/Icons/Achievement_Zone_Ashran
 							end
 						end
 					end
@@ -981,7 +929,7 @@ do
 		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "AshranTimeLeft")
 	end
 	if GetWorldStateUIInfo then -- XXX 8.0
-		Capping:AddBG(-978, Ashran) -- map id
+		mod:AddBG(-978, Ashran) -- map id
 	end
 end
 
@@ -990,7 +938,7 @@ do
 	local function Arena(self)
 		if GetNumWorldStateUI then -- XXX 8.0
 			if not self.ArenaTimers then
-				function Capping:ArenaTimers()
+				function mod:ArenaTimers()
 					for i = 1, GetNumWorldStateUI() do -- Not always at the same location, so check them all
 						local _, state, _, timeString = GetWorldStateUIInfo(i)
 						if state > 0 and timeString then -- Skip hidden states and states without text
@@ -1002,9 +950,9 @@ do
 								if remaining > 4 then
 									self:UnregisterEvent("WORLD_STATE_UI_TIMER_UPDATE")
 									local spell, _, icon = GetSpellInfo(34709)
-									self:StartBar(spell, 93, icon, "info2")
+									self:StartBar(spell, 93, icon, "colorOther")
 									local text = gsub(_G.TIME_REMAINING, ":", "")
-									self:StartBar(text, remaining, nil, "info2")
+									self:StartBar(text, remaining, nil, "colorOther")
 								end
 							end
 						end
@@ -1021,7 +969,7 @@ do
 		-- WORLD_STATE_UI_TIMER_UPDATE The first event fired with a valid remaining time (the current chosen method)
 		else
 			if not self.ArenaTimers then
-				function Capping:ArenaTimers(tbl)
+				function mod:ArenaTimers(tbl)
 					if tbl.widgetSetID == 1 and tbl.widgetType == 0 then
 						local id = tbl.widgetID
 						local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
@@ -1034,9 +982,9 @@ do
 								if remaining > 4 then
 									self:UnregisterEvent("UPDATE_UI_WIDGET")
 									local spell, _, icon = GetSpellInfo(34709)
-									self:StartBar(spell, 93, icon, "info2")
+									self:StartBar(spell, 93, icon, "colorOther")
 									local text = gsub(_G.TIME_REMAINING, ":", "")
-									self:StartBar(text, remaining, nil, "info2")
+									self:StartBar(text, remaining, nil, "colorOther")
 								end
 							end
 						end
@@ -1046,14 +994,14 @@ do
 			self:RegisterTempEvent("UPDATE_UI_WIDGET", "ArenaTimers")
 		end
 	end
-	Capping:AddBG(572, Arena) -- Ruins of Lordaeron
-	Capping:AddBG(617, Arena) -- Dalaran Sewers
-	Capping:AddBG(980, Arena) -- Tol'Viron Arena
-	Capping:AddBG(1134, Arena) -- The Tiger's Peak
-	Capping:AddBG(1504, Arena) -- Black Rook Hold Arena
-	Capping:AddBG(1505, Arena) -- Nagrand Arena
-	Capping:AddBG(1552, Arena) -- Ashamane's Fall
-	Capping:AddBG(1672, Arena) -- Blade's Edge Arena
-	Capping:AddBG(1825, Arena) -- Hook Point
+	mod:AddBG(572, Arena) -- Ruins of Lordaeron
+	mod:AddBG(617, Arena) -- Dalaran Sewers
+	mod:AddBG(980, Arena) -- Tol'Viron Arena
+	mod:AddBG(1134, Arena) -- The Tiger's Peak
+	mod:AddBG(1504, Arena) -- Black Rook Hold Arena
+	mod:AddBG(1505, Arena) -- Nagrand Arena
+	mod:AddBG(1552, Arena) -- Ashamane's Fall
+	mod:AddBG(1672, Arena) -- Blade's Edge Arena
+	mod:AddBG(1825, Arena) -- Hook Point
 end
 

@@ -294,7 +294,7 @@ local acOptions = {
 			end,
 		},
 		colorAlliance = {
-			name = "Alliance", -- XXX
+			name = "Alliance Bars", -- XXX
 			type = "color",
 			hasAlpha = true,
 			order = 18,
@@ -311,7 +311,7 @@ local acOptions = {
 			end,
 		},
 		colorHorde = {
-			name = "Horde", -- XXX
+			name = "Horde Bars", -- XXX
 			type = "color",
 			hasAlpha = true,
 			order = 19,
@@ -327,35 +327,35 @@ local acOptions = {
 				end
 			end,
 		},
-		colorQueueWait = {
-			name = "Queue", -- XXX
+		colorQueue = {
+			name = "Queue Bars", -- XXX
 			type = "color",
 			hasAlpha = true,
 			order = 20,
 			get = function()
-				return unpack(cap.db.colorQueueWait)
+				return unpack(cap.db.colorQueue)
 			end,
 			set = function(info, r, g, b, a)
-				cap.db.colorQueueWait = {r, g, b, a}
+				cap.db.colorQueue = {r, g, b, a}
 				for bar in next, cap.bars do
-					if bar:Get("capping:colorid") == "colorQueueWait" then
+					if bar:Get("capping:colorid") == "colorQueue" then
 						bar:SetColor(r, g, b, a)
 					end
 				end
 			end,
 		},
-		colorQueueReady = {
-			name = "Queue Ready", -- XXX
+		colorOther = {
+			name = "Other Bars", -- XXX
 			type = "color",
 			hasAlpha = true,
 			order = 20.1,
 			get = function()
-				return unpack(cap.db.colorQueueReady)
+				return unpack(cap.db.colorOther)
 			end,
 			set = function(info, r, g, b, a)
-				cap.db.colorQueueReady = {r, g, b, a}
+				cap.db.colorOther = {r, g, b, a}
 				for bar in next, cap.bars do
-					if bar:Get("capping:colorid") == "colorQueueReady" then
+					if bar:Get("capping:colorid") == "colorOther" then
 						bar:SetColor(r, g, b, a)
 					end
 				end
