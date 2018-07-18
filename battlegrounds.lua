@@ -619,9 +619,13 @@ do
 				prevtime = nil
 				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "WSGFlagCarrier")
 				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "WSGFlagCarrier")
-				--self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "WSGEnd")
-				
-				self:WSGEnd()
+
+				local func = function() self:WSGEnd() end
+				C_Timer.After(5, func)
+				C_Timer.After(30, func)
+				C_Timer.After(60, func)
+				C_Timer.After(130, func)
+				C_Timer.After(240, func)
 			end
 			--------------------------------------------
 			function mod:WSGFlagCarrier(a1) -- carrier detection and setup
@@ -634,21 +638,21 @@ do
 			-------------------------
 			function mod:WSGEnd() -- timer for last 5 minutes of WSG
 			-------------------------
-				--local _, _, _, timeString = GetWorldStateUIInfo(4)
-				--if timeString then
-				--	local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
-				--	minutes = tonumber(minutes)
-				--	seconds = tonumber(seconds)
-				--	if minutes and seconds then
-				--		local remaining = seconds + (minutes*60) + 1
-				--		local text = gsub(_G.TIME_REMAINING, ":", "")
-				--		local bar = self:GetBar(text)
-				--		if remaining > 3 and remaining < 600 and (not bar or bar.remaining > remaining+5 or bar.remaining < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
-				--			self:StartBar(text, remaining, 134420, "colorOther") -- Interface/Icons/INV_Misc_Rune_07
-				--		end
-				--		prevtime = remaining
-				--	end
-				--end
+				local tbl = GetIconAndTextWidgetVisualizationInfo(6) or GetIconAndTextWidgetVisualizationInfo(630) -- WSG or Twin Peaks
+				if tbl and tbl.state == 1 then
+					local minutes, seconds = strmatch(tbl.text, "(%d+):(%d+)")
+					minutes = tonumber(minutes)
+					seconds = tonumber(seconds)
+					if minutes and seconds then
+						local remaining = seconds + (minutes*60) + 1
+						local text = gsub(_G.TIME_REMAINING, ":", "")
+						local bar = self:GetBar(text)
+						if remaining > 3 and (not bar or bar.remaining > remaining+5 or bar.remaining < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
+							self:StartBar(text, remaining, 134420, "colorOther") -- Interface/Icons/INV_Misc_Rune_07
+						end
+						prevtime = remaining
+					end
+				end
 			end
 
 			--playerfaction = UnitFactionGroup("player")
