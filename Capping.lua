@@ -139,7 +139,7 @@ do
 	end
 
 	local wasInBG = false
-	local GetBestMapForUnit = C_Map and C_Map.GetBestMapForUnit -- XXX 8.0
+	local GetBestMapForUnit = C_Map.GetBestMapForUnit
 	function mod:ZONE_CHANGED_NEW_AREA()
 		if wasInBG then
 			wasInBG = false
@@ -171,12 +171,7 @@ do
 				print(format("Capping found a new id '%d' at '%s' tell us on GitHub.", id, GetRealZoneText(id)))
 			end
 		else
-			local id
-			if GetPlayerMapAreaID then -- XXX 8.0
-				id = -(GetPlayerMapAreaID("player") or 0)
-			else
-				id = -(GetBestMapForUnit("player"))
-			end
+			local id = -(GetBestMapForUnit("player") or 0)
 			local func = zoneIds[id]
 			if func then
 				wasInBG = true

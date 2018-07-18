@@ -7,7 +7,9 @@ local _G = getfenv(0)
 local floor = math.floor
 local strmatch, strlower, pairs, format, tonumber = strmatch, strlower, pairs, format, tonumber
 local UnitIsEnemy, UnitName, GetTime = UnitIsEnemy, UnitName, GetTime
-local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager and C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo -- XXX 8.0
+local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
+local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
+local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 local assaulted, claimed, defended, taken = L["has assaulted"], L["claims the"], L["has defended the"], L["has taken the"]
 local GetNumGroupMembers = GetNumGroupMembers
 
@@ -112,8 +114,6 @@ do -- POI handling
 		[154] = "colorHorde",
 	}
 	local GetPOITextureCoords = GetPOITextureCoords
-	local GetAreaPOIForMap = C_AreaPoiInfo and C_AreaPoiInfo.GetAreaPOIForMap -- XXX 8.0
-	local GetAreaPOIInfo = C_AreaPoiInfo and C_AreaPoiInfo.GetAreaPOIInfo -- XXX 8.0
 	local capTime = 0
 	local curMapID = 0
 	local path = {136441}
@@ -126,48 +126,12 @@ do -- POI handling
 		capTime = bgcaptime -- cap time
 		curMapID = uiMapID -- current map
 		landmarkCache = {}
-		if GetMapLandmarkInfo then -- XXX 8.0
-			for i = 1, GetNumMapLandmarks() do
-				local _, name, _, icon = GetMapLandmarkInfo(i)
-				landmarkCache[name] = icon
-			end
-			mod:RegisterTempEvent("WORLD_MAP_UPDATE")
-		else
-			local pois = GetAreaPOIForMap(uiMapID)
-			for i = 1, #pois do
-				local tbl = GetAreaPOIInfo(uiMapID, pois[i])
-				landmarkCache[tbl.name] = tbl.textureIndex
-			end
-			mod:RegisterTempEvent("AREA_POIS_UPDATED")
+		local pois = GetAreaPOIForMap(uiMapID)
+		for i = 1, #pois do
+			local tbl = GetAreaPOIInfo(uiMapID, pois[i])
+			landmarkCache[tbl.name] = tbl.textureIndex
 		end
-	end
-	-----------------------------------
-	function mod:WORLD_MAP_UPDATE() -- XXX 8.0 remove me
-	-----------------------------------
-		for i = 1, GetNumMapLandmarks() do
-			local _, name, _, icon = GetMapLandmarkInfo(i)
-			if landmarkCache[name] ~= icon then
-				landmarkCache[name] = icon
-				if iconDataConflict[icon] then
-					self:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
-					if icon == 137 or icon == 139 then -- Workshop in IoC
-						self:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
-					end
-				else
-					self:StopBar(name)
-					if icon == 136 or icon == 138 then -- Workshop in IoC
-						self:StartBar((GetSpellInfo(56661)), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
-					elseif icon == 2 or icon == 3 then
-						local _, _, _, id = UnitPosition("player")
-						if id == 30 then -- Alterac Valley
-							local bar = self:StartBar(name, 3600, GetIconData(icon), icon == 3 and "colorAlliance" or "colorHorde") -- Paused bar for mine status
-							bar:Pause()
-							bar:SetTimeVisibility(false)
-						end
-					end
-				end
-			end
-		end
+		mod:RegisterTempEvent("AREA_POIS_UPDATED")
 	end
 	-----------------------------------
 	function mod:AREA_POIS_UPDATED()
@@ -230,155 +194,81 @@ do
 	local ascore, atime, abases, hscore, htime, hbases, currentbg, prevText, prevTime
 	local allianceWidget, hordeWidget = 0, 0
 	local ppsTable
-	NewEstimator = function(bg, aW, hW, pointsPerSecond) -- resets estimator and sets new battleground
+	NewEstimator = function(pointsPerSecond, aW, hW) -- resets estimator and sets new battleground
 		allianceWidget, hordeWidget = aW, hW
 		ppsTable = pointsPerSecond
-		if GetWorldStateUIInfo then -- XXX 8.0
-			if not mod.UPDATE_WORLD_STATES then
-				local f2 = L["Final: %d - %d"]
-				local lookup = {
-					[1] = { [0] = 0, [1] = 1, [2] = 1.5, [3] = 2, [4] = 3.5, [5] = 30, }, -- ab
-					[2] = { [0] = 0, [1] = 0.5, [2] = 1, [3] = 2.5, [4] = 5, }, -- eots
-					[3] = { [0] = 0, [1] = 1, [2] = 3, [3] = 30, }, -- gilneas
-					[4] = { [0] = 0, [1] = 8, [2] = 16, [3] = 32, }, -- Deepwind Gorge
-				}
-				local function getlscore(ltime, pps, currentscore, maxscore, awin) -- estimate loser's final score
-					if currentbg == 2 then -- EotS
-						ltime = floor(ltime * pps + currentscore + 0.5)
-						ltime = (ltime < maxscore and ltime) or (maxscore - 1)
-					else -- AB or Gilneas
-						ltime = 10 * floor((ltime * pps + currentscore + 5) * 0.1)
-						ltime = (ltime < maxscore and ltime) or (maxscore - 10)
+		if not mod.UPDATE_UI_WIDGET then
+			local f2 = L["Final: %d - %d"]
+			--------------------------------------
+			function mod:UPDATE_UI_WIDGET(tbl)
+			--------------------------------------
+
+				local updateBases = false
+				local t = GetTime()
+				local id = tbl.widgetID
+				local MaxScore = 1500
+
+				if id == allianceWidget then
+					local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
+					local base, score, smax = strmatch(dataTbl.text, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
+					local ABases, AScore = tonumber(base), tonumber(score)
+					MaxScore = tonumber(smax) or MaxScore
+
+					if ABases then
+						if abases ~= ABases then
+							abases = ABases
+							updateBases = true
+						end
+						ascore = AScore
 					end
-					return (awin and format(f2, maxscore, ltime)) or format(f2, ltime, maxscore)
-				end
-				--------------------------------------
-				function mod:UPDATE_WORLD_STATES()
-				--------------------------------------
-					local _, zType = GetInstanceInfo()
-					if zType ~= "pvp" then return end
-
-					local currenttime = GetTime()
-					local updatetime = false
-
-					local _, _, _, scoreStringA = GetWorldStateUIInfo(currentbg == 2 and 2 or 1) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
-					local base, score, smax = strmatch(scoreStringA, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
-					local ABases, AScore, MaxScore = tonumber(base), tonumber(score), tonumber(smax) or 2000
-					local _, _, _, scoreStringH = GetWorldStateUIInfo(currentbg == 2 and 3 or 2) -- 1 & 2 for AB and Gil, 2 & 3 for EotS
-
-					base, score = strmatch(scoreStringH, "[^%d]+(%d+)[^%d]+(%d+)/") -- Bases: %d  Resources: %d/%d
+				elseif id == hordeWidget then
+					local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
+					local base, score, smax = strmatch(dataTbl.text, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
 					local HBases, HScore = tonumber(base), tonumber(score)
+					MaxScore = tonumber(smax) or MaxScore
 
-					if ABases and HBases then
-						abases, hbases = ABases, HBases
-						if ascore ~= AScore then
-							ascore, atime, updatetime = AScore, currenttime, true
+					if HBases then
+						if hbases ~= HBases then
+							hbases = HBases
+							updateBases = true
 						end
-						if hscore ~= HScore then
-							hscore, htime, updatetime = HScore, currenttime, true
-						end
+						hscore = HScore
 					end
+				else
+					local data = GetIconAndTextWidgetVisualizationInfo(id)
+					print("Capping: Found a new id - ", id, data.tooltip)
+				end
 
-					if not updatetime then return end
+				-- Conditions:
+				-- 1) Amount of owned bases changed
+				-- 2) Two updates happened in a short space of time and we want the data from the 2nd update (latest score info)
+				-- This happens when both teams have bases, the first update (alliance) will be incomplete, the second update (horde) will give us a complete outlook of final scores
+				if updateBases or (t - prevTime) < 0.8 then
+					prevTime = t
+					local apps, hpps = ppsTable[abases], ppsTable[hbases]
 
-					local apps, hpps = lookup[currentbg][abases], lookup[currentbg][hbases]
 					-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
-					local ATime = ((MaxScore - ascore) / (apps > 0 and apps or 0.000001)) - (currenttime - atime)
-					local HTime = ((MaxScore - hscore) / (hpps > 0 and hpps or 0.000001)) - (currenttime - htime)
+					local ATime = apps and ((MaxScore - ascore) / apps) or 1000000
+					local HTime = hpps and ((MaxScore - hscore) / hpps) or 1000000
 
 					if HTime < ATime then -- Horde is winning
-						local newText = getlscore(HTime, apps, ascore, MaxScore)
-						if newText ~= prevText then
-							self:StopBar(prevText)
-							self:StartBar(newText, HTime, GetIconData(48), "colorHorde") -- 48 = Horde Insignia
-							prevText = newText
-						end
+						local score = apps and (ascore + floor(apps * HTime)) or ascore
+						local txt = format(f2, score, MaxScore)
+						self:StopBar(prevText)
+						self:StartBar(txt, HTime, GetIconData(48), "colorHorde") -- 48 = Horde Insignia
+						prevText = txt
 					else -- Alliance is winning
-						local newText = getlscore(ATime, hpps, hscore, MaxScore, true)
-						if newText ~= prevText then
-							self:StopBar(prevText)
-							self:StartBar(newText, ATime, GetIconData(46), "colorAlliance") -- 46 = Alliance Insignia
-							prevText = newText
-						end
+						local score = hpps and (hscore + floor(hpps * ATime)) or hscore
+						local txt = format(f2, MaxScore, score)
+						self:StopBar(prevText)
+						self:StartBar(txt, ATime, GetIconData(46), "colorAlliance") -- 46 = Alliance Insignia
+						prevText = txt
 					end
 				end
 			end
-			currentbg, ascore, atime, abases, hscore, htime, hbases, prevText = bg, 0, 0, 0, 0, 0, 0, ""
-			mod:RegisterTempEvent("UPDATE_WORLD_STATES")
-		else
-			if not mod.UPDATE_UI_WIDGET then
-				local f2 = L["Final: %d - %d"]
-				--------------------------------------
-				function mod:UPDATE_UI_WIDGET(tbl)
-				--------------------------------------
-
-					local updateBases = false
-					local t = GetTime()
-					local id = tbl.widgetID
-					local MaxScore = 1500
-
-					if id == allianceWidget then
-						local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
-						local base, score, smax = strmatch(dataTbl.text, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
-						local ABases, AScore = tonumber(base), tonumber(score)
-						MaxScore = tonumber(smax) or MaxScore
-
-						if ABases then
-							if abases ~= ABases then
-								abases = ABases
-								updateBases = true
-							end
-							ascore = AScore
-						end
-					elseif id == hordeWidget then
-						local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
-						local base, score, smax = strmatch(dataTbl.text, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
-						local HBases, HScore = tonumber(base), tonumber(score)
-						MaxScore = tonumber(smax) or MaxScore
-
-						if HBases then
-							if hbases ~= HBases then
-								hbases = HBases
-								updateBases = true
-							end
-							hscore = HScore
-						end
-					else
-						local data = GetIconAndTextWidgetVisualizationInfo(id)
-						print("Capping: Found a new id - ", id, data.tooltip)
-					end
-
-					-- Conditions:
-					-- 1) Amount of owned bases changed
-					-- 2) Two updates happened in a short space of time and we want the data from the 2nd update (latest score info)
-					-- This happens when both teams have bases, the first update (alliance) will be incomplete, the second update (horde) will give us a complete outlook of final scores
-					if updateBases or (t - prevTime) < 0.8 then
-						prevTime = t
-						local apps, hpps = ppsTable[abases], ppsTable[hbases]
-
-						-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
-						local ATime = apps and ((MaxScore - ascore) / apps) or 1000000
-						local HTime = hpps and ((MaxScore - hscore) / hpps) or 1000000
-
-						if HTime < ATime then -- Horde is winning
-							local score = apps and (ascore + floor(apps * HTime)) or ascore
-							local txt = format(f2, score, MaxScore)
-							self:StopBar(prevText)
-							self:StartBar(txt, HTime, GetIconData(48), "colorHorde") -- 48 = Horde Insignia
-							prevText = txt
-						else -- Alliance is winning
-							local score = hpps and (hscore + floor(hpps * ATime)) or hscore
-							local txt = format(f2, MaxScore, score)
-							self:StopBar(prevText)
-							self:StartBar(txt, ATime, GetIconData(46), "colorAlliance") -- 46 = Alliance Insignia
-							prevText = txt
-						end
-					end
-				end
-			end
-			ascore, abases, hscore, hbases, prevText, prevTime = 0, 0, 0, 0, "", 0
-			mod:RegisterTempEvent("UPDATE_UI_WIDGET")
 		end
+		ascore, abases, hscore, hbases, prevText, prevTime = 0, 0, 0, 0, "", 0
+		mod:RegisterTempEvent("UPDATE_UI_WIDGET")
 	end
 end
 
@@ -388,13 +278,13 @@ do
 
 	local function ArathiBasin()
 		SetupAssault(60, 93)
-		NewEstimator(1, 495, 496, pointsPerSecond) -- BG table, alliance score widget, horde score widget
+		NewEstimator(pointsPerSecond, 495, 496) -- BG table, alliance score widget, horde score widget
 	end
 	mod:AddBG(529, ArathiBasin)
 
 	local function ArathiBasinSnowyPvPBrawl()
 		SetupAssault(60, 837)
-		NewEstimator(2)
+		NewEstimator(pointsPerSecond, 495, 496) -- XXX total guess
 	end
 	mod:AddBG(1681, ArathiBasinSnowyPvPBrawl)
 end
@@ -405,7 +295,7 @@ do
 
 	local function DeepwindGorge()
 		SetupAssault(61, 519)
-		NewEstimator(4, 734, 735, pointsPerSecond) -- BG table, alliance score widget, horde score widget
+		NewEstimator(pointsPerSecond, 734, 735) -- BG table, alliance score widget, horde score widget
 	end
 	mod:AddBG(1105, DeepwindGorge)
 end
@@ -416,7 +306,7 @@ do
 
 	local function TheBattleForGilneas()
 		SetupAssault(60, 275) -- Base cap time, uiMapID
-		NewEstimator(3, 699, 700, pointsPerSecond) -- BG table, alliance score widget, horde score widget
+		NewEstimator(pointsPerSecond, 699, 700) -- BG table, alliance score widget, horde score widget
 	end
 	mod:AddBG(761, TheBattleForGilneas) -- Instance ID
 end
@@ -597,7 +487,7 @@ do
 		ResetCarrier()
 
 		-- setup for final score estimation (2 for EotS)
-		NewEstimator(2, 523, 524, pointsPerSecond) -- BG table, alliance score widget, horde score widget
+		NewEstimator(pointsPerSecond, 523, 524) -- BG table, alliance score widget, horde score widget
 		SetupAssault(60, 112) -- In RBG the four points have flags that need to be assaulted, like AB
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HFlagUpdate")
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AFlagUpdate")
@@ -729,7 +619,7 @@ do
 				prevtime = nil
 				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "WSGFlagCarrier")
 				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "WSGFlagCarrier")
-				self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "WSGEnd")
+				--self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "WSGEnd")
 				
 				self:WSGEnd()
 			end
@@ -744,21 +634,21 @@ do
 			-------------------------
 			function mod:WSGEnd() -- timer for last 5 minutes of WSG
 			-------------------------
-				local _, _, _, timeString = GetWorldStateUIInfo(4)
-				if timeString then
-					local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
-					minutes = tonumber(minutes)
-					seconds = tonumber(seconds)
-					if minutes and seconds then
-						local remaining = seconds + (minutes*60) + 1
-						local text = gsub(_G.TIME_REMAINING, ":", "")
-						local bar = self:GetBar(text)
-						if remaining > 3 and remaining < 600 and (not bar or bar.remaining > remaining+5 or bar.remaining < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
-							self:StartBar(text, remaining, 134420, "colorOther") -- Interface/Icons/INV_Misc_Rune_07
-						end
-						prevtime = remaining
-					end
-				end
+				--local _, _, _, timeString = GetWorldStateUIInfo(4)
+				--if timeString then
+				--	local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
+				--	minutes = tonumber(minutes)
+				--	seconds = tonumber(seconds)
+				--	if minutes and seconds then
+				--		local remaining = seconds + (minutes*60) + 1
+				--		local text = gsub(_G.TIME_REMAINING, ":", "")
+				--		local bar = self:GetBar(text)
+				--		if remaining > 3 and remaining < 600 and (not bar or bar.remaining > remaining+5 or bar.remaining < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
+				--			self:StartBar(text, remaining, 134420, "colorOther") -- Interface/Icons/INV_Misc_Rune_07
+				--		end
+				--		prevtime = remaining
+				--	end
+				--end
 			end
 
 			--playerfaction = UnitFactionGroup("player")
@@ -775,192 +665,116 @@ end
 do
 	------------------------------------------------ Wintergrasp ------------------------------------------
 	local wallid, walls = nil, nil
-	local GetAreaPOIForMap = C_AreaPoiInfo and C_AreaPoiInfo.GetAreaPOIForMap -- XXX 8.0
-	local GetAreaPOIInfo = C_AreaPoiInfo and C_AreaPoiInfo.GetAreaPOIInfo -- XXX 8.0
 	local function Wintergrasp(self)
-		if GetNumMapLandmarks then
-			if not self.WinterAssault then
-				wallid = { -- wall section locations
-					[2222] = "NW ", [2223] = "NW ", [2224] = "NW ", [2225] = "NW ",
-					[2226] = "SW ", [2227] = "SW ", [2228] = "S ",
-					[2230] = "S ", [2231] = "SE ", [2232] = "SE ",
-					[2233] = "NE ", [2234] = "NE ", [2235] = "NE ", [2236] = "NE ",
-					[2237] = "Inner W ", [2238] = "Inner W ", [2239] = "Inner W ",
-					[2240] = "Inner S ", [2241] = "Inner S ", [2242] = "Inner S ",
-					[2243] = "Inner E ", [2244] = "Inner E ", [2245] = "Inner E ",
-					[2229] = "", [2246] = "", -- front gate and fortress door
-				}
+		if not self.WinterAssault then
+			wallid = { -- wall section locations
+				[2222] = "NW ", [2223] = "NW ", [2224] = "NW ", [2225] = "NW ",
+				[2226] = "SW ", [2227] = "SW ", [2228] = "S ",
+				[2230] = "S ", [2231] = "SE ", [2232] = "SE ",
+				[2233] = "NE ", [2234] = "NE ", [2235] = "NE ", [2236] = "NE ",
+				[2237] = "Inner W ", [2238] = "Inner W ", [2239] = "Inner W ",
+				[2240] = "Inner S ", [2241] = "Inner S ", [2242] = "Inner S ",
+				[2243] = "Inner E ", [2244] = "Inner E ", [2245] = "Inner E ",
+				[2229] = "", [2246] = "", -- front gate and fortress door
+			}
 
-				-- POI icon texture id
-				local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
-				local damaged, destroyed, all = { }, { }, { }
-				for k, v in pairs(intact) do
-					damaged[k + 1] = true
-					destroyed[k + 2] = true
-					all[k], all[k + 1], all[k + 2] = true, true, true
-				end
-				function mod:WinterAssault() -- scans POI landmarks for changes in wall textures
-					for i = 1, GetNumMapLandmarks() do
-						local _, name, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
-						local ti = walls[poiID]
-						if (ti and ti ~= textureIndex) or (not ti and wallid[poiID]) then
-							if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
-								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[poiID], name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
-							elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[poiID], name, _G.ACTION_UNIT_DESTROYED))
-							end
-							walls[poiID] = all[textureIndex] and textureIndex or ti
+			-- POI icon texture id
+			local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
+			local damaged, destroyed, all = { }, { }, { }
+			for k, v in pairs(intact) do
+				damaged[k + 1] = true
+				destroyed[k + 2] = true
+				all[k], all[k + 1], all[k + 2] = true, true, true
+			end
+			function mod:WinterAssault() -- scans POI landmarks for changes in wall textures
+				local pois = GetAreaPOIForMap(123) -- Wintergrasp
+				for i = 1, #pois do
+					local POI = pois[i]
+					local tbl = GetAreaPOIInfo(123, POI)
+					local ti = walls[POI]
+					local textureIndex = tbl.textureIndex
+					if tbl and ((ti and ti ~= textureIndex) or (not ti and wallid[POI])) then
+						if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
+							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
+						elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
+							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, _G.ACTION_UNIT_DESTROYED))
 						end
+						walls[POI] = all[textureIndex] and textureIndex or ti
 					end
 				end
 			end
-			walls = { }
-			for i = 1, GetNumMapLandmarks() do
-				local _, _, _, textureIndex, _, _, _, _, _, _, poiID = C_WorldMap.GetMapLandmarkInfo(i)
-				if wallid[poiID] then
-					walls[poiID] = textureIndex
-				end
-			end
-			self:RegisterTempEvent("WORLD_MAP_UPDATE", "WinterAssault")
-		else
-			if not self.WinterAssault then
-				wallid = { -- wall section locations
-					[2222] = "NW ", [2223] = "NW ", [2224] = "NW ", [2225] = "NW ",
-					[2226] = "SW ", [2227] = "SW ", [2228] = "S ",
-					[2230] = "S ", [2231] = "SE ", [2232] = "SE ",
-					[2233] = "NE ", [2234] = "NE ", [2235] = "NE ", [2236] = "NE ",
-					[2237] = "Inner W ", [2238] = "Inner W ", [2239] = "Inner W ",
-					[2240] = "Inner S ", [2241] = "Inner S ", [2242] = "Inner S ",
-					[2243] = "Inner E ", [2244] = "Inner E ", [2245] = "Inner E ",
-					[2229] = "", [2246] = "", -- front gate and fortress door
-				}
-
-				-- POI icon texture id
-				local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
-				local damaged, destroyed, all = { }, { }, { }
-				for k, v in pairs(intact) do
-					damaged[k + 1] = true
-					destroyed[k + 2] = true
-					all[k], all[k + 1], all[k + 2] = true, true, true
-				end
-				function mod:WinterAssault() -- scans POI landmarks for changes in wall textures
-					local pois = GetAreaPOIForMap(123) -- Wintergrasp
-					for i = 1, #pois do
-						local POI = pois[i]
-						local tbl = GetAreaPOIInfo(123, POI)
-						local ti = walls[POI]
-						local textureIndex = tbl.textureIndex
-						if tbl and ((ti and ti ~= textureIndex) or (not ti and wallid[POI])) then
-							if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
-								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
-							elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-								RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, _G.ACTION_UNIT_DESTROYED))
-							end
-							walls[POI] = all[textureIndex] and textureIndex or ti
-						end
-					end
-				end
-			end
-			walls = { }
-			local pois = GetAreaPOIForMap(123) -- Wintergrasp
-			for i = 1, #pois do
-				local POI = pois[i]
-				local tbl = GetAreaPOIInfo(123, POI)
-				if wallid[POI] and tbl.textureIndex then
-					walls[POI] = tbl.textureIndex
-				end
-			end
-			self:RegisterTempEvent("AREA_POIS_UPDATED", "WinterAssault")
 		end
+		walls = { }
+		local pois = GetAreaPOIForMap(123) -- Wintergrasp
+		for i = 1, #pois do
+			local POI = pois[i]
+			local tbl = GetAreaPOIInfo(123, POI)
+			if wallid[POI] and tbl.textureIndex then
+				walls[POI] = tbl.textureIndex
+			end
+		end
+		self:RegisterTempEvent("AREA_POIS_UPDATED", "WinterAssault")
 	end
-	if not GetAreaPOIForMap then -- XXX 8.0
-		mod:AddBG(-501, Wintergrasp) -- map id
-	else
-		mod:AddBG(-123, Wintergrasp) -- map id
-	end
+	mod:AddBG(-123, Wintergrasp) -- map id
 end
 
-do
-	------------------------------------------------ Ashran ------------------------------------------
-	local function Ashran(self)
-		if not self.AshranControl then
-			function mod:AshranControl(msg)
-				--print(msg, ...)
-				--Ashran Herald yells: The Horde controls the Market Graveyard for 15 minutes!
-				local faction, point, timeString = strmatch(msg, "The (.+) controls the (.+) for (%d+) minutes!")
-				local timeLeft = tonumber(timeString)
-				if faction and point and timeLeft then
-					self:StartBar(point, timeLeft*60, GetIconData(faction == "Horde" and 14 or 4), faction == "Horde" and "colorHorde" or "colorAlliance")
-				end
-			end
-		end
-		if not self.AshranEvents then
-			function mod:AshranEvents(msg)
-				local idString = strmatch(msg, "spell:(%d+)")
-				local id = tonumber(idString)
-				--print(msg:gsub("|", "||"), ...)
-				if id and id ~= 168506 then -- 168506 = Ancient Artifact
-					local name, _, icon = GetSpellInfo(id)
-					self:StartBar(name, 180, icon, "colorOther")
-				end
-			end
-		end
-		if not self.AshranTimeLeft then
-			function mod:AshranTimeLeft()
-				local _, _, _, timeString = GetWorldStateUIInfo(12)
-				if timeString then
-					local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
-					minutes = tonumber(minutes)
-					seconds = tonumber(seconds)
-					if minutes and seconds then
-						local remaining = seconds + (minutes*60) + 1
-						if remaining > 4 then
-							local text = _G.NEXT_BATTLE_LABEL
-							local bar = self:GetBar(text)
-							if not bar or remaining > bar.remaining+5 or remaining < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
-								self:StartBar(text, remaining, 1031537, "colorOther") -- Interface/Icons/Achievement_Zone_Ashran
-							end
-						end
-					end
-				end
-			end
-		end
-		self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "AshranControl")
-		self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
-		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "AshranTimeLeft")
-	end
-	if GetWorldStateUIInfo then -- XXX 8.0
-		mod:AddBG(-978, Ashran) -- map id
-	end
-end
+--do
+--	------------------------------------------------ Ashran ------------------------------------------
+--	local function Ashran(self)
+--		if not self.AshranControl then
+--			function mod:AshranControl(msg)
+--				--print(msg, ...)
+--				--Ashran Herald yells: The Horde controls the Market Graveyard for 15 minutes!
+--				local faction, point, timeString = strmatch(msg, "The (.+) controls the (.+) for (%d+) minutes!")
+--				local timeLeft = tonumber(timeString)
+--				if faction and point and timeLeft then
+--					self:StartBar(point, timeLeft*60, GetIconData(faction == "Horde" and 14 or 4), faction == "Horde" and "colorHorde" or "colorAlliance")
+--				end
+--			end
+--		end
+--		if not self.AshranEvents then
+--			function mod:AshranEvents(msg)
+--				local idString = strmatch(msg, "spell:(%d+)")
+--				local id = tonumber(idString)
+--				--print(msg:gsub("|", "||"), ...)
+--				if id and id ~= 168506 then -- 168506 = Ancient Artifact
+--					local name, _, icon = GetSpellInfo(id)
+--					self:StartBar(name, 180, icon, "colorOther")
+--				end
+--			end
+--		end
+--		if not self.AshranTimeLeft then
+--			function mod:AshranTimeLeft()
+--				local _, _, _, timeString = GetWorldStateUIInfo(12)
+--				if timeString then
+--					local minutes, seconds = strmatch(timeString, "(%d+):(%d+)")
+--					minutes = tonumber(minutes)
+--					seconds = tonumber(seconds)
+--					if minutes and seconds then
+--						local remaining = seconds + (minutes*60) + 1
+--						if remaining > 4 then
+--							local text = _G.NEXT_BATTLE_LABEL
+--							local bar = self:GetBar(text)
+--							if not bar or remaining > bar.remaining+5 or remaining < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
+--								self:StartBar(text, remaining, 1031537, "colorOther") -- Interface/Icons/Achievement_Zone_Ashran
+--							end
+--						end
+--					end
+--				end
+--			end
+--		end
+--		self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "AshranControl")
+--		self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
+--		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "AshranTimeLeft")
+--	end
+--	if GetWorldStateUIInfo then -- XXX 8.0
+--		mod:AddBG(-978, Ashran) -- map id
+--	end
+--end
 
 do
 	------------------------------------------------ Arena ------------------------------------------
 	local function Arena(self)
-		if GetNumWorldStateUI then -- XXX 8.0
-			if not self.ArenaTimers then
-				function mod:ArenaTimers()
-					for i = 1, GetNumWorldStateUI() do -- Not always at the same location, so check them all
-						local _, state, _, timeString = GetWorldStateUIInfo(i)
-						if state > 0 and timeString then -- Skip hidden states and states without text
-							local minutes, seconds = timeString:match("(%d+):(%d+)")
-							minutes = tonumber(minutes)
-							seconds = tonumber(seconds)
-							if minutes and seconds then
-								local remaining = seconds + (minutes*60) + 1
-								if remaining > 4 then
-									self:UnregisterEvent("WORLD_STATE_UI_TIMER_UPDATE")
-									local spell, _, icon = GetSpellInfo(34709)
-									self:StartBar(spell, 93, icon, "colorOther")
-									local text = gsub(_G.TIME_REMAINING, ":", "")
-									self:StartBar(text, remaining, nil, "colorOther")
-								end
-							end
-						end
-					end
-				end
-			end
-			self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "ArenaTimers")
 		-- What we CAN'T use for Shadow Sight timer
 		-- COMBAT_LOG_EVENT_UNFILTERED for Arena Preparation removal event, it randomly removes and reapplies itself during the warmup
 		-- UPDATE_WORLD_STATES will sometimes fire during the warmup, so we can't assume the first time it fires is the doors opening
@@ -968,32 +782,30 @@ do
 		-- What we CAN use for Shadow Sight timer
 		-- CHAT_MSG_BG_SYSTEM_NEUTRAL#The Arena battle has begun! - Requires localization
 		-- WORLD_STATE_UI_TIMER_UPDATE The first event fired with a valid remaining time (the current chosen method)
-		else
-			if not self.ArenaTimers then
-				function mod:ArenaTimers(tbl)
-					if tbl.widgetSetID == 1 and tbl.widgetType == 0 then
-						local id = tbl.widgetID
-						local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
-						if dataTbl and dataTbl.text and dataTbl.state == 1 then
-							local minutes, seconds = dataTbl.text:match("(%d+):(%d+)")
-							minutes = tonumber(minutes)
-							seconds = tonumber(seconds)
-							if minutes and seconds then
-								local remaining = seconds + (minutes*60) + 1
-								if remaining > 4 then
-									self:UnregisterEvent("UPDATE_UI_WIDGET")
-									local spell, _, icon = GetSpellInfo(34709)
-									self:StartBar(spell, 93, icon, "colorOther")
-									local text = gsub(_G.TIME_REMAINING, ":", "")
-									self:StartBar(text, remaining, nil, "colorOther")
-								end
+		if not self.ArenaTimers then
+			function mod:ArenaTimers(tbl)
+				if tbl.widgetSetID == 1 and tbl.widgetType == 0 then
+					local id = tbl.widgetID
+					local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
+					if dataTbl and dataTbl.text and dataTbl.state == 1 then
+						local minutes, seconds = dataTbl.text:match("(%d+):(%d+)")
+						minutes = tonumber(minutes)
+						seconds = tonumber(seconds)
+						if minutes and seconds then
+							local remaining = seconds + (minutes*60) + 1
+							if remaining > 4 then
+								self:UnregisterEvent("UPDATE_UI_WIDGET")
+								local spell, _, icon = GetSpellInfo(34709)
+								self:StartBar(spell, 93, icon, "colorOther")
+								local text = gsub(_G.TIME_REMAINING, ":", "")
+								self:StartBar(text, remaining, nil, "colorOther")
 							end
 						end
 					end
 				end
 			end
-			self:RegisterTempEvent("UPDATE_UI_WIDGET", "ArenaTimers")
 		end
+		self:RegisterTempEvent("UPDATE_UI_WIDGET", "ArenaTimers")
 	end
 	mod:AddBG(572, Arena) -- Ruins of Lordaeron
 	mod:AddBG(617, Arena) -- Dalaran Sewers
