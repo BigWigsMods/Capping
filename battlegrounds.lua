@@ -236,7 +236,9 @@ do
 					end
 				else
 					local data = GetIconAndTextWidgetVisualizationInfo(id)
-					print("Capping: Found a new id - ", id, data.tooltip)
+					if data then
+						print("Capping: Found a new id - ", id, data.tooltip)
+					end
 				end
 
 				-- Conditions:
