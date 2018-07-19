@@ -771,9 +771,7 @@ end
 --		self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
 --		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "AshranTimeLeft")
 --	end
---	if GetWorldStateUIInfo then -- XXX 8.0
---		mod:AddBG(-978, Ashran) -- map id
---	end
+--	mod:AddBG(X, Ashran) -- map id
 --end
 
 do
