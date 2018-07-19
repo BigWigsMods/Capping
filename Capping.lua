@@ -360,7 +360,7 @@ do
 
 	function mod:StartBar(name, remaining, icon, colorid, priority)
 		self:StopBar(name)
-		local bar = candy:New(media:Fetch("statusbar", db.profile.texture), db.profile.width, db.profile.height)
+		local bar = candy:New(media:Fetch("statusbar", db.profile.barTexture), db.profile.width, db.profile.height)
 		activeBars[bar] = true
 
 		bar:Set("capping:colorid", colorid)
