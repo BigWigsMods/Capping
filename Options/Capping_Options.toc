@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 80000
 ## Title: Capping_Options
 ## Author: Funkydude
 ## Notes: Capping Configuration Options.
@@ -13,7 +13,8 @@
 ## Notes-ptBR: Capping Opções de Configuração.
 ## Notes-ruRU: Capping параметры настроек.
 ## Version: @project-version@
-## X-Category: Miscellaneous
+## X-Category: Battlegrounds/PvP
+## X-Website: https://github.com/BigWigsMods/Capping
 ## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask us about anything else.
 ## X-Curse-Project-ID: 20143
 ## X-WoWI-ID: 11177
