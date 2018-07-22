@@ -1,4 +1,7 @@
 # Capping
+Battleground timers and other PvP features.
+
+Configure by right-clicking the anchor or by typing /capping
 
 ## Features
 * All battlegrounds/arenas have queue timers
