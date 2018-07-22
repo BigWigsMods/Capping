@@ -2,6 +2,7 @@
 local acr = LibStub("AceConfigRegistry-3.0")
 local acd = LibStub("AceConfigDialog-3.0")
 local media = LibStub("LibSharedMedia-3.0")
+local adbo = LibStub("AceDBOptions-3.0")
 local cap = CappingFrame
 local L
 do
@@ -386,7 +387,7 @@ local acOptions = {
 				},
 			},
 		},
-		profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(cap.db),
+		profiles = adbo:GetOptionsTable(cap.db),
 	},
 }
 
