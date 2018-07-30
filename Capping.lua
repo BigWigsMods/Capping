@@ -122,6 +122,7 @@ function mod:PLAYER_LOGIN()
 
 	if db.profile.lock then
 		frame:EnableMouse(false)
+		frame:SetMovable(false)
 		frame.bg:Hide()
 		frame.header:Hide()
 	end

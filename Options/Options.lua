@@ -53,14 +53,16 @@ local acOptions = {
 					set = function(info, value)
 						cap.db.profile.lock = value
 						if value then
-							cap:EnableMouse(false)
+							value = false
 							cap.bg:Hide()
 							cap.header:Hide()
 						else
-							cap:EnableMouse(true)
+							value = true
 							cap.bg:Show()
 							cap.header:Show()
 						end
+						cap:EnableMouse(value)
+						cap:SetMovable(value)
 					end,
 				},
 				icon = {
