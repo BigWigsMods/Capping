@@ -32,6 +32,7 @@ do
 		db.profile.position[4] = d
 	end)
 	local function openOpts()
+		EnableAddOn("Capping_Options") -- Make sure it wasn't left disabled for whatever reason
 		LoadAddOn("Capping_Options")
 		LibStub("AceConfigDialog-3.0"):Open(addonName)
 	end
