@@ -105,6 +105,9 @@ function mod:PLAYER_LOGIN()
 			colorOther = {1,1,0,1},
 			colorBarBackground = {0,0,0,0.75},
 			queueBars = true,
+			barOnShift = "SAY",
+			barOnControl = "INSTANCE_CHAT",
+			barOnAlt = "NONE",
 		},
 	}
 	db = LibStub("AceDB-3.0"):New("CappingSettings", defaults, true)
@@ -304,13 +307,16 @@ do
 			local faction = colorid == "colorHorde" and _G.FACTION_HORDE or colorid == "colorAlliance" and _G.FACTION_ALLIANCE or ""
 			local timeLeft = bar.candyBarDuration:GetText()
 			if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
+			if channel == "INSTANCE_CHAT" and not IsInGroup(2) then channel = "RAID" end -- LE_PARTY_CATEGORY_INSTANCE = 2
 			SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
 		end
 		function BarOnClick(bar)
-			if IsShiftKeyDown() then
-				ReportBar(bar, "SAY")
-			elseif IsControlKeyDown() then
-				ReportBar(bar, IsInGroup(2) and "INSTANCE_CHAT" or "RAID") -- LE_PARTY_CATEGORY_INSTANCE = 2
+			if IsShiftKeyDown() and db.profile.barOnShift ~= "NONE" then
+				ReportBar(bar, db.profile.barOnShift)
+			elseif IsControlKeyDown() and db.profile.barOnControl ~= "NONE" then
+				ReportBar(bar, db.profile.barOnControl)
+			elseif IsAltKeyDown() and db.profile.barOnAlt ~= "NONE" then
+				ReportBar(bar, db.profile.barOnAlt)
 			end
 		end
 	end
@@ -403,6 +409,11 @@ do
 		bar.candyBarLabel:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 		bar.candyBarDuration:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 		bar:SetScript("OnMouseUp", BarOnClick)
+		if db.profile.barOnShift ~= "NONE" or db.profile.barOnControl ~= "NONE" or db.profile.barOnAlt ~= "NONE" then
+			bar:EnableMouse(true)
+		else
+			bar:EnableMouse(false)
+		end
 		bar:Start()
 		RearrangeBars()
 		return bar

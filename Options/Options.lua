@@ -22,6 +22,24 @@ local function updateFlags()
 	return flags
 end
 
+local barClickOptions = {
+	NONE = L.none,
+	SAY = L.sayChat,
+	INSTANCE_CHAT = L.raidChat,
+}
+local barClickSetOptions = function(info, value)
+	cap.db.profile[info[#info]] = value
+	if cap.db.profile.barOnShift ~= "NONE" or cap.db.profile.barOnControl ~= "NONE" or cap.db.profile.barOnAlt ~= "NONE" then
+		for bar in next, cap.bars do
+			bar:EnableMouse(true)
+		end
+	else
+		for bar in next, cap.bars do
+			bar:EnableMouse(false)
+		end
+	end
+end
+
 local acOptions = {
 	type = "group",
 	childGroups = "tab",
@@ -408,6 +426,35 @@ local acOptions = {
 							end
 						end
 					end,
+				},
+				clickBarsHeader = {
+					type = "header",
+					name = L.clickableBars,
+					order = 2,
+				},
+				barOnShift = {
+					type = "select",
+					name = L.shiftClick,
+					desc = L.barClickDesc,
+					order = 4,
+					values = barClickOptions,
+					set = barClickSetOptions,
+				},
+				barOnControl = {
+					type = "select",
+					name = L.controlClick,
+					desc = L.barClickDesc,
+					order = 5,
+					values = barClickOptions,
+					set = barClickSetOptions,
+				},
+				barOnAlt = {
+					type = "select",
+					name = L.altClick,
+					desc = L.barClickDesc,
+					order = 6,
+					values = barClickOptions,
+					set = barClickSetOptions,
 				},
 			},
 		},
