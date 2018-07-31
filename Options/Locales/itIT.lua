@@ -35,3 +35,6 @@ local L = mod.L
 --L.otherBars = "Other Bars"
 --L.barBackground = "Bar Background"
 
+-- Features
+--L.features = "Features"
+--L.queueBarsDesc = "Enable the bars showing which queues you have joined and the estimated time you will be in the queue for."

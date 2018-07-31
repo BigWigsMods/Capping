@@ -35,3 +35,6 @@ L.textColor = "Couleur du texte"
 --L.otherBars = "Other Bars"
 L.barBackground = "Fond de la barre"
 
+-- Features
+--L.features = "Features"
+--L.queueBarsDesc = "Enable the bars showing which queues you have joined and the estimated time you will be in the queue for."

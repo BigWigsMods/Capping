@@ -35,3 +35,6 @@ L.textColor = "문자 색상"
 --L.otherBars = "Other Bars"
 L.barBackground = "바 배경"
 
+-- Features
+--L.features = "Features"
+--L.queueBarsDesc = "Enable the bars showing which queues you have joined and the estimated time you will be in the queue for."

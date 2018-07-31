@@ -389,9 +389,32 @@ local acOptions = {
 				},
 			},
 		},
+		features = {
+			name = L.features,
+			order = 2, type = "group",
+			args = {
+				queueBars = {
+					type = "toggle",
+					name = L.queueBars,
+					desc = L.queueBarsDesc,
+					order = 1,
+					set = function(info, value)
+						cap.db.profile.queueBars = value
+						if not value then
+							for bar in next, cap.bars do
+								if bar:Get("capping:queueid") then
+									bar:Stop()
+								end
+							end
+						end
+					end,
+				},
+			},
+		},
 		profiles = adbo:GetOptionsTable(cap.db),
 	},
 }
+acOptions.args.profiles.order = 3
 
 acr:RegisterOptionsTable(acOptions.name, acOptions, true)
 acd:SetDefaultSize(acOptions.name, 420, 640)

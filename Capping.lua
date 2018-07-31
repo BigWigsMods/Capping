@@ -104,6 +104,7 @@ function mod:PLAYER_LOGIN()
 			colorQueue = {0.6,0.6,0.6,1},
 			colorOther = {1,1,0,1},
 			colorBarBackground = {0,0,0,0.75},
+			queueBars = true,
 		},
 	}
 	db = LibStub("AceDB-3.0"):New("CappingSettings", defaults, true)
@@ -211,8 +212,6 @@ do -- estimated wait timer and port timer
 	end
 
 	function mod:UPDATE_BATTLEFIELD_STATUS(queueId)
-		--if not db.profile.port and not db.profile.wait then return end
-
 		local status, map, _, _, _, size = GetBattlefieldStatus(queueId)
 		if size == "ARENASKIRMISH" then
 			map = format("%s (%d)", ARENA, queueId) -- No size or name distinction given for casual arena 2v2/3v3, separate them manually. Messy :(
@@ -225,11 +224,11 @@ do -- estimated wait timer and port timer
 				bar = nil
 			end
 
-			if not bar then --and db.profile.port then
+			if not bar then
 				bar = self:StartBar(map, GetBattlefieldPortExpiration(queueId), 132327, "colorOther", true) -- 132327 = Interface/Icons/Ability_TownWatch
 				bar:Set("capping:queueid", queueId)
 			end
-		elseif status == "queued" then --and db.profile.wait then -- Waiting for BG to pop
+		elseif status == "queued" and db.profile.queueBars then -- Waiting for BG to pop
 			if size == "ARENASKIRMISH" then
 				cleanupQueue()
 			end
