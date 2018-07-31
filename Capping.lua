@@ -64,17 +64,16 @@ end
 function mod:START_TIMER(timerType, timeSeconds, totalTime)
 	local _, t = GetInstanceInfo()
 	if t == "pvp" or t == "arena" then
-		--if db.profile.hideblizztime then
-		--	for a, timer in pairs(TimerTracker.timerList) do
-		--		timer:Hide()
-		--	end
-		--end
+		for i = 1, #TimerTracker.timerList do
+			TimerTracker.timerList[i].bar:Hide() -- Hide the Blizz start timer
+		end
+
 		local faction = GetPlayerFactionGroup()
 		if faction and faction ~= "Neutral" then
 			local bar = self:GetBar(L["Battle Begins"])
 			if not bar or timeSeconds > bar.remaining+3 or timeSeconds < bar.remaining-3 then -- Don't restart bars for subtle changes +/- 3s
-				-- 516953 = Interface/Timer/Horde-Logo || 516949 = Interface/Timer/Alliance-Logo
-				mod:StartBar(L["Battle Begins"], timeSeconds, faction == "Horde" and 516953 or 516949, "colorOther")
+				-- 132485 = Interface/Icons/INV_BannerPVP_01 || 132486 = Interface/Icons/INV_BannerPVP_02
+				mod:StartBar(L["Battle Begins"], timeSeconds, faction == "Horde" and 132485 or 132486, "colorOther")
 			end
 		end
 	end
