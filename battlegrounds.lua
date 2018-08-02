@@ -1,38 +1,12 @@
 
 local addonName, mod = ...
-
 local L = mod.L
-local _G = getfenv(0)
 
 local floor = math.floor
-local strmatch, strlower, pairs, format, tonumber = strmatch, strlower, pairs, format, tonumber
-local UnitIsEnemy, UnitName, GetTime = UnitIsEnemy, UnitName, GetTime
+local strmatch, pairs, format, tonumber = strmatch, pairs, format, tonumber
 local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
 local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
-local GetNumGroupMembers = GetNumGroupMembers
-
-local GetBattlefieldScore, GetNumBattlefieldScores = GetBattlefieldScore, GetNumBattlefieldScores
-local function GetClassByName(name, faction) -- retrieves a player's class by name
-	for i = 1, GetNumBattlefieldScores(), 1 do
-		local iname, _, _, _, _, ifaction, _, _, iclass = GetBattlefieldScore(i)
-		if ifaction == faction and gsub(iname or "blah", "-(.+)", "") == name then
-			return iclass
-		end
-	end
-end
-
-local classcolor = { }
-for class, color in pairs(CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS) do
-	classcolor[class] = format("%02x%02x%02x", color.r * 255, color.g * 255, color.b * 255)
-end
-if CUSTOM_CLASS_COLORS then
-	CUSTOM_CLASS_COLORS:RegisterCallback(function()
-		for class, color in pairs(CUSTOM_CLASS_COLORS) do
-			classcolor[class] = format("%02x%02x%02x", color.r * 255, color.g * 255, color.b * 255)
-		end
-	end)
-end
 
 local SetupAssault, GetIconData
 do -- POI handling
@@ -162,29 +136,6 @@ do -- POI handling
 			end
 		end
 	end
-end
-
------------------------------------------------------------
-function mod:CreateCarrierButton(name, postclick) -- create common secure button
------------------------------------------------------------
-	--self.CarrierOnEnter = self.CarrierOnEnter or function(this)
-	--	if not this.car then return end
-	--	local c = self.db.colors[strlower(this.faction)] or self.db.colors.info1
-	--	this:SetBackdropColor(c.r, c.g, c.b, 0.4)
-	--end
-	--self.CarrierOnLeave = self.CarrierOnLeave or function(this)
-	--	this:SetBackdropColor(0, 0, 0, 0)
-	--end
-	--local b = CreateFrame("Button", name, UIParent, "SecureUnitButtonTemplate")
-	--b:SetWidth(200)
-	--b:SetHeight(20)
-	--b:RegisterForClicks("AnyUp")
-	--b:SetBackdrop(self.backdrop)
-	--b:SetBackdropColor(0, 0, 0, 0)
-	--b:SetScript("PostClick", postclick)
-	--b:SetScript("OnEnter", self.CarrierOnEnter)
-	--b:SetScript("OnLeave", self.CarrierOnLeave)
-	--return b
 end
 
 -- initialize or update a final score estimation bar (AB and EotS uses this)
@@ -377,34 +328,13 @@ do
 	------------------------------------------------ Eye of the Storm -------------------------------------------------
 	local pointsPerSecond = {1, 1.5, 2, 6} -- Updates every 2 seconds
 
-	local ef, ResetCarrier
+	local ResetCarrier
 	local function EyeOfTheStorm(self)
-		if not ef then
-			local eficon, eftext, carrier, cclass
-			-- handles secure stuff
-			local function SetEotSCarrierAttribute()
-				--ef:SetFrameStrata("HIGH")
-				--ef:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() - 14, AlwaysUpFrame1:GetBottom() + 8.5)
-				--if UnitExists("arena1") then
-				--	SecureUnitButton_OnLoad(ef, "arena1")
-				--elseif UnitExists("arena2") then
-				--	SecureUnitButton_OnLoad(ef, "arena2")
-				--end
-				--UnregisterUnitWatch(ef)
-			end
+		if not ResetCarrier then
 			-- resets carrier display
 			ResetCarrier = function(captured)
-				--carrier, ef.faction, ef.car = nil, nil, nil
-				--eftext:SetText("")
-				--eficon:Hide()
 				if captured then
 					self:StartBar(L.flagRespawns, 21, GetIconData(45), "colorOther") -- 45 = White flag
-				end
-				--self:CheckCombat(SetEotSCarrierAttribute)
-			end
-			local function CarrierOnClick(this)
-				if IsControlKeyDown() and carrier then
-					SendChatMessage(format(L["%s's flag carrier: %s (%s)"], this.faction, carrier, cclass), "INSTANCE_CHAT")
 				end
 			end
 			-- parse battleground messages
@@ -413,14 +343,6 @@ do
 				if found then
 					if found == "L'Alliance" then -- frFR
 						ResetCarrier(true)
-					else
-						--cclass = GetClassByName(name, faction)
-						--carrier, ef.car = name, true
-						--ef.faction = (faction == 0 and _G.FACTION_HORDE) or _G.FACTION_ALLIANCE
-						--eftext:SetFormattedText("|cff%s%s|r", classcolor[cclass or "PRIEST"] or classcolor.PRIEST, name or "")
-						--eficon:SetTexture(faction == 0 and 137218 or 137200) --137218-"Interface\\WorldStateFrame\\HordeFlag" || 137200-"Interface\\WorldStateFrame\\AllianceFlag"
-						--eficon:Show()
-						--self:CheckCombat(SetEotSCarrierAttribute)
 					end
 				elseif strmatch(a1, L.droppedTrigger) then
 					ResetCarrier()
@@ -471,19 +393,8 @@ do
 					end
 				end
 			end
-
-			--ef = self:CreateCarrierButton("CappingEotSFrame", CarrierOnClick)
-			--eficon = ef:CreateTexture(nil, "ARTWORK") -- flag icon
-			--eficon:SetPoint("TOPLEFT", ef, "TOPLEFT", 0, 1)
-			--eficon:SetPoint("BOTTOMRIGHT", ef, "BOTTOMLEFT", 20, -1)
-
-			--eftext = self:CreateText(ef, 13, "LEFT", eficon, 22, 0, ef, 0, 0) -- carrier text
-			--ef.text = eftext
-
-			--self:AddFrameToHide(ef) -- add to the tohide list to hide when bg is over
 		end
 
-		--ef:Show()
 		ResetCarrier()
 
 		-- setup for final score estimation (2 for EotS)
@@ -507,136 +418,16 @@ end
 do
 	------------------------------------------------ Warsong Gulch ----------------------------------------------------
 	local function WarsongGulch(self)
-		if not self.WSGBulk then -- init some data and create carrier frames
-			local wsgicon, playerfaction, prevtime, togunit
-			local af, aftext, aftexthp, acarrier, aclass
-			local hf, hftext, hftexthp, hcarrier, hclass
-			local ahealth, hhealth = 0, 0
-			local elap = 0
-			local unknownhp = "|cff777777??%|r"
-
-			-- props to "Fedos" and the ICU mod
-			-- updates a carrier's frame secure stuff, button will be slightly transparent if button cannot update (in combat)
-			--local function SetWSGCarrierAttribute()
-			--	if not af:GetAttribute("unit") or not hf:GetAttribute("unit") then
-			--		if acarrier == "arena1" or hcarrier == "arena2" then
-			--			SecureUnitButton_OnLoad(af, "arena1")
-			--			SecureUnitButton_OnLoad(hf, "arena2")
-			--		elseif acarrier or hcarrier then
-			--			SecureUnitButton_OnLoad(af, "arena2")
-			--			SecureUnitButton_OnLoad(hf, "arena1")
-			--		end
-			--		UnregisterUnitWatch(af)
-			--		UnregisterUnitWatch(hf)
-			--	end
-			--	if AlwaysUpFrame1 then
-			--		af:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame1:GetRight() + 38, AlwaysUpFrame1:GetTop())
-			--		hf:SetPoint("LEFT", UIParent, "BOTTOMLEFT", AlwaysUpFrame2:GetRight() + 38, AlwaysUpFrame2:GetTop())
-			--	end
-			--end
-			--local function SetCarrier(faction, carrier, class, u) -- setup carrier frames
-			--	if faction == "Horde" then
-			--		hcarrier, hclass, hf.car = carrier, class, carrier
-			--		hftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
-			--		local hhealth_before = hhealth
-			--		hhealth = min(floor(100 * UnitHealth(u)/UnitHealthMax(u)), 100)
-			--		hftexthp:SetFormattedText("|cff%s%d%%|r", (hhealth < hhealth_before and "ff2222") or "dddddd", hhealth)
-			--		hcarrier = u
-			--		hftext.unit = u
-			--		return hhealth
-			--	elseif faction == "Alliance" then
-			--		acarrier, aclass, af.car = carrier, class, carrier
-			--		aftext:SetFormattedText("|cff%s%s|r", classcolor[class or "PRIEST"] or classcolor.PRIEST, carrier or "")
-			--		ahealth = 0
-			--		aftexthp:SetText((carrier and unknownhp) or "")
-			--		local ahealth_before = ahealth
-			--		ahealth = min(floor(100 * UnitHealth(u)/UnitHealthMax(u)), 100)
-			--		aftexthp:SetFormattedText("|cff%s%d%%|r", (ahealth < ahealth_before and "ff2222") or "dddddd", ahealth)
-			--		acarrier = u
-			--		aftext.unit = u
-			--		return ahealth
-			--	elseif aftext.unit == faction then
-			--		aftext:SetText("")
-			--		aftexthp:SetText("")
-			--		acarrier, aclass, af.car = "", "", nil
-			--	elseif hftext.unit == faction then
-			--		hftext:SetText("")
-			--		hftexthp:SetText("")
-			--		hcarrier, hclass, hf.car = "", "", nil
-			--	end
-			--	mod:CheckCombat(SetWSGCarrierAttribute)
-			--end
-			--local function CarrierOnClick() -- sends basic carrier info to battleground chat
-            --
-			--end
-			--local function CreateWSGFrame() -- create all frames
-			--	local function CreateCarrierFrame(faction) -- create carriers' frames
-			--		local b = self:CreateCarrierButton("CappingTarget"..faction, CarrierOnClick)
-			--		local text = self:CreateText(b, 14, "LEFT", b, 29, 0, b, 0, 0)
-			--		local texthp = self:CreateText(b, 10, "RIGHT", b, -4, 0, b, 28 - b:GetWidth(), 0)
-			--		b.faction = (faction == "Alliance" and _G.FACTION_ALLIANCE) or _G.FACTION_HORDE
-			--		b.text = text
-			--		self:AddFrameToHide(b)
-			--		return b, text, texthp
-			--	end
-			--	af, aftext, aftexthp = CreateCarrierFrame("Alliance")
-			--	hf, hftext, hftexthp = CreateCarrierFrame("Horde")
-            --
-			--	af:SetScript("OnUpdate", function(_, a1)
-			--		elap = elap + a1
-			--		if elap > 0.25 then -- health check and display
-			--			elap, togunit = 0, not togunit
-			--			if togunit then
-			--				if UnitExists("arena1") then
-			--					local faction = UnitFactionGroup("arena1")
-			--					local name = GetUnitName("arena1", true)
-			--					local health = UnitHealth("arena1")
-			--					local _, class = UnitClass("arena1")
-			--					SetCarrier(faction, name, class, "arena1")
-			--				else
-			--					SetCarrier("arena1")
-			--				end
-			--			else
-			--				if UnitExists("arena2") then
-			--					local faction = UnitFactionGroup("arena2")
-			--					local name = GetUnitName("arena2", true)
-			--					local health = UnitHealth("arena2")
-			--					local _, class = UnitClass("arena2")
-			--					SetCarrier(faction, name, class, "arena2")
-			--				else
-			--					SetCarrier("arena2")
-			--				end
-			--			end
-			--		end
-			--	end)
-			--	CreateCarrierFrame, CreateWSGFrame = nil, nil
-			--end
-			self.WSGBulk = function() -- stuff to do at the beginning of every wsg, but after combat
-				--af:Show()
-				--hf:Show()
-				--SetCarrier()
-
-				prevtime = nil
-				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "WSGFlagCarrier")
-				self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "WSGFlagCarrier")
-
-				local func = function() self:WSGEnd() end
-				C_Timer.After(5, func)
-				C_Timer.After(30, func)
-				C_Timer.After(60, func)
-				C_Timer.After(130, func)
-				C_Timer.After(240, func)
-			end
+		if not self.WSGFlagCarrier then -- init some data and create carrier frames
 			--------------------------------------------
 			function mod:WSGFlagCarrier(a1) -- carrier detection and setup
 			--------------------------------------------
-				if strmatch(a1, L.capturedTheTrigger) then -- flag was captured, reset all carriers
-					--SetCarrier()
+				if strmatch(a1, L.capturedTheTrigger) then -- flag was captured
 					self:StartBar(L.flagRespawns, 12, GetIconData(45), "colorOther") -- White flag
 				end
 			end
 			-------------------------
-			function mod:WSGEnd() -- timer for last 5 minutes of WSG
+			function mod:WSGGetTimeRemaining()
 			-------------------------
 				local tbl = GetIconAndTextWidgetVisualizationInfo(6) or GetIconAndTextWidgetVisualizationInfo(630) -- WSG or Twin Peaks
 				if tbl and tbl.state == 1 then
@@ -645,22 +436,25 @@ do
 					seconds = tonumber(seconds)
 					if minutes and seconds then
 						local remaining = seconds + (minutes*60) + 1
-						local text = gsub(_G.TIME_REMAINING, ":", "")
+						local text = gsub(TIME_REMAINING, ":", "")
 						local bar = self:GetBar(text)
 						if remaining > 3 and (not bar or bar.remaining > remaining+5 or bar.remaining < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
 							self:StartBar(text, remaining, 134420, "colorOther") -- Interface/Icons/INV_Misc_Rune_07
 						end
-						prevtime = remaining
 					end
 				end
 			end
-
-			--playerfaction = UnitFactionGroup("player")
-			--wsgicon = strlower(playerfaction)
-			--self:CheckCombat(CreateWSGFrame)
 		end
 
-		self:WSGBulk()
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "WSGFlagCarrier")
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "WSGFlagCarrier")
+
+		local func = function() self:WSGGetTimeRemaining() end
+		C_Timer.After(5, func)
+		C_Timer.After(30, func)
+		C_Timer.After(60, func)
+		C_Timer.After(130, func)
+		C_Timer.After(240, func)
 	end
 	mod:AddBG(489, WarsongGulch)
 	mod:AddBG(726, WarsongGulch) -- Twin Peaks
@@ -699,9 +493,9 @@ do
 					local textureIndex = tbl.textureIndex
 					if tbl and ((ti and ti ~= textureIndex) or (not ti and wallid[POI])) then
 						if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
-							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, _G.ACTION_ENVIRONMENTAL_DAMAGE))
+							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, ACTION_ENVIRONMENTAL_DAMAGE))
 						elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, _G.ACTION_UNIT_DESTROYED))
+							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, ACTION_UNIT_DESTROYED))
 						end
 						walls[POI] = all[textureIndex] and textureIndex or ti
 					end
@@ -757,7 +551,7 @@ end
 --					if minutes and seconds then
 --						local remaining = seconds + (minutes*60) + 1
 --						if remaining > 4 then
---							local text = _G.NEXT_BATTLE_LABEL
+--							local text = NEXT_BATTLE_LABEL
 --							local bar = self:GetBar(text)
 --							if not bar or remaining > bar.remaining+5 or remaining < bar.remaining-5 then -- Don't restart bars for subtle changes +/- 5s
 --								self:StartBar(text, remaining, 1031537, "colorOther") -- Interface/Icons/Achievement_Zone_Ashran
@@ -799,7 +593,7 @@ do
 								self:UnregisterEvent("UPDATE_UI_WIDGET")
 								local spell, _, icon = GetSpellInfo(34709)
 								self:StartBar(spell, 93, icon, "colorOther")
-								local text = gsub(_G.TIME_REMAINING, ":", "")
+								local text = gsub(TIME_REMAINING, ":", "")
 								self:StartBar(text, remaining, nil, "colorOther")
 							end
 						end
