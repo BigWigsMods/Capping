@@ -1,5 +1,9 @@
 
-local addonName, mod = ...
+local mod
+do
+	local _
+	_, mod = ...
+end
 local L = mod.L
 
 local floor = math.floor
@@ -141,7 +145,7 @@ end
 -- initialize or update a final score estimation bar (AB and EotS uses this)
 local NewEstimator
 do
-	local ascore, atime, abases, hscore, htime, hbases, currentbg, prevText, prevTime
+	local ascore, abases, hscore, hbases, prevText, prevTime
 	local allianceWidget, hordeWidget = 0, 0
 	local ppsTable
 	NewEstimator = function(pointsPerSecond, aW, hW) -- resets estimator and sets new battleground
@@ -328,33 +332,15 @@ do
 	------------------------------------------------ Eye of the Storm -------------------------------------------------
 	local pointsPerSecond = {1, 1.5, 2, 6} -- Updates every 2 seconds
 
-	local ResetCarrier
 	local function EyeOfTheStorm(self)
-		if not ResetCarrier then
-			-- resets carrier display
-			ResetCarrier = function(captured)
-				if captured then
+		if not mod.FlagUpdate then
+			function mod:FlagUpdate(msg)
+				local found = strmatch(msg, L.takenTheFlagTrigger)
+				if found and found == "L'Alliance" then -- frFR
+					self:StartBar(L.flagRespawns, 21, GetIconData(45), "colorOther") -- 45 = White flag
+				elseif strmatch(msg, L.capturedTheTrigger) or strmatch(msg, L.hasTakenTheTrigger) then
 					self:StartBar(L.flagRespawns, 21, GetIconData(45), "colorOther") -- 45 = White flag
 				end
-			end
-			-- parse battleground messages
-			local function EotSFlag(a1, faction, name)
-				local found = strmatch(a1, L.takenTheFlagTrigger)
-				if found then
-					if found == "L'Alliance" then -- frFR
-						ResetCarrier(true)
-					end
-				elseif strmatch(a1, L.droppedTrigger) then
-					ResetCarrier()
-				elseif strmatch(a1, L.capturedTheTrigger) or strmatch(a1, L.hasTakenTheTrigger) then
-					ResetCarrier(true)
-				end
-			end
-			function mod:HFlagUpdate(msg, _, _, _, name)
-				EotSFlag(msg, 0, name)
-			end
-			function mod:AFlagUpdate(msg, _, _, _, name)
-				EotSFlag(msg, 1, name)
 			end
 			-- EotS PvP Brawl: Gravity Lapse
 			local ticker1, ticker2 = nil, nil
@@ -400,8 +386,8 @@ do
 		-- setup for final score estimation (2 for EotS)
 		NewEstimator(pointsPerSecond, 523, 524) -- BG table, alliance score widget, horde score widget
 		SetupAssault(60, 112) -- In RBG the four points have flags that need to be assaulted, like AB
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "HFlagUpdate")
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "AFlagUpdate")
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagUpdate")
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagUpdate")
 		self:RegisterTempEvent("RAID_BOSS_WHISPER", "CheckForGravity")
 	end
 	mod:AddBG(566, EyeOfTheStorm)
@@ -479,7 +465,7 @@ do
 			-- POI icon texture id
 			local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
 			local damaged, destroyed, all = { }, { }, { }
-			for k, v in pairs(intact) do
+			for k in pairs(intact) do
 				damaged[k + 1] = true
 				destroyed[k + 2] = true
 				all[k], all[k + 1], all[k + 2] = true, true, true

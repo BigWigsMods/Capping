@@ -61,7 +61,7 @@ function mod:UnregisterEvent(event)
 	frame:UnregisterEvent(event)
 end
 
-function mod:START_TIMER(timerType, timeSeconds, totalTime)
+function mod:START_TIMER(_, timeSeconds)
 	local _, t = GetInstanceInfo()
 	if t == "pvp" or t == "arena" then
 		for i = 1, #TimerTracker.timerList do

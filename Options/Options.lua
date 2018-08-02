@@ -68,7 +68,7 @@ local acOptions = {
 					type = "toggle",
 					name = L.lock,
 					order = 1,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.lock = value
 						if value then
 							value = false
@@ -87,7 +87,7 @@ local acOptions = {
 					type = "toggle",
 					name = L.barIcon,
 					order = 2,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.icon = value
 						for bar in next, cap.bars do
 							if value then
@@ -103,7 +103,7 @@ local acOptions = {
 					type = "toggle",
 					name = L.showTime,
 					order = 3,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.timeText = value
 						for bar in next, cap.bars do
 							bar:SetTimeVisibility(value)
@@ -114,7 +114,7 @@ local acOptions = {
 					type = "toggle",
 					name = L.fillBar,
 					order = 4,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.fill = value
 						for bar in next, cap.bars do
 							bar:SetFill(value)
@@ -132,7 +132,7 @@ local acOptions = {
 							if v == cap.db.profile.font then return i end
 						end
 					end,
-					set = function(info, value)
+					set = function(_, value)
 						local list = media:List("font")
 						local font = list[value]
 						cap.db.profile.font = font
@@ -149,7 +149,7 @@ local acOptions = {
 					max = 200,
 					min = 1,
 					step = 1,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.fontSize = value
 						for bar in next, cap.bars do
 							bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.profile.font), value, updateFlags())
@@ -161,7 +161,7 @@ local acOptions = {
 					type = "toggle",
 					name = L.monochrome,
 					order = 7,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.monochrome = value
 						for bar in next, cap.bars do
 							bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.profile.font), cap.db.profile.fontSize, updateFlags())
@@ -178,7 +178,7 @@ local acOptions = {
 						OUTLINE = L.thin,
 						THICKOUTLINE = L.thick,
 					},
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.outline = value
 						for bar in next, cap.bars do
 							bar.candyBarLabel:SetFont(media:Fetch("font", cap.db.profile.font), cap.db.profile.fontSize, updateFlags())
@@ -198,7 +198,7 @@ local acOptions = {
 							if v == cap.db.profile.barTexture then return i end
 						end
 					end,
-					set = function(info, value)
+					set = function(_, value)
 						local list = media:List("statusbar")
 						local texture = list[value]
 						cap.db.profile.barTexture = texture
@@ -214,7 +214,7 @@ local acOptions = {
 					max = 2000,
 					min = 10,
 					step = 1,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.width = value
 						for bar in next, cap.bars do
 							bar:SetWidth(value)
@@ -228,7 +228,7 @@ local acOptions = {
 					max = 100,
 					min = 5,
 					step = 1,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.height = value
 						for bar in next, cap.bars do
 							bar:SetHeight(value)
@@ -243,7 +243,7 @@ local acOptions = {
 						LEFT = L.left,
 						RIGHT = L.right,
 					},
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.alignIcon = value
 						for bar in next, cap.bars do
 							bar:SetIconPosition(value)
@@ -258,7 +258,7 @@ local acOptions = {
 					max = 100,
 					min = 0,
 					step = 1,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.spacing = value
 						cap.RearrangeBars()
 					end,
@@ -272,7 +272,7 @@ local acOptions = {
 						CENTER = L.center,
 						RIGHT = L.right,
 					},
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.alignText = value
 						for bar in next, cap.bars do
 							bar.candyBarLabel:SetJustifyH(value)
@@ -288,7 +288,7 @@ local acOptions = {
 						CENTER = L.center,
 						RIGHT = L.right,
 					},
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.alignTime = value
 						for bar in next, cap.bars do
 							bar.candyBarDuration:SetJustifyH(value)
@@ -300,7 +300,7 @@ local acOptions = {
 					name = L.growUpwards,
 					order = 16,
 					width = 2,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.growUp = value
 						cap.RearrangeBars()
 					end,
@@ -313,7 +313,7 @@ local acOptions = {
 					get = function()
 						return unpack(cap.db.profile.colorText)
 					end,
-					set = function(info, r, g, b, a)
+					set = function(_, r, g, b, a)
 						cap.db.profile.colorText = {r, g, b, a}
 						for bar in next, cap.bars do
 							bar:SetTextColor(r, g, b, a)
@@ -328,7 +328,7 @@ local acOptions = {
 					get = function()
 						return unpack(cap.db.profile.colorBarBackground)
 					end,
-					set = function(info, r, g, b, a)
+					set = function(_, r, g, b, a)
 						cap.db.profile.colorBarBackground = {r, g, b, a}
 						for bar in next, cap.bars do
 							if bar then
@@ -345,7 +345,7 @@ local acOptions = {
 					get = function()
 						return unpack(cap.db.profile.colorAlliance)
 					end,
-					set = function(info, r, g, b, a)
+					set = function(_, r, g, b, a)
 						cap.db.profile.colorAlliance = {r, g, b, a}
 						for bar in next, cap.bars do
 							if bar:Get("capping:colorid") == "colorAlliance" then
@@ -362,7 +362,7 @@ local acOptions = {
 					get = function()
 						return unpack(cap.db.profile.colorHorde)
 					end,
-					set = function(info, r, g, b, a)
+					set = function(_, r, g, b, a)
 						cap.db.profile.colorHorde = {r, g, b, a}
 						for bar in next, cap.bars do
 							if bar:Get("capping:colorid") == "colorHorde" then
@@ -379,7 +379,7 @@ local acOptions = {
 					get = function()
 						return unpack(cap.db.profile.colorQueue)
 					end,
-					set = function(info, r, g, b, a)
+					set = function(_, r, g, b, a)
 						cap.db.profile.colorQueue = {r, g, b, a}
 						for bar in next, cap.bars do
 							if bar:Get("capping:colorid") == "colorQueue" then
@@ -396,7 +396,7 @@ local acOptions = {
 					get = function()
 						return unpack(cap.db.profile.colorOther)
 					end,
-					set = function(info, r, g, b, a)
+					set = function(_, r, g, b, a)
 						cap.db.profile.colorOther = {r, g, b, a}
 						for bar in next, cap.bars do
 							if bar:Get("capping:colorid") == "colorOther" then
@@ -416,7 +416,7 @@ local acOptions = {
 					name = L.queueBars,
 					desc = L.queueBarsDesc,
 					order = 1,
-					set = function(info, value)
+					set = function(_, value)
 						cap.db.profile.queueBars = value
 						if not value then
 							for bar in next, cap.bars do
