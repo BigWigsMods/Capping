@@ -70,10 +70,10 @@ function mod:START_TIMER(timerType, timeSeconds, totalTime)
 
 		local faction = GetPlayerFactionGroup()
 		if faction and faction ~= "Neutral" then
-			local bar = self:GetBar(L["Battle Begins"])
+			local bar = self:GetBar(L.battleBegins)
 			if not bar or timeSeconds > bar.remaining+3 or timeSeconds < bar.remaining-3 then -- Don't restart bars for subtle changes +/- 3s
 				-- 132485 = Interface/Icons/INV_BannerPVP_01 || 132486 = Interface/Icons/INV_BannerPVP_02
-				mod:StartBar(L["Battle Begins"], timeSeconds, faction == "Horde" and 132485 or 132486, "colorOther")
+				mod:StartBar(L.battleBegins, timeSeconds, faction == "Horde" and 132485 or 132486, "colorOther")
 			end
 		end
 	end

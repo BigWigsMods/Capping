@@ -10,7 +10,6 @@ local UnitIsEnemy, UnitName, GetTime = UnitIsEnemy, UnitName, GetTime
 local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
 local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
-local assaulted, claimed, defended, taken = L["has assaulted"], L["claims the"], L["has defended the"], L["has taken the"]
 local GetNumGroupMembers = GetNumGroupMembers
 
 local GetBattlefieldScore, GetNumBattlefieldScores = GetBattlefieldScore, GetNumBattlefieldScores
@@ -198,7 +197,6 @@ do
 		allianceWidget, hordeWidget = aW, hW
 		ppsTable = pointsPerSecond
 		if not mod.UPDATE_UI_WIDGET then
-			local f2 = L["Final: %d - %d"]
 			--------------------------------------
 			function mod:UPDATE_UI_WIDGET(tbl)
 			--------------------------------------
@@ -255,13 +253,13 @@ do
 
 					if HTime < ATime then -- Horde is winning
 						local score = apps and (ascore + floor(apps * HTime)) or ascore
-						local txt = format(f2, score, MaxScore)
+						local txt = format(L.finalScore, score, MaxScore)
 						self:StopBar(prevText)
 						self:StartBar(txt, HTime, GetIconData(48), "colorHorde") -- 48 = Horde Insignia
 						prevText = txt
 					else -- Alliance is winning
 						local score = hpps and (hscore + floor(hpps * ATime)) or hscore
-						local txt = format(f2, MaxScore, score)
+						local txt = format(L.finalScore, MaxScore, score)
 						self:StopBar(prevText)
 						self:StartBar(txt, ATime, GetIconData(46), "colorAlliance") -- 46 = Alliance Insignia
 						prevText = txt
@@ -323,7 +321,7 @@ do
 				local mobId = tonumber(id)
 				if mobId == 13176 or mobId == 13257 then -- Smith Regzar, Murgot Deepforge
 					-- Open Quest to Smith or Murgot
-					if GetGossipOptions() and strmatch(GetGossipOptions(), L["Upgrade to"] ) then
+					if GetGossipOptions() and strmatch(GetGossipOptions(), L.upgradeToTrigger) then
 						SelectGossipOption(1)
 					elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
 						SelectGossipAvailableQuest(1)
@@ -400,7 +398,7 @@ do
 				--eftext:SetText("")
 				--eficon:Hide()
 				if captured then
-					self:StartBar(L["Flag respawns"], 21, GetIconData(45), "colorOther") -- 45 = White flag
+					self:StartBar(L.flagRespawns, 21, GetIconData(45), "colorOther") -- 45 = White flag
 				end
 				--self:CheckCombat(SetEotSCarrierAttribute)
 			end
@@ -411,7 +409,7 @@ do
 			end
 			-- parse battleground messages
 			local function EotSFlag(a1, faction, name)
-				local found = strmatch(a1, L["^(.+) has taken the flag!"])
+				local found = strmatch(a1, L.takenTheFlagTrigger)
 				if found then
 					if found == "L'Alliance" then -- frFR
 						ResetCarrier(true)
@@ -424,9 +422,9 @@ do
 						--eficon:Show()
 						--self:CheckCombat(SetEotSCarrierAttribute)
 					end
-				elseif strmatch(a1, L["dropped"]) then
+				elseif strmatch(a1, L.droppedTrigger) then
 					ResetCarrier()
-				elseif strmatch(a1, L["captured the"]) or strmatch(a1, taken) then
+				elseif strmatch(a1, L.capturedTheTrigger) or strmatch(a1, L.hasTakenTheTrigger) then
 					ResetCarrier(true)
 				end
 			end
@@ -632,9 +630,9 @@ do
 			--------------------------------------------
 			function mod:WSGFlagCarrier(a1) -- carrier detection and setup
 			--------------------------------------------
-				if strmatch(a1, L["captured the"]) then -- flag was captured, reset all carriers
+				if strmatch(a1, L.capturedTheTrigger) then -- flag was captured, reset all carriers
 					--SetCarrier()
-					self:StartBar(L["Flag respawns"], 12, GetIconData(45), "colorOther") -- White flag
+					self:StartBar(L.flagRespawns, 12, GetIconData(45), "colorOther") -- White flag
 				end
 			end
 			-------------------------
