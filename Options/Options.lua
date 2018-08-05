@@ -41,9 +41,8 @@ local barClickSetOptions = function(info, value)
 end
 
 local acOptions = {
-	type = "group",
-	childGroups = "tab",
 	name = "Capping",
+	type = "group", childGroups = "tab",
 	get = function(info)
 		return cap.db.profile[info[#info]]
 	end,

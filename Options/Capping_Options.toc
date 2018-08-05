@@ -13,14 +13,14 @@
 ## Notes-ptBR: Capping Opções de Configuração.
 ## Notes-ruRU: Capping параметры настроек.
 ## Version: @project-version@
+## LoadOnDemand: 1
+## Dependencies: Capping
+
 ## X-Category: Battlegrounds/PvP
 ## X-Website: https://github.com/BigWigsMods/Capping
 ## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask us about anything else.
 ## X-Curse-Project-ID: 20143
 ## X-WoWI-ID: 11177
-
-## LoadOnDemand: 1
-## Dependencies: Capping
 
 embeds.xml
 locales.xml
