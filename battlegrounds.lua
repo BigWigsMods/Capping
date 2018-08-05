@@ -381,8 +381,6 @@ do
 			end
 		end
 
-		ResetCarrier()
-
 		-- setup for final score estimation (2 for EotS)
 		NewEstimator(pointsPerSecond, 523, 524) -- BG table, alliance score widget, horde score widget
 		SetupAssault(60, 112) -- In RBG the four points have flags that need to be assaulted, like AB
