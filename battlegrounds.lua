@@ -239,7 +239,7 @@ do
 
 	local function ArathiBasinSnowyPvPBrawl()
 		SetupAssault(60, 837)
-		NewEstimator(pointsPerSecond, 495, 496) -- XXX total guess
+		NewEstimator(pointsPerSecond, 914, 915) -- BG table, alliance score widget, horde score widget
 	end
 	mod:AddBG(1681, ArathiBasinSnowyPvPBrawl)
 end
