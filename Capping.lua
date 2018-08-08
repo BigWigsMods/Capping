@@ -210,8 +210,11 @@ do -- estimated wait timer and port timer
 			--
 			-- This messyness is purely down to Blizzard calling both casual arenas the same name... which would screw with our bars if we were queued for both at the same time.
 			local id = bar:Get("capping:queueid")
-			if id and GetBattlefieldStatus(id) == "none" then
-				bar:Stop()
+			if id then
+				local status = GetBattlefieldStatus(id)
+				if status == "none" or status == "active" then
+					bar:Stop()
+				end
 			end
 		end
 	end
@@ -277,15 +280,7 @@ do -- estimated wait timer and port timer
 				end
 			end
 		elseif status == "active" then -- Inside BG
-			-- We can't directly call :StopBar(map) as it doesn't work for random BGs.
-			-- A random BG will adopt the zone name when it changes to "active" E.g. Random Battleground > Arathi Basin
-			for bar in next, activeBars do
-				local id = bar:Get("capping:queueid")
-				if id == queueId then
-					bar:Stop()
-					break
-				end
-			end
+			cleanupQueue()
 		elseif status == "none" then -- Leaving queue
 			cleanupQueue()
 		end
