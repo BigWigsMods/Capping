@@ -349,9 +349,7 @@ do
 		if not mod.FlagUpdate then
 			function mod:FlagUpdate(msg)
 				local found = strmatch(msg, L.takenTheFlagTrigger)
-				if found and found == "L'Alliance" then -- frFR
-					self:StartBar(L.flagRespawns, 21, GetIconData(45), "colorOther") -- 45 = White flag
-				elseif strmatch(msg, L.capturedTheTrigger) or strmatch(msg, L.hasTakenTheTrigger) then
+				if (found and found == "L'Alliance") or strmatch(msg, L.capturedTheTrigger) then -- frFR
 					self:StartBar(L.flagRespawns, 21, GetIconData(45), "colorOther") -- 45 = White flag
 				end
 				self:UpdateBases()
