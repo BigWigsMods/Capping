@@ -211,7 +211,7 @@ do
 						local txt = format(L.finalScore, score, MaxScore)
 						if txt ~= prevText then
 							self:StopBar(prevText)
-							self:StartBar(txt, HTime, GetIconData(48), "colorHorde") -- 48 = Horde Insignia
+							self:StartBar(txt, HTime, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
 							prevText = txt
 						end
 					elseif ATime < HTime then -- Alliance is winning
@@ -220,7 +220,7 @@ do
 						local txt = format(L.finalScore, MaxScore, score)
 						if txt ~= prevText then
 							self:StopBar(prevText)
-							self:StartBar(txt, ATime, GetIconData(46), "colorAlliance") -- 46 = Alliance Insignia
+							self:StartBar(txt, ATime, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
 							prevText = txt
 						end
 					end
