@@ -146,17 +146,18 @@ end
 local NewEstimator
 do
 	local ascore, abases, hscore, hbases, prevText, prevTime
-	local allianceWidget, hordeWidget = 0, 0
+	local allianceWidget, hordeWidget, updateBases = 0, 0, false
 	local ppsTable
 	NewEstimator = function(pointsPerSecond, aW, hW) -- resets estimator and sets new battleground
 		allianceWidget, hordeWidget = aW, hW
 		ppsTable = pointsPerSecond
+		updateBases = false
+		C_Timer.After(5, function() updateBases = true end) -- Delay the first update so we don't get bad data
 		if not mod.UPDATE_UI_WIDGET then
 			--------------------------------------
 			function mod:UPDATE_UI_WIDGET(tbl)
 			--------------------------------------
 
-				local updateBases = false
 				local t = GetTime()
 				local id = tbl.widgetID
 				local MaxScore = 1500
@@ -170,7 +171,6 @@ do
 					if ABases then
 						if abases ~= ABases then
 							abases = ABases
-							updateBases = true
 						end
 						ascore = AScore
 					end
@@ -183,7 +183,6 @@ do
 					if HBases then
 						if hbases ~= HBases then
 							hbases = HBases
-							updateBases = true
 						end
 						hscore = HScore
 					end
@@ -207,12 +206,14 @@ do
 					local HTime = hpps and ((MaxScore - hscore) / hpps) or 1000000
 
 					if HTime < ATime then -- Horde is winning
+						updateBases = false
 						local score = apps and (ascore + floor(apps * HTime)) or ascore
 						local txt = format(L.finalScore, score, MaxScore)
 						self:StopBar(prevText)
 						self:StartBar(txt, HTime, GetIconData(48), "colorHorde") -- 48 = Horde Insignia
 						prevText = txt
-					else -- Alliance is winning
+					elseif ATime < HTime then -- Alliance is winning
+						updateBases = false
 						local score = hpps and (hscore + floor(hpps * ATime)) or hscore
 						local txt = format(L.finalScore, MaxScore, score)
 						self:StopBar(prevText)
@@ -225,21 +226,29 @@ do
 		ascore, abases, hscore, hbases, prevText, prevTime = 0, 0, 0, 0, "", 0
 		mod:RegisterTempEvent("UPDATE_UI_WIDGET")
 	end
+
+	function mod:UpdateBases()
+		updateBases = true
+	end
 end
 
 do
 	------------------------------------------------ Arathi Basin -----------------------------------------------------
 	local pointsPerSecond = {1, 1.5, 2, 3.5, 30} -- Updates every 2 seconds
 
-	local function ArathiBasin()
+	local function ArathiBasin(self)
 		SetupAssault(60, 93)
 		NewEstimator(pointsPerSecond, 495, 496) -- BG table, alliance score widget, horde score widget
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "UpdateBases")
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "UpdateBases")
 	end
 	mod:AddBG(529, ArathiBasin)
 
-	local function ArathiBasinSnowyPvPBrawl()
+	local function ArathiBasinSnowyPvPBrawl(self)
 		SetupAssault(60, 837)
 		NewEstimator(pointsPerSecond, 914, 915) -- BG table, alliance score widget, horde score widget
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "UpdateBases")
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "UpdateBases")
 	end
 	mod:AddBG(1681, ArathiBasinSnowyPvPBrawl)
 end
@@ -248,9 +257,11 @@ do
 	------------------------------------------------ Deepwind Gorge -----------------------------------------------------
 	local pointsPerSecond = {1.6, 3.2, 6.4} -- Updates every 5 seconds
 
-	local function DeepwindGorge()
+	local function DeepwindGorge(self)
 		SetupAssault(61, 519)
 		NewEstimator(pointsPerSecond, 734, 735) -- BG table, alliance score widget, horde score widget
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "UpdateBases")
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "UpdateBases")
 	end
 	mod:AddBG(1105, DeepwindGorge)
 end
@@ -259,9 +270,11 @@ do
 	------------------------------------------------ Gilneas -----------------------------------------------------
 	local pointsPerSecond = {1, 3, 30} -- Updates every 1 second
 
-	local function TheBattleForGilneas()
+	local function TheBattleForGilneas(self)
 		SetupAssault(60, 275) -- Base cap time, uiMapID
 		NewEstimator(pointsPerSecond, 699, 700) -- BG table, alliance score widget, horde score widget
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "UpdateBases")
+		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "UpdateBases")
 	end
 	mod:AddBG(761, TheBattleForGilneas) -- Instance ID
 end
@@ -341,6 +354,7 @@ do
 				elseif strmatch(msg, L.capturedTheTrigger) or strmatch(msg, L.hasTakenTheTrigger) then
 					self:StartBar(L.flagRespawns, 21, GetIconData(45), "colorOther") -- 45 = White flag
 				end
+				self:UpdateBases()
 			end
 			-- EotS PvP Brawl: Gravity Lapse
 			local ticker1, ticker2 = nil, nil
