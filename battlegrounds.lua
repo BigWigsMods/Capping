@@ -209,16 +209,20 @@ do
 						updateBases = false
 						local score = apps and (ascore + floor(apps * HTime)) or ascore
 						local txt = format(L.finalScore, score, MaxScore)
-						self:StopBar(prevText)
-						self:StartBar(txt, HTime, GetIconData(48), "colorHorde") -- 48 = Horde Insignia
-						prevText = txt
+						if txt ~= prevText then
+							self:StopBar(prevText)
+							self:StartBar(txt, HTime, GetIconData(48), "colorHorde") -- 48 = Horde Insignia
+							prevText = txt
+						end
 					elseif ATime < HTime then -- Alliance is winning
 						updateBases = false
 						local score = hpps and (hscore + floor(hpps * ATime)) or hscore
 						local txt = format(L.finalScore, MaxScore, score)
-						self:StopBar(prevText)
-						self:StartBar(txt, ATime, GetIconData(46), "colorAlliance") -- 46 = Alliance Insignia
-						prevText = txt
+						if txt ~= prevText then
+							self:StopBar(prevText)
+							self:StartBar(txt, ATime, GetIconData(46), "colorAlliance") -- 46 = Alliance Insignia
+							prevText = txt
+						end
 					end
 				end
 			end
