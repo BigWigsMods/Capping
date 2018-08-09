@@ -6,7 +6,7 @@ do
 end
 local L = mod.L
 
-local floor = math.floor
+local ceil = math.ceil
 local strmatch, pairs, format, tonumber = strmatch, pairs, format, tonumber
 local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
 local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
@@ -145,94 +145,81 @@ end
 -- initialize or update a final score estimation bar (AB and EotS uses this)
 local NewEstimator
 do
-	local ascore, abases, hscore, hbases, prevText, prevTime
-	local allianceWidget, hordeWidget, updateBases = 0, 0, false
+	local allianceWidget, hordeWidget, prevTime, updateBases, hordeWinning = 0, 0, 0, false, false
+	local update = function() updateBases = true end
+	local MaxScore, prevText = 1500, ""
 	local ppsTable
+	function mod:ScorePredictor()
+		local t = GetTime()
+		-- Conditions:
+		-- 1) Amount of owned bases changed
+		-- 2) Two updates happened in a short space of time and we want the data from the 2nd update (latest score info)
+		-- This happens when both teams have bases, the first update (alliance) will be incomplete, the second update (horde) will give us a complete outlook of final scores
+		if updateBases or (t - prevTime) < 0.8 then
+			prevTime = t
+
+			local ascore, abases = 0, 0
+			do
+				local dataTbl = GetIconAndTextWidgetVisualizationInfo(allianceWidget)
+				local base, score = strmatch(dataTbl.text, "^[^%d]+(%d)[^%d]+(%d+)[^%d]+%d+$") -- Bases: %d  Resources: %d/%d
+				local ABases, AScore = tonumber(base), tonumber(score)
+				if ABases and AScore then
+					abases = ABases
+					ascore = AScore
+				end
+			end
+
+			local hscore, hbases = 0, 0
+			do
+				local dataTbl = GetIconAndTextWidgetVisualizationInfo(hordeWidget)
+				local base, score = strmatch(dataTbl.text, "^[^%d]+(%d)[^%d]+(%d+)[^%d]+%d+$") -- Bases: %d  Resources: %d/%d
+				local HBases, HScore = tonumber(base), tonumber(score)
+
+				if HBases and HScore then
+					hbases = HBases
+					hscore = HScore
+				end
+			end
+
+			local apps, hpps = ppsTable[abases], ppsTable[hbases]
+			-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
+			local ATime = apps and ((MaxScore - ascore) / apps) or 1000000
+			local HTime = hpps and ((MaxScore - hscore) / hpps) or 1000000
+
+			if HTime < ATime then -- Horde is winning
+				updateBases = false
+				local score = apps and (ascore + ceil(apps * HTime)) or ascore
+				local txt = format(L.finalScore, score, MaxScore)
+				if txt ~= prevText or not hordeWinning then
+					hordeWinning = true
+					self:StopBar(prevText)
+					self:StartBar(txt, HTime, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+					prevText = txt
+				end
+			elseif ATime < HTime then -- Alliance is winning
+				updateBases = false
+				local score = hpps and (hscore + ceil(hpps * ATime)) or hscore
+				local txt = format(L.finalScore, MaxScore, score)
+				if txt ~= prevText or hordeWinning then
+					hordeWinning = false
+					self:StopBar(prevText)
+					self:StartBar(txt, ATime, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+					prevText = txt
+				end
+			end
+		end
+	end
 	NewEstimator = function(pointsPerSecond, aW, hW) -- resets estimator and sets new battleground
 		allianceWidget, hordeWidget = aW, hW
 		ppsTable = pointsPerSecond
 		updateBases = false
-		C_Timer.After(5, function() updateBases = true end) -- Delay the first update so we don't get bad data
-		if not mod.UPDATE_UI_WIDGET then
-			--------------------------------------
-			function mod:UPDATE_UI_WIDGET(tbl)
-			--------------------------------------
-
-				local t = GetTime()
-				local id = tbl.widgetID
-				local MaxScore = 1500
-
-				if id == allianceWidget then
-					local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
-					local base, score, smax = strmatch(dataTbl.text, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
-					local ABases, AScore = tonumber(base), tonumber(score)
-					MaxScore = tonumber(smax) or MaxScore
-
-					if ABases then
-						if abases ~= ABases then
-							abases = ABases
-						end
-						ascore = AScore
-					end
-				elseif id == hordeWidget then
-					local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
-					local base, score, smax = strmatch(dataTbl.text, "[^%d]+(%d+)[^%d]+(%d+)/(%d+)") -- Bases: %d  Resources: %d/%d
-					local HBases, HScore = tonumber(base), tonumber(score)
-					MaxScore = tonumber(smax) or MaxScore
-
-					if HBases then
-						if hbases ~= HBases then
-							hbases = HBases
-						end
-						hscore = HScore
-					end
-				else
-					local data = GetIconAndTextWidgetVisualizationInfo(id)
-					if data then
-						print("Capping: Found a new id - ", id, data.tooltip)
-					end
-				end
-
-				-- Conditions:
-				-- 1) Amount of owned bases changed
-				-- 2) Two updates happened in a short space of time and we want the data from the 2nd update (latest score info)
-				-- This happens when both teams have bases, the first update (alliance) will be incomplete, the second update (horde) will give us a complete outlook of final scores
-				if updateBases or (t - prevTime) < 0.8 then
-					prevTime = t
-					local apps, hpps = ppsTable[abases], ppsTable[hbases]
-
-					-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
-					local ATime = apps and ((MaxScore - ascore) / apps) or 1000000
-					local HTime = hpps and ((MaxScore - hscore) / hpps) or 1000000
-
-					if HTime < ATime then -- Horde is winning
-						updateBases = false
-						local score = apps and (ascore + floor(apps * HTime)) or ascore
-						local txt = format(L.finalScore, score, MaxScore)
-						if txt ~= prevText then
-							self:StopBar(prevText)
-							self:StartBar(txt, HTime, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
-							prevText = txt
-						end
-					elseif ATime < HTime then -- Alliance is winning
-						updateBases = false
-						local score = hpps and (hscore + floor(hpps * ATime)) or hscore
-						local txt = format(L.finalScore, MaxScore, score)
-						if txt ~= prevText then
-							self:StopBar(prevText)
-							self:StartBar(txt, ATime, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
-							prevText = txt
-						end
-					end
-				end
-			end
-		end
-		ascore, abases, hscore, hbases, prevText, prevTime = 0, 0, 0, 0, "", 0
-		mod:RegisterTempEvent("UPDATE_UI_WIDGET")
+		prevText = ""
+		C_Timer.After(2, update) -- Delay the first update so we don't get bad data
+		mod:RegisterTempEvent("UPDATE_UI_WIDGET", "ScorePredictor")
 	end
 
 	function mod:UpdateBases()
-		updateBases = true
+		C_Timer.After(1, update) -- Delay the first update so we don't get bad data
 	end
 end
 
