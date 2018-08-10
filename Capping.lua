@@ -210,17 +210,15 @@ do -- estimated wait timer and port timer
 			--
 			-- This messyness is purely down to Blizzard calling both casual arenas the same name... which would screw with our bars if we were queued for both at the same time.
 			local id = bar:Get("capping:queueid")
-			if id then
-				local status = GetBattlefieldStatus(id)
-				if status == "none" or status == "active" then
-					bar:Stop()
-				end
+			if id and GetBattlefieldStatus(id) == "none" then
+				bar:Stop()
 			end
 		end
 	end
 
 	function mod:UPDATE_BATTLEFIELD_STATUS(queueId)
 		local status, map, _, _, _, size = GetBattlefieldStatus(queueId)
+
 		if size == "ARENASKIRMISH" then
 			map = format("%s (%d)", ARENA, queueId) -- No size or name distinction given for casual arena 2v2/3v3, separate them manually. Messy :(
 		end
@@ -236,7 +234,7 @@ do -- estimated wait timer and port timer
 				bar = self:StartBar(map, GetBattlefieldPortExpiration(queueId), 132327, "colorOther", true) -- 132327 = Interface/Icons/Ability_TownWatch
 				bar:Set("capping:queueid", queueId)
 			end
-		elseif status == "queued" and db.profile.queueBars then -- Waiting for BG to pop
+		elseif status == "queued" and map and db.profile.queueBars then -- Waiting for BG to pop
 			if size == "ARENASKIRMISH" then
 				cleanupQueue()
 			end
@@ -280,7 +278,15 @@ do -- estimated wait timer and port timer
 				end
 			end
 		elseif status == "active" then -- Inside BG
-			cleanupQueue()
+			-- We can't directly call :StopBar(map) as it doesn't work for random BGs.
+			-- A random BG will adopt the zone name when it changes to "active" E.g. Random Battleground > Arathi Basin
+			-- Also sometimes when queue 1 becomes active and you are in 2 queues, they will swap ID, because why not...
+			for bar in next, activeBars do
+				if bar:Get("capping:queueid") and bar:Get("capping:colorid") == "colorOther" then
+					bar:Stop()
+					break
+				end
+			end
 		elseif status == "none" then -- Leaving queue
 			cleanupQueue()
 		end
