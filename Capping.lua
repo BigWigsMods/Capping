@@ -107,6 +107,7 @@ function mod:PLAYER_LOGIN()
 			colorOther = {1,1,0,1},
 			colorBarBackground = {0,0,0,0.75},
 			queueBars = true,
+			useMasterForQueue = true,
 			barOnShift = "SAY",
 			barOnControl = "INSTANCE_CHAT",
 			barOnAlt = "NONE",
@@ -233,6 +234,13 @@ do -- estimated wait timer and port timer
 			if not bar then
 				bar = self:StartBar(map, GetBattlefieldPortExpiration(queueId), 132327, "colorOther", true) -- 132327 = Interface/Icons/Ability_TownWatch
 				bar:Set("capping:queueid", queueId)
+			end
+
+			if db.profile.useMasterForQueue then
+				local _, id = PlaySound(8459, "Master", false) -- SOUNDKIT.PVP_THROUGH_QUEUE
+				if id then
+					StopSound(id-1) -- Should work most of the time to stop the blizz sound
+				end
 			end
 		elseif status == "queued" and map and db.profile.queueBars then -- Waiting for BG to pop
 			if size == "ARENASKIRMISH" then

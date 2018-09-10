@@ -426,10 +426,16 @@ local acOptions = {
 						end
 					end,
 				},
+				useMasterForQueue = {
+					type = "toggle",
+					name = L.loudQueue,
+					desc = L.loudQueueDesc,
+					order = 2,
+				},
 				clickBarsHeader = {
 					type = "header",
 					name = L.clickableBars,
-					order = 2,
+					order = 3,
 				},
 				barOnShift = {
 					type = "select",
