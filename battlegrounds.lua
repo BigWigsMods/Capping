@@ -599,5 +599,6 @@ do
 	mod:AddBG(1552, Arena) -- Ashamane's Fall
 	mod:AddBG(1672, Arena) -- Blade's Edge Arena
 	mod:AddBG(1825, Arena) -- Hook Point
+	mod:AddBG(1911, Arena) -- Mugambala
 end
 
