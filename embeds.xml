@@ -4,15 +4,12 @@
 <Script file="Libs\LibStub\LibStub.lua"/>
 <Script file="Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua"/>
 
-<!--@no-lib-strip@-->
+<!--@non-debug@
 <Include file="Libs\LibSharedMedia-3.0\lib.xml"/>
 <Include file="Libs\LibCandyBar-3.0\lib.xml"/>
 <Include file="Libs\LibChatAnims\LibChatAnims.xml"/>
 <Include file="Libs\AceDB-3.0\AceDB-3.0.xml"/>
-<!--@end-no-lib-strip@-->
+@end-non-debug@-->
 
-<!--@do-not-package@-->
-<Include file="Options\embeds.xml"/>
-<!--@end-do-not-package@-->
 </Ui>
 
