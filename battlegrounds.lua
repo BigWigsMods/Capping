@@ -106,7 +106,18 @@ do -- POI handling
 		local pois = GetAreaPOIForMap(uiMapID)
 		for i = 1, #pois do
 			local tbl = GetAreaPOIInfo(uiMapID, pois[i])
-			landmarkCache[tbl.name] = tbl.textureIndex
+			local icon = tbl.textureIndex
+			landmarkCache[tbl.name] = icon
+			if icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
+				-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+				local _, _, _, id = UnitPosition("player")
+				if id == 30 or id == 628 then -- Alterac Valley, IoC
+					local bar = mod:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde") -- Paused bar for mine status
+					bar:Pause()
+					bar:SetTimeVisibility(false)
+					bar:Set("capping:customchat", function() end)
+				end
+			end
 		end
 		mod:RegisterTempEvent("AREA_POIS_UPDATED")
 	end
@@ -128,12 +139,14 @@ do -- POI handling
 					self:StopBar(name)
 					if icon == 136 or icon == 138 then -- Workshop in IoC
 						self:StartBar((GetSpellInfo(56661)), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
-					elseif icon == 2 or icon == 3 then
+					elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
+						-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
 						local _, _, _, id = UnitPosition("player")
-						if id == 30 then -- Alterac Valley
-							local bar = self:StartBar(name, 3600, GetIconData(icon), icon == 3 and "colorAlliance" or "colorHorde") -- Paused bar for mine status
+						if id == 30 or id == 628 then -- Alterac Valley, IoC
+							local bar = self:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde") -- Paused bar for mine status
 							bar:Pause()
 							bar:SetTimeVisibility(false)
+							bar:Set("capping:customchat", function() end)
 						end
 					end
 				end
@@ -220,6 +233,97 @@ do
 
 	function mod:UpdateBases()
 		C_Timer.After(1, update) -- Delay the first update so we don't get bad data
+	end
+end
+
+local SetupHealthCheck
+do
+	local unitTable = {
+		"target", "targettarget",
+		"mouseover", "mouseovertarget",
+		"focus", "focustarget",
+		"nameplate1", "nameplate2", "nameplate3", "nameplate4", "nameplate5", "nameplate6", "nameplate7", "nameplate8", "nameplate9", "nameplate10",
+		"nameplate11", "nameplate12", "nameplate13", "nameplate14", "nameplate15", "nameplate16", "nameplate17", "nameplate18", "nameplate19", "nameplate20",
+		"nameplate21", "nameplate22", "nameplate23", "nameplate24", "nameplate25", "nameplate26", "nameplate27", "nameplate28", "nameplate29", "nameplate30",
+		"nameplate31", "nameplate32", "nameplate33", "nameplate34", "nameplate35", "nameplate36", "nameplate37", "nameplate38", "nameplate39", "nameplate40",
+		"party1target", "party2target", "party3target", "party4target",
+		"raid1target", "raid2target", "raid3target", "raid4target", "raid5target",
+		"raid6target", "raid7target", "raid8target", "raid9target", "raid10target",
+		"raid11target", "raid12target", "raid13target", "raid14target", "raid15target",
+		"raid16target", "raid17target", "raid18target", "raid19target", "raid20target",
+		"raid21target", "raid22target", "raid23target", "raid24target", "raid25target",
+		"raid26target", "raid27target", "raid28target", "raid29target", "raid30target",
+		"raid31target", "raid32target", "raid33target", "raid34target", "raid35target",
+		"raid36target", "raid37target", "raid38target", "raid39target", "raid40target"
+	}
+	local collection, prev, count, started = {}, 0, #unitTable, false
+
+	local UnitGUID, strsplit, tonumber = UnitGUID, strsplit, tonumber
+	local function HealthScan()
+		local _, _, _, id = UnitPosition("player")
+		if id == 30 or id == 628 then -- Alterac Valley, IoC
+			C_Timer.After(1, HealthScan)
+		else
+			started = false
+			collection = {}
+			return
+		end
+
+		local tbl = {}
+		for i = 1, count do
+			local unit = unitTable[i]
+			local guid = UnitGUID(unit)
+			if guid then
+				local _, _, _, _, _, strid = strsplit("-", guid)
+				local id = tonumber(strid)
+				if id and collection[id] and not tbl[id] then
+					tbl[id] = true
+					local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
+					print(unit, id, hp)
+					C_ChatInfo.SendAddonMessage("Capping", ("%d:%.1f"):format(id, hp), "INSTANCE_CHAT")
+				end
+			end
+		end
+	end
+
+	SetupHealthCheck = function(npcId, npcName, icon, color)
+		collection[npcId] = {npcName, icon, color}
+		if not started then
+			started = true
+			C_ChatInfo.RegisterAddonMessagePrefix("Capping")
+			mod:RegisterTempEvent("CHAT_MSG_ADDON", "HealthUpdate")
+			C_Timer.After(1, HealthScan)
+		end
+	end
+
+	function mod:HealthUpdate(prefix, msg, channel, sender)
+		if prefix == "Capping" and channel == "INSTANCE_CHAT" then
+			local strid, strhp = strsplit(":", msg)
+			local id, hp = tonumber(strid), tonumber(strhp)
+			if id and hp and collection[id] and hp < 100.1 and hp > 0 then
+				if collection[id].candyBarBar then
+					if hp < 100 then
+						collection[id].candyBarBar:SetValue(hp)
+						collection[id].candyBarDuration:SetFormattedText("%.1f%%", hp)
+					else
+						local tbl = collection[id]:Get("capping:hpdata")
+						collection[id]:Stop()
+						collection[id] = tbl
+					end
+				elseif hp < 100 then
+					local tbl = collection[id]
+					local bar = mod:StartBar(tbl[1], 100, tbl[2], tbl[3], true)
+					bar:Pause()
+					bar.candyBarBar:SetValue(hp)
+					bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+					bar:Set("capping:customchat", function()
+						return bar.candyBarLabel:GetText() ..": ".. bar.candyBarDuration:GetText()
+					end)
+					bar:Set("capping:hpdata", tbl)
+					collection[id] = bar
+				end
+			end
+		end
 	end
 end
 
@@ -325,6 +429,8 @@ do
 		end
 
 		SetupAssault(242, 91)
+		SetupHealthCheck(11946, "Drek'Thar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
+		SetupHealthCheck(11948, "Vanndar Stormpike", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
 		self:RegisterTempEvent("GOSSIP_SHOW", "AVTurnIn")
 		self:RegisterTempEvent("QUEST_PROGRESS", "AVTurnInProgress")
 		self:RegisterTempEvent("QUEST_COMPLETE", "AVTurnInComplete")
@@ -398,6 +504,8 @@ do
 	------------------------------------------------ Isle of Conquest --------------------------------------
 	local function IsleOfConquest()
 		SetupAssault(61, 169)
+		SetupHealthCheck(34922, "Overlord Agmar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
+		SetupHealthCheck(34924, "Halford Wyrmbane", 236448, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Male
 	end
 	mod:AddBG(628, IsleOfConquest)
 end

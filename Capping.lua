@@ -314,12 +314,20 @@ do
 	do
 		local function ReportBar(bar, channel)
 			if not activeBars[bar] then return end
-			local colorid = bar:Get("capping:colorid")
-			local faction = colorid == "colorHorde" and _G.FACTION_HORDE or colorid == "colorAlliance" and _G.FACTION_ALLIANCE or ""
-			local timeLeft = bar.candyBarDuration:GetText()
-			if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
 			if channel == "INSTANCE_CHAT" and not IsInGroup(2) then channel = "RAID" end -- LE_PARTY_CATEGORY_INSTANCE = 2
-			SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
+			local custom = bar:Get("capping:customchat")
+			if not custom then
+				local colorid = bar:Get("capping:colorid")
+				local faction = colorid == "colorHorde" and _G.FACTION_HORDE or colorid == "colorAlliance" and _G.FACTION_ALLIANCE or ""
+				local timeLeft = bar.candyBarDuration:GetText()
+				if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
+				SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
+			else
+				local msg = custom()
+				if msg then
+					SendChatMessage(format("Capping: %s", msg), channel)
+				end
+			end
 		end
 		function BarOnClick(bar)
 			if IsShiftKeyDown() and db.profile.barOnShift ~= "NONE" then
