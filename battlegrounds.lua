@@ -246,6 +246,14 @@ do
 		"nameplate11", "nameplate12", "nameplate13", "nameplate14", "nameplate15", "nameplate16", "nameplate17", "nameplate18", "nameplate19", "nameplate20",
 		"nameplate21", "nameplate22", "nameplate23", "nameplate24", "nameplate25", "nameplate26", "nameplate27", "nameplate28", "nameplate29", "nameplate30",
 		"nameplate31", "nameplate32", "nameplate33", "nameplate34", "nameplate35", "nameplate36", "nameplate37", "nameplate38", "nameplate39", "nameplate40",
+		"nameplate1target", "nameplate2target", "nameplate3target", "nameplate4target", "nameplate5target",
+		"nameplate6target", "nameplate7target", "nameplate8target", "nameplate9target", "nameplate10target",
+		"nameplate11target", "nameplate12target", "nameplate13target", "nameplate14target", "nameplate15target",
+		"nameplate16target", "nameplate17target", "nameplate18target", "nameplate19target", "nameplate20target",
+		"nameplate21target", "nameplate22target", "nameplate23target", "nameplate24target", "nameplate25target",
+		"nameplate26target", "nameplate27target", "nameplate28target", "nameplate29target", "nameplate30target",
+		"nameplate31target", "nameplate32target", "nameplate33target", "nameplate34target", "nameplate35target",
+		"nameplate36target", "nameplate37target", "nameplate38target", "nameplate39target", "nameplate40target",
 		"party1target", "party2target", "party3target", "party4target",
 		"raid1target", "raid2target", "raid3target", "raid4target", "raid5target",
 		"raid6target", "raid7target", "raid8target", "raid9target", "raid10target",
@@ -256,7 +264,7 @@ do
 		"raid31target", "raid32target", "raid33target", "raid34target", "raid35target",
 		"raid36target", "raid37target", "raid38target", "raid39target", "raid40target"
 	}
-	local collection, prev, count, started = {}, 0, #unitTable, false
+	local collection, reset, prev, count, started = {}, {}, 0, #unitTable, false
 
 	local UnitGUID, strsplit, tonumber = UnitGUID, strsplit, tonumber
 	local function HealthScan()
@@ -265,8 +273,18 @@ do
 			C_Timer.After(1, HealthScan)
 		else
 			started = false
-			collection = {}
+			collection, reset = {}, {}
 			return
+		end
+
+		for id, counter in next, reset do
+			reset[id] = counter + 1
+			if counter > 20 then
+				local tbl = collection[id]:Get("capping:hpdata")
+				collection[id]:Stop()
+				reset[id] = nil
+				collection[id] = tbl
+			end
 		end
 
 		local tbl = {}
@@ -279,7 +297,6 @@ do
 				if id and collection[id] and not tbl[id] then
 					tbl[id] = true
 					local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
-					print(unit, id, hp)
 					C_ChatInfo.SendAddonMessage("Capping", ("%d:%.1f"):format(id, hp), "INSTANCE_CHAT")
 				end
 			end
@@ -303,11 +320,13 @@ do
 			if id and hp and collection[id] and hp < 100.1 and hp > 0 then
 				if collection[id].candyBarBar then
 					if hp < 100 then
+						reset[id] = 0
 						collection[id].candyBarBar:SetValue(hp)
 						collection[id].candyBarDuration:SetFormattedText("%.1f%%", hp)
 					else
 						local tbl = collection[id]:Get("capping:hpdata")
 						collection[id]:Stop()
+						reset[id] = nil
 						collection[id] = tbl
 					end
 				elseif hp < 100 then
@@ -320,6 +339,7 @@ do
 						return bar.candyBarLabel:GetText() ..": ".. bar.candyBarDuration:GetText()
 					end)
 					bar:Set("capping:hpdata", tbl)
+					reset[id] = 0
 					collection[id] = bar
 				end
 			end
@@ -431,6 +451,8 @@ do
 		SetupAssault(242, 91)
 		SetupHealthCheck(11946, "Drek'Thar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
 		SetupHealthCheck(11948, "Vanndar Stormpike", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
+		SetupHealthCheck(11947, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
+		SetupHealthCheck(11949, "Balinda Stonehearth", 236447, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Female
 		self:RegisterTempEvent("GOSSIP_SHOW", "AVTurnIn")
 		self:RegisterTempEvent("QUEST_PROGRESS", "AVTurnInProgress")
 		self:RegisterTempEvent("QUEST_COMPLETE", "AVTurnInComplete")
