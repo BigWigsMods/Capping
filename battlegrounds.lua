@@ -112,7 +112,7 @@ do -- POI handling
 				-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
 				local _, _, _, id = UnitPosition("player")
 				if id == 30 or id == 628 then -- Alterac Valley, IoC
-					local bar = mod:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde") -- Paused bar for mine status
+					local bar = mod:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
 					bar:Pause()
 					bar:SetTimeVisibility(false)
 					bar:Set("capping:customchat", function() end)
@@ -143,7 +143,7 @@ do -- POI handling
 						-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
 						local _, _, _, id = UnitPosition("player")
 						if id == 30 or id == 628 then -- Alterac Valley, IoC
-							local bar = self:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde") -- Paused bar for mine status
+							local bar = self:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
 							bar:Pause()
 							bar:SetTimeVisibility(false)
 							bar:Set("capping:customchat", function() end)
@@ -303,8 +303,8 @@ do
 		end
 	end
 
-	SetupHealthCheck = function(npcId, npcName, icon, color)
-		collection[npcId] = {npcName, icon, color}
+	SetupHealthCheck = function(npcId, npcName, englishName, icon, color)
+		collection[npcId] = {npcName, englishName, icon, color}
 		if not started then
 			started = true
 			C_ChatInfo.RegisterAddonMessagePrefix("Capping")
@@ -331,12 +331,16 @@ do
 					end
 				elseif hp < 100 then
 					local tbl = collection[id]
-					local bar = mod:StartBar(tbl[1], 100, tbl[2], tbl[3], true)
+					local bar = mod:StartBar(tbl[1], 100, tbl[3], tbl[4], true)
 					bar:Pause()
 					bar.candyBarBar:SetValue(hp)
 					bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 					bar:Set("capping:customchat", function()
-						return bar.candyBarLabel:GetText() ..": ".. bar.candyBarDuration:GetText()
+						if tbl[1] ~= tbl[2] then
+							return tbl[2] .."/".. tbl[1] .." - ".. bar.candyBarDuration:GetText()
+						else
+							return tbl[1] .." - ".. bar.candyBarDuration:GetText()
+						end
 					end)
 					bar:Set("capping:hpdata", tbl)
 					reset[id] = 0
@@ -449,10 +453,10 @@ do
 		end
 
 		SetupAssault(242, 91)
-		SetupHealthCheck(11946, "Drek'Thar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
-		SetupHealthCheck(11948, "Vanndar Stormpike", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
-		SetupHealthCheck(11947, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
-		SetupHealthCheck(11949, "Balinda Stonehearth", 236447, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Female
+		SetupHealthCheck(11946, L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
+		SetupHealthCheck(11948, L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
+		SetupHealthCheck(11947, L.galvangar, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
+		SetupHealthCheck(11949, L.balinda, "Balinda Stonehearth", 236447, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Female
 		self:RegisterTempEvent("GOSSIP_SHOW", "AVTurnIn")
 		self:RegisterTempEvent("QUEST_PROGRESS", "AVTurnInProgress")
 		self:RegisterTempEvent("QUEST_COMPLETE", "AVTurnInComplete")
@@ -524,10 +528,89 @@ end
 
 do
 	------------------------------------------------ Isle of Conquest --------------------------------------
+	local baseGateHealth = 1497600
+	local lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
+	local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
+	local hordeGates, allianceGates = {}, {}
 	local function IsleOfConquest()
+		if not mod.CheckGateHealth then
+			function mod:CheckGateHealth()
+				local _, event, _, _, _, _, _, destGUID, _, _, _, _, _, _, amount = CombatLogGetCurrentEventInfo()
+				if event == "SPELL_BUILDING_DAMAGE" then
+					local _, _, _, _, _, strid = strsplit("-", destGUID)
+					if hordeGates[strid] then
+						local newHp = hordeGates[strid] - amount
+						hordeGates[strid] = newHp
+						if newHp < lowestHordeHp then
+							lowestHordeHp = newHp
+							local bar = mod:GetBar(L.hordeGate)
+							if bar then
+								local hp = newHp / baseGateHealth * 100
+								if hp < 1 then
+									bar:Stop()
+								else
+									bar.candyBarBar:SetValue(hp)
+									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+								end
+							end
+						end
+					elseif allianceGates[strid] then
+						local newHp = allianceGates[strid] - amount
+						allianceGates[strid] = newHp
+						if newHp < lowestAllianceHp then
+							lowestAllianceHp = newHp
+							local bar = mod:GetBar(L.allianceGate)
+							if bar then
+								local hp = newHp / baseGateHealth * 100
+								if hp < 1 then
+									bar:Stop()
+								else
+									bar.candyBarBar:SetValue(hp)
+									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+		lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
+		hordeGates = {
+			["195494"] = baseGateHealth,
+			["195495"] = baseGateHealth,
+			["195496"] = baseGateHealth,
+		}
+		allianceGates = {
+			["195698"] = baseGateHealth,
+			["195699"] = baseGateHealth,
+			["195700"] = baseGateHealth,
+		}
 		SetupAssault(61, 169)
-		SetupHealthCheck(34922, "Overlord Agmar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
-		SetupHealthCheck(34924, "Halford Wyrmbane", 236448, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Male
+		SetupHealthCheck(34922, L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
+		SetupHealthCheck(34924, L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
+		mod:RegisterTempEvent("COMBAT_LOG_EVENT_UNFILTERED", "CheckGateHealth")
+		local aBar = mod:StartBar(L.allianceGate, 100, 2054277, "colorHorde", true) -- Interface/Icons/spell_tailor_defenceup01
+		aBar:Pause()
+		aBar.candyBarBar:SetValue(100)
+		aBar.candyBarDuration:SetText("100%")
+		aBar:Set("capping:customchat", function()
+			if L.allianceGate ~= "Alliance Gate" then
+				return "Alliance Gate/".. L.allianceGate .." - ".. aBar.candyBarDuration:GetText()
+			else
+				return L.allianceGate .." - ".. aBar.candyBarDuration:GetText()
+			end
+		end)
+		local hBar = mod:StartBar(L.hordeGate, 100, 2054277, "colorAlliance", true) -- Interface/Icons/spell_tailor_defenceup01
+		hBar:Pause()
+		hBar.candyBarBar:SetValue(100)
+		hBar.candyBarDuration:SetText("100%")
+		hBar:Set("capping:customchat", function()
+			if L.hordeGate ~= "Horde Gate" then
+				return "Horde Gate/".. L.hordeGate .." - ".. hBar.candyBarDuration:GetText()
+			else
+				return L.hordeGate .." - ".. hBar.candyBarDuration:GetText()
+			end
+		end)
 	end
 	mod:AddBG(628, IsleOfConquest)
 end

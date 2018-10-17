@@ -12,3 +12,10 @@ local L = mod.L
 --L.upgradeToTrigger = "Upgrade to"
 --L.droppedTrigger = "dropped"
 --L.capturedTheTrigger = "captured the"
+
+--L.hordeGate = "Horde Gate"
+--L.allianceGate = "Alliance Gate"
+--L.hordeBoss = "Horde Boss"
+--L.allianceBoss = "Alliance Boss"
+--L.galvangar = "Galvangar"
+--L.balinda = "Balinda Stonehearth"
