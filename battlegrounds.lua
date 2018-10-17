@@ -238,7 +238,7 @@ end
 
 local SetupHealthCheck
 do
-	local unitTable = {
+	local unitTable1 = {
 		"target", "targettarget",
 		"mouseover", "mouseovertarget",
 		"focus", "focustarget",
@@ -246,6 +246,8 @@ do
 		"nameplate11", "nameplate12", "nameplate13", "nameplate14", "nameplate15", "nameplate16", "nameplate17", "nameplate18", "nameplate19", "nameplate20",
 		"nameplate21", "nameplate22", "nameplate23", "nameplate24", "nameplate25", "nameplate26", "nameplate27", "nameplate28", "nameplate29", "nameplate30",
 		"nameplate31", "nameplate32", "nameplate33", "nameplate34", "nameplate35", "nameplate36", "nameplate37", "nameplate38", "nameplate39", "nameplate40",
+	}
+	local unitTable2 = {
 		"nameplate1target", "nameplate2target", "nameplate3target", "nameplate4target", "nameplate5target",
 		"nameplate6target", "nameplate7target", "nameplate8target", "nameplate9target", "nameplate10target",
 		"nameplate11target", "nameplate12target", "nameplate13target", "nameplate14target", "nameplate15target",
@@ -255,6 +257,8 @@ do
 		"nameplate31target", "nameplate32target", "nameplate33target", "nameplate34target", "nameplate35target",
 		"nameplate36target", "nameplate37target", "nameplate38target", "nameplate39target", "nameplate40target",
 		"party1target", "party2target", "party3target", "party4target",
+	}
+	local unitTable3 = {
 		"raid1target", "raid2target", "raid3target", "raid4target", "raid5target",
 		"raid6target", "raid7target", "raid8target", "raid9target", "raid10target",
 		"raid11target", "raid12target", "raid13target", "raid14target", "raid15target",
@@ -264,13 +268,46 @@ do
 		"raid31target", "raid32target", "raid33target", "raid34target", "raid35target",
 		"raid36target", "raid37target", "raid38target", "raid39target", "raid40target"
 	}
-	local collection, reset, prev, count, started = {}, {}, 0, #unitTable, false
+	local collection, reset, blocked, prev, started = {}, {}, {}, 0, false
+	local count1, count2, count3 = #unitTable1, #unitTable2, #unitTable3
 
 	local UnitGUID, strsplit, tonumber = UnitGUID, strsplit, tonumber
+	local Timer, SendAddonMessage = C_Timer.After, C_ChatInfo.SendAddonMessage
+
+	local function parse2()
+		for i = 1, count2 do
+			local unit = unitTable2[i]
+			local guid = UnitGUID(unit)
+			if guid then
+				local _, _, _, _, _, strid = strsplit("-", guid)
+				if strid and collection[strid] and not blocked[strid] then
+					blocked[strid] = true
+					local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
+					SendAddonMessage("Capping", ("%s:%.1f"):format(strid, hp), "INSTANCE_CHAT")
+				end
+			end
+		end
+	end
+	local function parse3()
+		for i = 1, count3 do
+			local unit = unitTable3[i]
+			local guid = UnitGUID(unit)
+			if guid then
+				local _, _, _, _, _, strid = strsplit("-", guid)
+				if strid and collection[strid] and not blocked[strid] then
+					blocked[strid] = true
+					local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
+					SendAddonMessage("Capping", ("%s:%.1f"):format(strid, hp), "INSTANCE_CHAT")
+				end
+			end
+		end
+	end
 	local function HealthScan()
 		local _, _, _, id = UnitPosition("player")
 		if id == 30 or id == 628 then -- Alterac Valley, IoC
-			C_Timer.After(1, HealthScan)
+			Timer(1, HealthScan)
+			Timer(0.1, parse2) -- Break up parsing
+			Timer(0.2, parse3)
 		else
 			started = false
 			collection, reset = {}, {}
@@ -287,17 +324,16 @@ do
 			end
 		end
 
-		local tbl = {}
-		for i = 1, count do
-			local unit = unitTable[i]
+		blocked = {}
+		for i = 1, count1 do
+			local unit = unitTable1[i]
 			local guid = UnitGUID(unit)
 			if guid then
 				local _, _, _, _, _, strid = strsplit("-", guid)
-				local id = tonumber(strid)
-				if id and collection[id] and not tbl[id] then
-					tbl[id] = true
+				if strid and collection[strid] and not blocked[strid] then
+					blocked[strid] = true
 					local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
-					C_ChatInfo.SendAddonMessage("Capping", ("%d:%.1f"):format(id, hp), "INSTANCE_CHAT")
+					SendAddonMessage("Capping", ("%s:%.1f"):format(strid, hp), "INSTANCE_CHAT")
 				end
 			end
 		end
@@ -316,21 +352,21 @@ do
 	function mod:HealthUpdate(prefix, msg, channel, sender)
 		if prefix == "Capping" and channel == "INSTANCE_CHAT" then
 			local strid, strhp = strsplit(":", msg)
-			local id, hp = tonumber(strid), tonumber(strhp)
-			if id and hp and collection[id] and hp < 100.1 and hp > 0 then
-				if collection[id].candyBarBar then
+			local hp = tonumber(strhp)
+			if strid and hp and collection[strid] and hp < 100.1 and hp > 0 then
+				if collection[strid].candyBarBar then
 					if hp < 100 then
-						reset[id] = 0
-						collection[id].candyBarBar:SetValue(hp)
-						collection[id].candyBarDuration:SetFormattedText("%.1f%%", hp)
+						reset[strid] = 0
+						collection[strid].candyBarBar:SetValue(hp)
+						collection[strid].candyBarDuration:SetFormattedText("%.1f%%", hp)
 					else
-						local tbl = collection[id]:Get("capping:hpdata")
-						collection[id]:Stop()
-						reset[id] = nil
-						collection[id] = tbl
+						local tbl = collection[strid]:Get("capping:hpdata")
+						collection[strid]:Stop()
+						reset[strid] = nil
+						collection[strid] = tbl
 					end
 				elseif hp < 100 then
-					local tbl = collection[id]
+					local tbl = collection[strid]
 					local bar = mod:StartBar(tbl[1], 100, tbl[3], tbl[4], true)
 					bar:Pause()
 					bar.candyBarBar:SetValue(hp)
@@ -343,8 +379,8 @@ do
 						end
 					end)
 					bar:Set("capping:hpdata", tbl)
-					reset[id] = 0
-					collection[id] = bar
+					reset[strid] = 0
+					collection[strid] = bar
 				end
 			end
 		end
@@ -453,10 +489,10 @@ do
 		end
 
 		SetupAssault(242, 91)
-		SetupHealthCheck(11946, L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
-		SetupHealthCheck(11948, L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
-		SetupHealthCheck(11947, L.galvangar, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
-		SetupHealthCheck(11949, L.balinda, "Balinda Stonehearth", 236447, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Female
+		SetupHealthCheck("11946", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
+		SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
+		SetupHealthCheck("11947", L.galvangar, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
+		SetupHealthCheck("11949", L.balinda, "Balinda Stonehearth", 236447, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Female
 		self:RegisterTempEvent("GOSSIP_SHOW", "AVTurnIn")
 		self:RegisterTempEvent("QUEST_PROGRESS", "AVTurnInProgress")
 		self:RegisterTempEvent("QUEST_COMPLETE", "AVTurnInComplete")
@@ -586,8 +622,8 @@ do
 			["195700"] = baseGateHealth,
 		}
 		SetupAssault(61, 169)
-		SetupHealthCheck(34922, L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
-		SetupHealthCheck(34924, L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
+		SetupHealthCheck("34922", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
+		SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
 		mod:RegisterTempEvent("COMBAT_LOG_EVENT_UNFILTERED", "CheckGateHealth")
 		local aBar = mod:StartBar(L.allianceGate, 100, 2054277, "colorHorde", true) -- Interface/Icons/spell_tailor_defenceup01
 		aBar:Pause()
