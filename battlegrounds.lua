@@ -11,6 +11,7 @@ local strmatch, pairs, format, tonumber = strmatch, pairs, format, tonumber
 local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
 local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
+local Timer, SendAddonMessage = C_Timer.After, C_ChatInfo.SendAddonMessage
 
 local SetupAssault, GetIconData
 do -- POI handling
@@ -227,12 +228,12 @@ do
 		ppsTable = pointsPerSecond
 		updateBases = false
 		prevText = ""
-		C_Timer.After(2, update) -- Delay the first update so we don't get bad data
+		Timer(2, update) -- Delay the first update so we don't get bad data
 		mod:RegisterTempEvent("UPDATE_UI_WIDGET", "ScorePredictor")
 	end
 
 	function mod:UpdateBases()
-		C_Timer.After(1, update) -- Delay the first update so we don't get bad data
+		Timer(1, update) -- Delay the first update so we don't get bad data
 	end
 end
 
@@ -270,9 +271,7 @@ do
 	}
 	local collection, reset, blocked, prev, started = {}, {}, {}, 0, false
 	local count1, count2, count3 = #unitTable1, #unitTable2, #unitTable3
-
-	local UnitGUID, strsplit, tonumber = UnitGUID, strsplit, tonumber
-	local Timer, SendAddonMessage = C_Timer.After, C_ChatInfo.SendAddonMessage
+	local UnitGUID, strsplit = UnitGUID, strsplit
 
 	local function parse2()
 		for i = 1, count2 do
@@ -283,7 +282,7 @@ do
 				if strid and collection[strid] and not blocked[strid] then
 					blocked[strid] = true
 					local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
-					SendAddonMessage("Capping", ("%s:%.1f"):format(strid, hp), "INSTANCE_CHAT")
+					SendAddonMessage("Capping", format("%s:%.1f", strid, hp), "INSTANCE_CHAT")
 				end
 			end
 		end
@@ -297,7 +296,7 @@ do
 				if strid and collection[strid] and not blocked[strid] then
 					blocked[strid] = true
 					local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
-					SendAddonMessage("Capping", ("%s:%.1f"):format(strid, hp), "INSTANCE_CHAT")
+					SendAddonMessage("Capping", format("%s:%.1f", strid, hp), "INSTANCE_CHAT")
 				end
 			end
 		end
@@ -333,7 +332,7 @@ do
 				if strid and collection[strid] and not blocked[strid] then
 					blocked[strid] = true
 					local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
-					SendAddonMessage("Capping", ("%s:%.1f"):format(strid, hp), "INSTANCE_CHAT")
+					SendAddonMessage("Capping", format("%s:%.1f", strid, hp), "INSTANCE_CHAT")
 				end
 			end
 		end
@@ -345,7 +344,7 @@ do
 			started = true
 			C_ChatInfo.RegisterAddonMessagePrefix("Capping")
 			mod:RegisterTempEvent("CHAT_MSG_ADDON", "HealthUpdate")
-			C_Timer.After(1, HealthScan)
+			Timer(1, HealthScan)
 		end
 	end
 
@@ -541,8 +540,8 @@ do
 					local name = GetSpellInfo(44224) -- Gravity Lapse
 					local icon = GetSpellTexture(44224)
 					self:StartBar(name, 15, icon, "colorOther")
-					C_Timer.After(15, StartNextGravTimer)
-					C_Timer.After(10, PrintExtraMessage)
+					Timer(15, StartNextGravTimer)
+					Timer(10, PrintExtraMessage)
 					if ticker1 then
 						ticker1:Cancel()
 						ticker2:Cancel()
@@ -568,62 +567,48 @@ do
 	local lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
 	local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 	local hordeGates, allianceGates = {}, {}
-	local function IsleOfConquest()
-		if not mod.CheckGateHealth then
-			function mod:CheckGateHealth()
-				local _, event, _, _, _, _, _, destGUID, _, _, _, _, _, _, amount = CombatLogGetCurrentEventInfo()
-				if event == "SPELL_BUILDING_DAMAGE" then
-					local _, _, _, _, _, strid = strsplit("-", destGUID)
-					if hordeGates[strid] then
-						local newHp = hordeGates[strid] - amount
-						hordeGates[strid] = newHp
-						if newHp < lowestHordeHp then
-							lowestHordeHp = newHp
-							local bar = mod:GetBar(L.hordeGate)
-							if bar then
-								local hp = newHp / baseGateHealth * 100
-								if hp < 1 then
-									bar:Stop()
-								else
-									bar.candyBarBar:SetValue(hp)
-									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
-								end
-							end
+
+	function mod:CheckGateHealth()
+		local _, event, _, _, _, _, _, destGUID, _, _, _, _, _, _, amount = CombatLogGetCurrentEventInfo()
+		if event == "SPELL_BUILDING_DAMAGE" then
+			local _, _, _, _, _, strid = strsplit("-", destGUID)
+			if hordeGates[strid] then
+				local newHp = hordeGates[strid] - amount
+				hordeGates[strid] = newHp
+				if newHp < lowestHordeHp then
+					lowestHordeHp = newHp
+					local bar = mod:GetBar(L.hordeGate)
+					if bar then
+						local hp = newHp / baseGateHealth * 100
+						if hp < 1 then
+							bar:Stop()
+						else
+							bar.candyBarBar:SetValue(hp)
+							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 						end
-					elseif allianceGates[strid] then
-						local newHp = allianceGates[strid] - amount
-						allianceGates[strid] = newHp
-						if newHp < lowestAllianceHp then
-							lowestAllianceHp = newHp
-							local bar = mod:GetBar(L.allianceGate)
-							if bar then
-								local hp = newHp / baseGateHealth * 100
-								if hp < 1 then
-									bar:Stop()
-								else
-									bar.candyBarBar:SetValue(hp)
-									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
-								end
-							end
+					end
+				end
+			elseif allianceGates[strid] then
+				local newHp = allianceGates[strid] - amount
+				allianceGates[strid] = newHp
+				if newHp < lowestAllianceHp then
+					lowestAllianceHp = newHp
+					local bar = mod:GetBar(L.allianceGate)
+					if bar then
+						local hp = newHp / baseGateHealth * 100
+						if hp < 1 then
+							bar:Stop()
+						else
+							bar.candyBarBar:SetValue(hp)
+							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 						end
 					end
 				end
 			end
 		end
-		lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
-		hordeGates = {
-			["195494"] = baseGateHealth,
-			["195495"] = baseGateHealth,
-			["195496"] = baseGateHealth,
-		}
-		allianceGates = {
-			["195698"] = baseGateHealth,
-			["195699"] = baseGateHealth,
-			["195700"] = baseGateHealth,
-		}
-		SetupAssault(61, 169)
-		SetupHealthCheck("34922", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
-		SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
+	end
+
+	local function initGateBars()
 		mod:RegisterTempEvent("COMBAT_LOG_EVENT_UNFILTERED", "CheckGateHealth")
 		local aBar = mod:StartBar(L.allianceGate, 100, 2054277, "colorHorde", true) -- Interface/Icons/spell_tailor_defenceup01
 		aBar:Pause()
@@ -647,6 +632,115 @@ do
 				return L.hordeGate .." - ".. hBar.candyBarDuration:GetText()
 			end
 		end)
+	end
+
+	local hereFromTheStart, hasData = true, true
+	local stopTimer = nil
+	local function allow() hereFromTheStart = false end
+	local function stop() hereFromTheStart = true stopTimer = nil end
+	local function IoCSyncRequest()
+		local bar = mod:GetBar(L.battleBegins)
+		if bar then
+			hereFromTheStart = true
+			hasData = true
+			initGateBars()
+		else
+			hereFromTheStart = true
+			hasData = false
+			Timer(0.5, allow)
+			stopTimer = C_Timer.NewTicker(3, stop, 1)
+			SendAddonMessage("Capping", "gr", "INSTANCE_CHAT")
+		end
+	end
+
+	local timer = nil
+	local function SendIoCGates()
+		timer = nil
+		if IsInGroup(2) then -- We've not just ragequit
+			local msg = format(
+				"195494:%d:195495:%d:195496:%d:195698:%d:195699:%d:195700:%d",
+				hordeGates["195494"], hordeGates["195495"], hordeGates["195496"],
+				allianceGates["195698"], allianceGates["195699"], allianceGates["195700"]
+			)
+			SendAddonMessage("Capping", msg, "INSTANCE_CHAT")
+		end
+	end
+
+	do
+		local me = UnitName("player").. "-" ..GetRealmName()
+		function mod:IoCSync(prefix, msg, channel, sender)
+			self:HealthUpdate(prefix, msg, channel, sender)
+			if prefix == "Capping" and channel == "INSTANCE_CHAT" and sender ~= me then
+				if msg == "gr" then -- gate request
+					if hasData then -- Joined a late game, don't send data
+						if timer then timer:Cancel() end
+						timer = C_Timer.NewTicker(1, SendIoCGates, 1)
+					elseif stopTimer then
+						stopTimer:Cancel()
+						stopTimer = C_Timer.NewTicker(3, stop, 1)
+					end
+				else
+					local h1, h1hp, h2, h2hp, h3, h3hp, a1, a1hp, a2, a2hp, a3, a3hp = strsplit(":", msg)
+					local hGate1, hGate2, hGate3, aGate1, aGate2, aGate3 = tonumber(h1hp), tonumber(h2hp), tonumber(h3hp), tonumber(a1hp), tonumber(a2hp), tonumber(a3hp)
+					if hGate1 and hGate2 and hGate3 and aGate1 and aGate2 and aGate3 and -- Safety dance
+					h1 == "195494" and h2 == "195495" and h3 == "195496" and a1 =="195698" and a2 == "195699" and a3 == "195700" then
+						if not hereFromTheStart then
+							hereFromTheStart = true
+							hasData = true
+							initGateBars()
+							lowestHordeHp = math.min(hGate1, hGate2, hGate3)
+							lowestAllianceHp = math.min(aGate1, aGate2, aGate3)
+							hordeGates["195494"] = hGate1
+							hordeGates["195495"] = hGate2
+							hordeGates["195496"] = hGate3
+							allianceGates["195698"] = aGate1
+							allianceGates["195699"] = aGate2
+							allianceGates["195700"] = aGate3
+
+							local bar = mod:GetBar(L.hordeGate)
+							if bar then
+								local hp = lowestHordeHp / baseGateHealth * 100
+								if hp < 1 then
+									bar:Stop()
+								else
+									bar.candyBarBar:SetValue(hp)
+									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+								end
+							end
+							local bar = mod:GetBar(L.allianceGate)
+							if bar then
+								local hp = lowestAllianceHp / baseGateHealth * 100
+								if hp < 1 then
+									bar:Stop()
+								else
+									bar.candyBarBar:SetValue(hp)
+									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	local function IsleOfConquest()
+		lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
+		hordeGates = {
+			["195494"] = baseGateHealth,
+			["195495"] = baseGateHealth,
+			["195496"] = baseGateHealth,
+		}
+		allianceGates = {
+			["195698"] = baseGateHealth,
+			["195699"] = baseGateHealth,
+			["195700"] = baseGateHealth,
+		}
+		SetupAssault(61, 169)
+		SetupHealthCheck("34922", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
+		SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
+		mod:RegisterTempEvent("CHAT_MSG_ADDON", "IoCSync")
+		Timer(2, IoCSyncRequest)
 	end
 	mod:AddBG(628, IsleOfConquest)
 end
@@ -686,11 +780,11 @@ do
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "WSGFlagCarrier")
 
 		local func = function() self:WSGGetTimeRemaining() end
-		C_Timer.After(5, func)
-		C_Timer.After(30, func)
-		C_Timer.After(60, func)
-		C_Timer.After(130, func)
-		C_Timer.After(240, func)
+		Timer(5, func)
+		Timer(30, func)
+		Timer(60, func)
+		Timer(130, func)
+		Timer(240, func)
 	end
 	mod:AddBG(489, WarsongGulch)
 	mod:AddBG(726, WarsongGulch) -- Twin Peaks
