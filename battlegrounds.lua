@@ -139,7 +139,7 @@ do -- POI handling
 				else
 					self:StopBar(name)
 					if icon == 136 or icon == 138 then -- Workshop in IoC
-						self:StartBar((GetSpellInfo(56661)), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+						self:StartBar(GetSpellInfo(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
 					elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
 						-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
 						local _, _, _, id = UnitPosition("player")
@@ -356,14 +356,9 @@ do
 				if collection[strid].candyBarBar then
 					if hp < 100 then
 						reset[strid] = 0
-						collection[strid].candyBarBar:SetValue(hp)
-						collection[strid].candyBarDuration:SetFormattedText("%.1f%%", hp)
-					else
-						local tbl = collection[strid]:Get("capping:hpdata")
-						collection[strid]:Stop()
-						reset[strid] = nil
-						collection[strid] = tbl
 					end
+					collection[strid].candyBarBar:SetValue(hp)
+					collection[strid].candyBarDuration:SetFormattedText("%.1f%%", hp)
 				elseif hp < 100 then
 					local tbl = collection[strid]
 					local bar = mod:StartBar(tbl[1], 100, tbl[3], tbl[4], true)
@@ -670,8 +665,8 @@ do
 		local me = UnitName("player").. "-" ..GetRealmName()
 		function mod:IoCSync(prefix, msg, channel, sender)
 			self:HealthUpdate(prefix, msg, channel, sender)
-			if prefix == "Capping" and channel == "INSTANCE_CHAT" and sender ~= me then
-				if msg == "gr" then -- gate request
+			if prefix == "Capping" and channel == "INSTANCE_CHAT" then
+				if msg == "gr" and sender ~= me then -- gate request
 					if hasData then -- Joined a late game, don't send data
 						if timer then timer:Cancel() end
 						timer = C_Timer.NewTicker(1, SendIoCGates, 1)
@@ -679,48 +674,67 @@ do
 						stopTimer:Cancel()
 						stopTimer = C_Timer.NewTicker(3, stop, 1)
 					end
-				else
+				elseif msg == "rb" or msg == "rbh" then -- Re-Build / Re-Build Halfway
+					local pois = GetAreaPOIForMap(169)
+					for i = 1, #pois do
+						local tbl = GetAreaPOIInfo(169, pois[i])
+						local icon = tbl.textureIndex
+						if icon == 136 or icon == 138 then -- Workshop in IoC
+							local text = GetSpellInfo(56661) -- Build Siege Engine
+							local bar = self:GetBar(text)
+							if not bar then
+								self:StartBar(text, msg == "rb" and 181 or 90.5, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- 252187 = ability_vehicle_siegeengineram
+							end
+						end
+					end
+				elseif not hereFromTheStart and sender ~= me then
 					local h1, h1hp, h2, h2hp, h3, h3hp, a1, a1hp, a2, a2hp, a3, a3hp = strsplit(":", msg)
 					local hGate1, hGate2, hGate3, aGate1, aGate2, aGate3 = tonumber(h1hp), tonumber(h2hp), tonumber(h3hp), tonumber(a1hp), tonumber(a2hp), tonumber(a3hp)
 					if hGate1 and hGate2 and hGate3 and aGate1 and aGate2 and aGate3 and -- Safety dance
 					h1 == "195494" and h2 == "195495" and h3 == "195496" and a1 =="195698" and a2 == "195699" and a3 == "195700" then
-						if not hereFromTheStart then
-							hereFromTheStart = true
-							hasData = true
-							initGateBars()
-							lowestHordeHp = math.min(hGate1, hGate2, hGate3)
-							lowestAllianceHp = math.min(aGate1, aGate2, aGate3)
-							hordeGates["195494"] = hGate1
-							hordeGates["195495"] = hGate2
-							hordeGates["195496"] = hGate3
-							allianceGates["195698"] = aGate1
-							allianceGates["195699"] = aGate2
-							allianceGates["195700"] = aGate3
+						hereFromTheStart = true
+						hasData = true
+						initGateBars()
+						lowestHordeHp = math.min(hGate1, hGate2, hGate3)
+						lowestAllianceHp = math.min(aGate1, aGate2, aGate3)
+						hordeGates["195494"] = hGate1
+						hordeGates["195495"] = hGate2
+						hordeGates["195496"] = hGate3
+						allianceGates["195698"] = aGate1
+						allianceGates["195699"] = aGate2
+						allianceGates["195700"] = aGate3
 
-							local bar = mod:GetBar(L.hordeGate)
-							if bar then
-								local hp = lowestHordeHp / baseGateHealth * 100
-								if hp < 1 then
-									bar:Stop()
-								else
-									bar.candyBarBar:SetValue(hp)
-									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
-								end
+						local bar = mod:GetBar(L.hordeGate)
+						if bar then
+							local hp = lowestHordeHp / baseGateHealth * 100
+							if hp < 1 then
+								bar:Stop()
+							else
+								bar.candyBarBar:SetValue(hp)
+								bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 							end
-							local bar = mod:GetBar(L.allianceGate)
-							if bar then
-								local hp = lowestAllianceHp / baseGateHealth * 100
-								if hp < 1 then
-									bar:Stop()
-								else
-									bar.candyBarBar:SetValue(hp)
-									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
-								end
+						end
+						local bar = mod:GetBar(L.allianceGate)
+						if bar then
+							local hp = lowestAllianceHp / baseGateHealth * 100
+							if hp < 1 then
+								bar:Stop()
+							else
+								bar.candyBarBar:SetValue(hp)
+								bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 							end
 						end
 					end
 				end
 			end
+		end
+	end
+
+	function mod:RestartSiegeBar(msg)
+		if msg:find(L.broken, nil, true) then
+			SendAddonMessage("Capping", "rb", "INSTANCE_CHAT")
+		elseif msg:find(L.halfway, nil, true) then
+			SendAddonMessage("Capping", "rbh", "INSTANCE_CHAT")
 		end
 	end
 
@@ -740,6 +754,7 @@ do
 		SetupHealthCheck("34922", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
 		SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
 		mod:RegisterTempEvent("CHAT_MSG_ADDON", "IoCSync")
+		mod:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "RestartSiegeBar")
 		Timer(2, IoCSyncRequest)
 	end
 	mod:AddBG(628, IsleOfConquest)
