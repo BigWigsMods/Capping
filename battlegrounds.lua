@@ -257,7 +257,6 @@ do
 		"nameplate26target", "nameplate27target", "nameplate28target", "nameplate29target", "nameplate30target",
 		"nameplate31target", "nameplate32target", "nameplate33target", "nameplate34target", "nameplate35target",
 		"nameplate36target", "nameplate37target", "nameplate38target", "nameplate39target", "nameplate40target",
-		"party1target", "party2target", "party3target", "party4target",
 	}
 	local unitTable3 = {
 		"raid1target", "raid2target", "raid3target", "raid4target", "raid5target",
@@ -599,6 +598,11 @@ do
 						end
 					end
 				end
+			end
+		elseif event == "UNIT_DIED" then
+			local _, _, _, _, _, strid = strsplit("-", destGUID)
+			if strid == "34776" or strid == "35069" then -- Alliance Siege, Horde Siege
+				SendAddonMessage("Capping", "rb", "INSTANCE_CHAT")
 			end
 		end
 	end
