@@ -161,24 +161,28 @@ do
 				elist[event] = nil
 				self:UnregisterEvent(event)
 			end
-			for bar in next, activeBars do -- close all temp timerbars
-				local separate = bar:Get("capping:separate")
-				if not separate then
-					bar:Stop()
-				end
+			for bar in next, activeBars do -- stop all bars
+				bar:Stop()
 			end
+			self:UPDATE_BATTLEFIELD_STATUS(1) -- restore queue bars
 		end
 
 		local _, zoneType, _, _, _, _, _, id = GetInstanceInfo()
 		if zoneType == "pvp" then
 			local func = zoneIds[id]
 			if func then
+				for bar in next, activeBars do -- stop all bars
+					bar:Stop()
+				end
 				wasInBG = true
 				func(self)
 			end
 		elseif zoneType == "arena" then
 			local func = zoneIds[id]
 			if func then
+				for bar in next, activeBars do -- stop all bars
+					bar:Stop()
+				end
 				wasInBG = true
 				func(self)
 			else
@@ -243,6 +247,11 @@ do -- estimated wait timer and port timer
 				end
 			end
 		elseif status == "queued" and map and db.profile.queueBars then -- Waiting for BG to pop
+			local _, zoneType = GetInstanceInfo()
+			if zoneType == "pvp" or zoneType == "arena" then
+				return -- Hide queue bars in pvp/arena
+			end
+
 			if size == "ARENASKIRMISH" then
 				cleanupQueue()
 			end
@@ -283,16 +292,6 @@ do -- estimated wait timer and port timer
 					bar.remaining = 1
 					bar:SetTimeVisibility(false)
 					bar:Set("capping:queueid", queueId)
-				end
-			end
-		elseif status == "active" then -- Inside BG
-			-- We can't directly call :StopBar(map) as it doesn't work for random BGs.
-			-- A random BG will adopt the zone name when it changes to "active" E.g. Random Battleground > Arathi Basin
-			-- Also sometimes when queue 1 becomes active and you are in 2 queues, they will swap ID, because why not...
-			for bar in next, activeBars do
-				if bar:Get("capping:queueid") and bar:Get("capping:colorid") == "colorOther" then
-					bar:Stop()
-					break
 				end
 			end
 		elseif status == "none" then -- Leaving queue
