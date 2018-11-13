@@ -13,7 +13,7 @@ local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 local Timer, SendAddonMessage = C_Timer.After, C_ChatInfo.SendAddonMessage
 
-local SetupAssault, GetIconData
+local SetupAssault, GetIconData, UpdateAssault
 do -- POI handling
 	-- Easy world map icon checker
 	--[[local start = function(self) self:StartMoving() end
@@ -128,11 +128,12 @@ do -- POI handling
 		local pois = GetAreaPOIForMap(curMapID)
 		for i = 1, #pois do
 			local tbl = GetAreaPOIInfo(curMapID, pois[i])
-			local name, icon = tbl.name, tbl.textureIndex
+			local name, icon, areaPoiID = tbl.name, tbl.textureIndex, tbl.areaPoiID
 			if landmarkCache[name] ~= icon then
 				landmarkCache[name] = icon
 				if iconDataConflict[icon] then
-					self:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
+					local bar = self:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
+					bar:Set("capping:poiid", areaPoiID)
 					if icon == 137 or icon == 139 then -- Workshop in IoC
 						self:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
 					end
@@ -151,6 +152,18 @@ do -- POI handling
 						end
 					end
 				end
+			end
+		end
+	end
+
+	UpdateAssault = function(uiMapID, inProgressDataTbl)
+		local pois = GetAreaPOIForMap(uiMapID)
+		for i = 1, #pois do
+			local tbl = GetAreaPOIInfo(uiMapID, pois[i])
+			local name, icon, areaPoiID = tbl.name, tbl.textureIndex, tbl.areaPoiID
+			local timer = inProgressDataTbl[areaPoiID]
+			if timer and iconDataConflict[icon] then
+				mod:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon])
 			end
 		end
 	end
@@ -429,6 +442,82 @@ end
 
 do
 	------------------------------------------------ Alterac Valley ---------------------------------------------------
+	local hereFromTheStart, hasData = true, true
+	local stopTimer = nil
+	local function allow() hereFromTheStart = false end
+	local function stop() hereFromTheStart = true hasData = true stopTimer = nil end
+	local function AVSyncRequest()
+		local t = GetTime()
+		if mod.prevTimer and t - mod.prevTimer < 2 then -- mod.prevTimer set when START_TIMER fires (Capping.lua)
+			hereFromTheStart = true
+			hasData = true
+		else
+			hereFromTheStart = true
+			hasData = false
+			Timer(0.5, allow)
+			stopTimer = C_Timer.NewTicker(3, stop, 1)
+			C_ChatInfo.SendAddonMessage("Capping", "tr", "INSTANCE_CHAT")
+		end
+	end
+
+	local timer = nil
+	local function SendAVTimers()
+		timer = nil
+		if IsInGroup(2) then -- We've not just ragequit
+			local str = ""
+			for bar in next, CappingFrame.bars do
+				local poiId = bar:Get("capping:poiid")
+				if poiId then
+					str = format("%s%d-%d~", str, poiId, math.floor(bar.remaining))
+				end
+			end
+
+			if str ~= "" and string.len(str) < 250 then
+				SendAddonMessage("Capping", str, "INSTANCE_CHAT")
+			end
+		end
+	end
+
+	do
+		local function Unwrap(...)
+			local inProgressDataTbl = {}
+			for i = 1, select("#", ...) do
+				local arg = select(i, ...)
+				local id, remaining = strsplit("-", arg)
+				if id and remaining then
+					local widget, barTime = tonumber(id), tonumber(remaining)
+					if widget and barTime and barTime > 5 and barTime < 245 then
+						inProgressDataTbl[widget] = barTime
+					end
+				end
+			end
+
+			if next(inProgressDataTbl) then
+				UpdateAssault(91, inProgressDataTbl)
+			end
+		end
+
+		local me = UnitName("player").. "-" ..GetRealmName()
+		function mod:AVSync(prefix, msg, channel, sender)
+			if prefix == "Capping" and channel == "INSTANCE_CHAT" then
+				self:HealthUpdate(prefix, msg, channel, sender)
+				if msg == "tr" and sender ~= me then -- timer request
+					if hasData then -- Joined a late game, don't send data
+						if timer then timer:Cancel() end
+						timer = C_Timer.NewTicker(1, SendAVTimers, 1)
+					elseif stopTimer then
+						stopTimer:Cancel()
+						stopTimer = C_Timer.NewTicker(3, stop, 1)
+					end
+				elseif not hereFromTheStart and sender ~= me and msg:find("~", nil, true) then
+					hereFromTheStart = true
+					hasData = true
+					Unwrap(strsplit("~", msg))
+				end
+			end
+		end
+	end
+
 	local function AlteracValley(self)
 		function mod:AVTurnIn()
 			local target = UnitGUID("npc")
@@ -486,9 +575,11 @@ do
 		SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
 		SetupHealthCheck("11947", L.galvangar, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
 		SetupHealthCheck("11949", L.balinda, "Balinda Stonehearth", 236447, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Female
+		self:RegisterTempEvent("CHAT_MSG_ADDON", "AVSync")
 		self:RegisterTempEvent("GOSSIP_SHOW", "AVTurnIn")
 		self:RegisterTempEvent("QUEST_PROGRESS", "AVTurnInProgress")
 		self:RegisterTempEvent("QUEST_COMPLETE", "AVTurnInComplete")
+		AVSyncRequest()
 	end
 	mod:AddBG(30, AlteracValley)
 end
@@ -656,8 +747,8 @@ do
 	local function allow() hereFromTheStart = false end
 	local function stop() hereFromTheStart = true stopTimer = nil end
 	local function IoCSyncRequest()
-		local bar = mod:GetBar(L.battleBegins)
-		if bar then
+		local t = GetTime()
+		if mod.prevTimer and t - mod.prevTimer < 2 then -- mod.prevTimer set when START_TIMER fires (Capping.lua)
 			hereFromTheStart = true
 			hasData = true
 			initGateBars()
@@ -686,8 +777,8 @@ do
 	do
 		local me = UnitName("player").. "-" ..GetRealmName()
 		function mod:IoCSync(prefix, msg, channel, sender)
-			self:HealthUpdate(prefix, msg, channel, sender)
 			if prefix == "Capping" and channel == "INSTANCE_CHAT" then
+				self:HealthUpdate(prefix, msg, channel, sender)
 				if msg == "gr" and sender ~= me then -- gate request
 					if hasData then -- Joined a late game, don't send data
 						if timer then timer:Cancel() end
@@ -777,7 +868,7 @@ do
 		SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
 		mod:RegisterTempEvent("CHAT_MSG_ADDON", "IoCSync")
 		mod:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "RestartSiegeBar")
-		Timer(2, IoCSyncRequest)
+		IoCSyncRequest()
 	end
 	mod:AddBG(628, IsleOfConquest)
 end
