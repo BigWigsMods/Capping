@@ -579,7 +579,7 @@ do
 		self:RegisterTempEvent("GOSSIP_SHOW", "AVTurnIn")
 		self:RegisterTempEvent("QUEST_PROGRESS", "AVTurnInProgress")
 		self:RegisterTempEvent("QUEST_COMPLETE", "AVTurnInComplete")
-		AVSyncRequest()
+		Timer(2, AVSyncRequest)
 	end
 	mod:AddBG(30, AlteracValley)
 end
@@ -868,7 +868,7 @@ do
 		SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
 		mod:RegisterTempEvent("CHAT_MSG_ADDON", "IoCSync")
 		mod:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "RestartSiegeBar")
-		IoCSyncRequest()
+		Timer(2, IoCSyncRequest)
 	end
 	mod:AddBG(628, IsleOfConquest)
 end
