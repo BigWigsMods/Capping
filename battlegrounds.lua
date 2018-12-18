@@ -188,6 +188,7 @@ do
 			local ascore, abases = 0, 0
 			do
 				local dataTbl = GetIconAndTextWidgetVisualizationInfo(allianceWidget)
+				if not dataTbl then return end
 				local base, score = strmatch(dataTbl.text, "^[^%d]+(%d)[^%d]+(%d+)[^%d]+%d+$") -- Bases: %d  Resources: %d/%d
 				local ABases, AScore = tonumber(base), tonumber(score)
 				if ABases and AScore then
@@ -199,6 +200,7 @@ do
 			local hscore, hbases = 0, 0
 			do
 				local dataTbl = GetIconAndTextWidgetVisualizationInfo(hordeWidget)
+				if not dataTbl then return end
 				local base, score = strmatch(dataTbl.text, "^[^%d]+(%d)[^%d]+(%d+)[^%d]+%d+$") -- Bases: %d  Resources: %d/%d
 				local HBases, HScore = tonumber(base), tonumber(score)
 
