@@ -13,12 +13,12 @@ L.upgradeToTrigger = "升级到"
 L.droppedTrigger = "丢掉了"
 L.capturedTheTrigger = "夺取"
 
---L.hordeGate = "Horde Gate"
---L.allianceGate = "Alliance Gate"
---L.hordeBoss = "Horde Boss"
---L.allianceBoss = "Alliance Boss"
---L.galvangar = "Galvangar"
---L.balinda = "Balinda Stonehearth"
+L.hordeGate = "部落大门"
+L.allianceGate = "联盟大门"
+L.hordeBoss = "部落将军"
+L.allianceBoss = "联盟将军"
+L.galvangar = "加尔范上尉"
+L.balinda = "巴琳达·斯通赫尔斯"
 
 --- Alliance IoC Workshop yells:
 -- Gnomish Mechanic yells: I'm halfway there! Keep the Horde away from here.  They don't teach fighting in engineering school!
@@ -26,5 +26,5 @@ L.capturedTheTrigger = "夺取"
 --- Horde IoC Workshop yells:
 -- Goblin Mechanic yells: I'm about halfway done! Keep the Alliance away - fighting's not in my contract!
 -- Goblin Mechanic yells: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
---L.halfway = "halfway"
---L.broken = "broken"
+L.halfway = "一半"
+L.broken = "被摧毁"
