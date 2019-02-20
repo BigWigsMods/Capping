@@ -20,11 +20,13 @@ L.allianceBoss = "联盟将军"
 L.galvangar = "加尔范上尉"
 L.balinda = "巴琳达·斯通赫尔斯"
 
+
 --- Alliance IoC Workshop yells:
--- Gnomish Mechanic yells: I'm halfway there! Keep the Horde away from here.  They don't teach fighting in engineering school!
--- Gnomish Mechanic yells: It's broken already?! No worries. It's nothing I can't fix.
+-- 侏儒技师喊道：我就要完成了！挡住那帮部落的家伙。他们可不是在工程学校进行战斗教学！
+-- 侏儒技师喊道：它已经坏了？！别担心，没有我修不好的。
 --- Horde IoC Workshop yells:
--- Goblin Mechanic yells: I'm about halfway done! Keep the Alliance away - fighting's not in my contract!
--- Goblin Mechanic yells: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
-L.halfway = "一半"
-L.broken = "被摧毁"
+-- 地精机械师喊道：我就要完成了！挡住那帮联盟的家伙，合同上没说我还得打仗！
+-- 地精机械师喊道：它又坏了？！我会把它修好……但我可不保证它一定能好用。
+
+--L.halfway = "halfway"
+--L.broken = "broken"
