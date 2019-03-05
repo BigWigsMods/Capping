@@ -389,7 +389,7 @@ do
 		frame.RearrangeBars = RearrangeBars
 	end
 
-	function mod:StartBar(name, remaining, icon, colorid, priority)
+	function mod:StartBar(name, remaining, icon, colorid, priority, maxBarTime)
 		self:StopBar(name)
 		local bar = candy:New(media:Fetch("statusbar", db.profile.barTexture), db.profile.width, db.profile.height)
 		activeBars[bar] = true
@@ -433,7 +433,7 @@ do
 		else
 			bar:EnableMouse(false)
 		end
-		bar:Start()
+		bar:Start(maxBarTime)
 		RearrangeBars()
 		return bar
 	end

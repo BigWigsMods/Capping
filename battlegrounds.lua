@@ -156,14 +156,14 @@ do -- POI handling
 		end
 	end
 
-	UpdateAssault = function(uiMapID, inProgressDataTbl)
+	UpdateAssault = function(uiMapID, inProgressDataTbl, maxBarTime)
 		local pois = GetAreaPOIForMap(uiMapID)
 		for i = 1, #pois do
 			local tbl = GetAreaPOIInfo(uiMapID, pois[i])
 			local name, icon, areaPoiID = tbl.name, tbl.textureIndex, tbl.areaPoiID
 			local timer = inProgressDataTbl[areaPoiID]
 			if timer and iconDataConflict[icon] then
-				mod:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon])
+				mod:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon], nil, maxBarTime)
 			end
 		end
 	end
@@ -495,7 +495,7 @@ do
 			end
 
 			if next(inProgressDataTbl) then
-				UpdateAssault(91, inProgressDataTbl)
+				UpdateAssault(91, inProgressDataTbl, 242)
 			end
 		end
 
