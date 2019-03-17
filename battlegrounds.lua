@@ -1061,6 +1061,66 @@ do
 	mod:AddBG(-123, Wintergrasp) -- map id
 end
 
+do
+	------------------------------------------------ Wintergrasp Instance ------------------------------------------
+	local wallid, walls = nil, nil
+	local function Wintergrasp(self)
+		if not self.WinterAssaultBrawl then
+			wallid = { -- wall section locations
+				[6048] = "NW ", [6049] = "NW ", [6050] = "NW ", [6051] = "NW ",
+				[6047] = "SW ", [6046] = "SW ", [6045] = "S ",
+				[6043] = "S ", [6042] = "SE ", [6041] = "SE ",
+				[6040] = "NE ", [6039] = "NE ", [6038] = "NE ", [6037] = "NE ",
+				[6034] = "Inner W ", [6035] = "Inner W ", [6036] = "Inner W ",
+				[6033] = "Inner S ", [6032] = "Inner S ", [6031] = "Inner S ",
+				[6030] = "Inner E ", [6029] = "Inner E ", [6028] = "Inner E ",
+				[6056] = "", [6027] = "", -- front gate and fortress door
+			}
+
+			-- POI icon texture id: gateH, gateA, horizWallH, horizWallA, vertWallH, vertWallA
+			local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
+			local damaged, destroyed, all = { }, { }, { }
+			for k in pairs(intact) do
+				damaged[k + 1] = true
+				destroyed[k + 2] = true
+				all[k], all[k + 1], all[k + 2] = true, true, true
+			end
+			function mod:WinterAssaultBrawl() -- scans POI landmarks for changes in wall textures
+				local pois = GetAreaPOIForMap(1334) -- Wintergrasp
+				for i = 1, #pois do
+					local POI = pois[i]
+					local tbl = GetAreaPOIInfo(1334, POI)
+					local ti = walls[POI]
+					local textureIndex = tbl.textureIndex
+					if tbl and ((ti and ti ~= textureIndex) or (not ti and wallid[POI])) then
+						if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
+							local msg = format("|cFF33FF99Capping|r: %s%s %s!", wallid[POI], tbl.name, ACTION_ENVIRONMENTAL_DAMAGE)
+							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", msg)
+							print(msg)
+						elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
+							local msg = format("|cFF33FF99Capping|r: %s%s %s!", wallid[POI], tbl.name, ACTION_UNIT_DESTROYED)
+							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", msg)
+							print(msg)
+						end
+						walls[POI] = all[textureIndex] and textureIndex or ti
+					end
+				end
+			end
+		end
+		walls = { }
+		local pois = GetAreaPOIForMap(1334) -- Wintergrasp
+		for i = 1, #pois do
+			local POI = pois[i]
+			local tbl = GetAreaPOIInfo(1334, POI)
+			if wallid[POI] and tbl.textureIndex then
+				walls[POI] = tbl.textureIndex
+			end
+		end
+		self:RegisterTempEvent("AREA_POIS_UPDATED", "WinterAssaultBrawl")
+	end
+	mod:AddBG(2118, Wintergrasp) -- map id
+end
+
 --do
 --	------------------------------------------------ Ashran ------------------------------------------
 --	local function Ashran(self)
