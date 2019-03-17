@@ -136,9 +136,9 @@ function mod:PLAYER_LOGIN()
 	end
 
 	-- Fix flag carriers for some people
-	SetCVar("showArenaEnemyCastbar", "1")
-	SetCVar("showArenaEnemyFrames", "1")
-	SetCVar("showArenaEnemyPets", "1")
+	C_CVar.SetCVar("showArenaEnemyCastbar", "1")
+	C_CVar.SetCVar("showArenaEnemyFrames", "1")
+	C_CVar.SetCVar("showArenaEnemyPets", "1")
 
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")

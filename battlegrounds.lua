@@ -6,7 +6,7 @@ do
 end
 local L = mod.L
 
-local ceil = math.ceil
+local ceil, floor = math.ceil, math.floor
 local strmatch, pairs, format, tonumber = strmatch, pairs, format, tonumber
 local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
 local GetDoubleStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetDoubleStatusBarWidgetVisualizationInfo
@@ -296,10 +296,10 @@ do
 				hRemain = maxscore - hscore
 				-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
 				-- If ticks are 0 (no bases) then set to a random huge number (10,000)
-				aTicksToWin = math.ceil(aIncrease == 0 and 10000 or aRemain / aIncrease)
-				hTicksToWin = math.ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
+				aTicksToWin = ceil(aIncrease == 0 and 10000 or aRemain / aIncrease)
+				hTicksToWin = ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
 				-- Round to the closest time
-				timeBetweenEachTick = elapsed % 1 >= 0.5 and math.ceil(elapsed) or math.floor(elapsed)
+				timeBetweenEachTick = elapsed % 1 >= 0.5 and ceil(elapsed) or floor(elapsed)
 
 				prevAScore, prevHScore = ascore, hscore
 				Timer(0.5, UpdatePredictor)
@@ -314,7 +314,7 @@ do
 				hRemain = maxscore - hscore
 				-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
 				-- If ticks are 0 (no bases) then set to a random huge number (10,000)
-				hTicksToWin = math.ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
+				hTicksToWin = ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
 
 				prevHScore = hscore
 			end
@@ -362,7 +362,7 @@ do
 		"raid31target", "raid32target", "raid33target", "raid34target", "raid35target",
 		"raid36target", "raid37target", "raid38target", "raid39target", "raid40target"
 	}
-	local collection, reset, blocked, prev, started = {}, {}, {}, 0, false
+	local collection, reset, blocked, started = {}, {}, {}, false
 	local count1, count2, count3 = #unitTable1, #unitTable2, #unitTable3
 	local UnitGUID, strsplit = UnitGUID, strsplit
 
@@ -441,7 +441,7 @@ do
 		end
 	end
 
-	function mod:HealthUpdate(prefix, msg, channel, sender)
+	function mod:HealthUpdate(prefix, msg, channel)
 		if prefix == "Capping" and channel == "INSTANCE_CHAT" then
 			local strid, strhp = strsplit(":", msg)
 			local hp = tonumber(strhp)
@@ -478,13 +478,13 @@ do
 	------------------------------------------------ Arathi Basin -----------------------------------------------------
 	--local pointsPerSecond = {1, 1.5, 2, 3.5, 30} -- Updates every 2 seconds
 
-	local function ArathiBasin(self)
+	local function ArathiBasin()
 		SetupAssault(60, 93)
 		NewEstimator()
 	end
 	mod:AddBG(2107, ArathiBasin)
 
-	local function ArathiBasinSnowyPvPBrawl(self)
+	local function ArathiBasinSnowyPvPBrawl()
 		SetupAssault(60, 837)
 		NewEstimator()
 	end
@@ -503,7 +503,7 @@ do
 		["dg_capPts-rightIcon4-state1"] = "colorHorde",
 	}
 
-	local function DeepwindGorge(self)
+	local function DeepwindGorge()
 		SetupAssault(61, 519, colors)
 		NewEstimator()
 	end
@@ -514,7 +514,7 @@ do
 	------------------------------------------------ Gilneas -----------------------------------------------------
 	--local pointsPerSecond = {1, 3, 30} -- Updates every 1 second
 
-	local function TheBattleForGilneas(self)
+	local function TheBattleForGilneas()
 		SetupAssault(60, 275) -- Base cap time, uiMapID
 		NewEstimator()
 	end
@@ -549,7 +549,7 @@ do
 			for bar in next, CappingFrame.bars do
 				local poiId = bar:Get("capping:poiid")
 				if poiId then
-					str = format("%s%d-%d~", str, poiId, math.floor(bar.remaining))
+					str = format("%s%d-%d~", str, poiId, floor(bar.remaining))
 				end
 			end
 
