@@ -235,41 +235,35 @@ local NewEstimator
 do
 	local prevText = ""
 	local prevTime, prevAScore, prevHScore, prevAIncrease, prevHIncrease = 0, 0, 0, 0, 0
-	local timeBetweenEachTick = 0
-	local timer = nil
+	local timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
 	local maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
 	local aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
 
 	local function UpdatePredictor()
-		timer = nil
-		if aIncrease ~= prevAIncrease or hIncrease ~= prevHIncrease then
-			if aIncrease > 60 or hIncrease > 60 then
-				mod:StopBar(prevText) -- Captured a flag/cart in EotS/DG
+		if aIncrease ~= prevAIncrease or hIncrease ~= prevHIncrease or timeBetweenEachTick ~= prevTick then
+			if aIncrease > 60 or hIncrease > 60 or aIncrease < 0 or hIncrease < 0 then -- Scores can reduce in DG
+				mod:StopBar(prevText) -- >60 increase means captured a flag/cart in EotS/DG
 				prevAIncrease, prevHIncrease = -1, -1
-				--print("Large increase, return", aIncrease, hIncrease)
 				return
 			end
-			prevAIncrease, prevHIncrease = aIncrease, hIncrease
-			--print("inc", aIncrease, hIncrease)
+			prevAIncrease, prevHIncrease, prevTick = aIncrease, hIncrease, timeBetweenEachTick
 
 			if hTicksToWin < aTicksToWin then -- Horde is winning
 				local timeToWin = hTicksToWin * timeBetweenEachTick
-				--print("hwin", timeToWin)
 				local finalAScore = ascore + (hTicksToWin * aIncrease)
 				local txt = format(L.finalScore, finalAScore, maxscore)
-				if txt ~= prevText  then
-					hordeWinning = true
+				if txt ~= prevText or timeToWin ~= prevTimeToWin then
+					prevTimeToWin = timeToWin
 					mod:StopBar(prevText)
 					mod:StartBar(txt, timeToWin-0.5, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
 					prevText = txt
 				end
 			elseif aTicksToWin < hTicksToWin then -- Alliance is winning
-				local timeToWin = hTicksToWin * timeBetweenEachTick
-				--print("awin", timeToWin)
+				local timeToWin = aTicksToWin * timeBetweenEachTick
 				local finalHScore = hscore + (aTicksToWin * hIncrease)
 				local txt = format(L.finalScore, maxscore, finalHScore)
-				if txt ~= prevText then
-					hordeWinning = false
+				if txt ~= prevText or timeToWin ~= prevTimeToWin then
+					prevTimeToWin = timeToWin
 					mod:StopBar(prevText)
 					mod:StartBar(txt, timeToWin-0.5, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
 					prevText = txt
@@ -298,12 +292,6 @@ do
 				hscore = dataTbl.rightBarValue -- Horde Bar
 				aIncrease = ascore - prevAScore
 				hIncrease = hscore - prevHScore
-				if aIncrease < 0 then
-					--print("tick1failA", aIncrease, ascore, prevAScore)
-				end
-				if hIncrease < 0 then
-					--print("tick1failH", hIncrease, hscore, prevHScore)
-				end
 				aRemain = maxscore - ascore
 				hRemain = maxscore - hscore
 				-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
@@ -314,8 +302,7 @@ do
 				timeBetweenEachTick = elapsed % 1 >= 0.5 and math.ceil(elapsed) or math.floor(elapsed)
 
 				prevAScore, prevHScore = ascore, hscore
-				if timer then timer:Cancel() end
-				timer = NewTicker(0.5, UpdatePredictor, 1)
+				Timer(0.5, UpdatePredictor)
 			else
 				-- If elapsed < 0.5 then the event fired twice because both alliance and horde have bases.
 				-- 1st update = alliance, 2nd update = horde
@@ -324,9 +311,6 @@ do
 				-- In this one where we have 2 updates, we overwrite the horde stats from the 1st update.
 				hscore = dataTbl.rightBarValue -- Horde Bar
 				hIncrease = hscore - prevHScore
-				if hIncrease < 0 then
-					--print("tick2failH", hIncrease, hscore, prevHScore)
-				end
 				hRemain = maxscore - hscore
 				-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
 				-- If ticks are 0 (no bases) then set to a random huge number (10,000)
@@ -339,8 +323,7 @@ do
 	NewEstimator = function() -- resets estimator and sets new battleground
 		prevText = ""
 		prevTime, prevAScore, prevHScore, prevAIncrease, prevHIncrease = 0, 0, 0, 0, 0
-		timeBetweenEachTick = 0
-		timer = nil
+		timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
 		maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
 		aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
 
