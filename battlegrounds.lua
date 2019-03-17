@@ -109,16 +109,22 @@ do -- POI handling
 		for i = 1, #pois do
 			local tbl = GetAreaPOIInfo(uiMapID, pois[i])
 			local icon = tbl.textureIndex
-			landmarkCache[tbl.name] = icon
-			if icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
-				-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
-				local _, _, _, id = UnitPosition("player")
-				if id == 30 or id == 628 then -- Alterac Valley, IoC
-					local bar = mod:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
-					bar:Pause()
-					bar:SetTimeVisibility(false)
-					bar:Set("capping:customchat", function() end)
+			local atlasName = tbl.atlasName
+			if icon then
+				landmarkCache[tbl.name] = icon
+				if icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
+					-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+					local _, _, _, id = UnitPosition("player")
+					if id == 30 or id == 628 then -- Alterac Valley, IoC
+						local bar = mod:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
+						bar:Pause()
+						bar:SetTimeVisibility(false)
+						bar:Set("capping:customchat", function() end)
+					end
 				end
+			elseif atlasName then
+				local atlasTbl = C_Texture.GetAtlasInfo(atlasName)
+				--print(tbl.name, atlasTbl.file)
 			end
 		end
 		mod:RegisterTempEvent("AREA_POIS_UPDATED")
@@ -129,30 +135,35 @@ do -- POI handling
 		local pois = GetAreaPOIForMap(curMapID)
 		for i = 1, #pois do
 			local tbl = GetAreaPOIInfo(curMapID, pois[i])
-			local name, icon, areaPoiID = tbl.name, tbl.textureIndex, tbl.areaPoiID
-			if landmarkCache[name] ~= icon then
-				landmarkCache[name] = icon
-				if iconDataConflict[icon] then
-					local bar = self:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
-					bar:Set("capping:poiid", areaPoiID)
-					if icon == 137 or icon == 139 then -- Workshop in IoC
-						self:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
-					end
-				else
-					self:StopBar(name)
-					if icon == 136 or icon == 138 then -- Workshop in IoC
-						self:StartBar(GetSpellInfo(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
-					elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
-						-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
-						local _, _, _, id = UnitPosition("player")
-						if id == 30 or id == 628 then -- Alterac Valley, IoC
-							local bar = self:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
-							bar:Pause()
-							bar:SetTimeVisibility(false)
-							bar:Set("capping:customchat", function() end)
+			local name, icon, atlasName, areaPoiID = tbl.name, tbl.textureIndex, tbl.atlasName, tbl.areaPoiID
+			if icon then
+				if landmarkCache[name] ~= icon then
+					landmarkCache[name] = icon
+					if iconDataConflict[icon] then
+						local bar = self:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
+						bar:Set("capping:poiid", areaPoiID)
+						if icon == 137 or icon == 139 then -- Workshop in IoC
+							self:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
+						end
+					else
+						self:StopBar(name)
+						if icon == 136 or icon == 138 then -- Workshop in IoC
+							self:StartBar(GetSpellInfo(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+						elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
+							-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+							local _, _, _, id = UnitPosition("player")
+							if id == 30 or id == 628 then -- Alterac Valley, IoC
+								local bar = self:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
+								bar:Pause()
+								bar:SetTimeVisibility(false)
+								bar:Set("capping:customchat", function() end)
+							end
 						end
 					end
 				end
+			elseif atlasName then
+				local atlasTbl = C_Texture.GetAtlasInfo(atlasName)
+				--print(name, atlasTbl.file)
 			end
 		end
 	end
@@ -932,7 +943,7 @@ do
 		Timer(130, func)
 		Timer(240, func)
 	end
-	mod:AddBG(489, WarsongGulch)
+	mod:AddBG(2106, WarsongGulch)
 	mod:AddBG(726, WarsongGulch) -- Twin Peaks
 end
 
