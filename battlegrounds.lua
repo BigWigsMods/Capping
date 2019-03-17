@@ -13,6 +13,7 @@ local GetDoubleStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetDoubleSta
 local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 local Timer, SendAddonMessage, NewTicker = C_Timer.After, C_ChatInfo.SendAddonMessage, C_Timer.NewTicker
+local GetAtlasInfo = C_Texture.GetAtlasInfo
 
 local SetupAssault, GetIconData, UpdateAssault
 do -- POI handling
@@ -92,6 +93,7 @@ do -- POI handling
 		[152] = "colorAlliance",
 		[154] = "colorHorde",
 	}
+	local atlasColors = nil
 	local GetPOITextureCoords = GetPOITextureCoords
 	local capTime = 0
 	local curMapID = 0
@@ -101,7 +103,8 @@ do -- POI handling
 		return path
 	end
 	local landmarkCache = {}
-	SetupAssault = function(bgcaptime, uiMapID)
+	SetupAssault = function(bgcaptime, uiMapID, colors)
+		atlasColors = colors
 		capTime = bgcaptime -- cap time
 		curMapID = uiMapID -- current map
 		landmarkCache = {}
@@ -123,8 +126,19 @@ do -- POI handling
 					end
 				end
 			elseif atlasName then
-				local atlasTbl = C_Texture.GetAtlasInfo(atlasName)
-				--print(tbl.name, atlasTbl.file)
+				--local atlasTbl = GetAtlasInfo(atlasName)
+				landmarkCache[tbl.name] = atlasName
+				-- This can stay commented out until the day IoC/AV is converted to atlasNames
+				--if atlasName == 2 or atlasName == 3 or atlasName == 151 or atlasName == 153 or atlasName == 18 or atlasName == 20 then
+				--	-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+				--	local _, _, _, id = UnitPosition("player")
+				--	if id == 30 or id == 628 then -- Alterac Valley, IoC
+				--		local bar = mod:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
+				--		bar:Pause()
+				--		bar:SetTimeVisibility(false)
+				--		bar:Set("capping:customchat", function() end)
+				--	end
+				--end
 			end
 		end
 		mod:RegisterTempEvent("AREA_POIS_UPDATED")
@@ -162,8 +176,43 @@ do -- POI handling
 					end
 				end
 			elseif atlasName then
-				local atlasTbl = C_Texture.GetAtlasInfo(atlasName)
-				--print(name, atlasTbl.file)
+				local atlasTbl = GetAtlasInfo(atlasName)
+				if landmarkCache[name] ~= atlasName then
+					--print(name, atlasName)
+					landmarkCache[name] = atlasName
+					if atlasColors[atlasName] then
+						local bar = self:StartBar(
+							name,
+							capTime,
+							{ -- Begin Icon Texture
+								atlasTbl.file,
+								atlasTbl.leftTexCoord,
+								atlasTbl.rightTexCoord,
+								atlasTbl.topTexCoord,
+								atlasTbl.bottomTexCoord,
+							}, -- End Icon Texture
+							atlasColors[atlasName] -- Color
+						)
+						bar:Set("capping:poiid", areaPoiID)
+						--if atlasName == WORKSHOPHORDE or atlasName == WORKSHOPALLIANCE then -- Workshop in IoC
+						--	self:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
+						--end
+					else
+						self:StopBar(name)
+						--if icon == 136 or icon == 138 then -- Workshop in IoC
+						--	self:StartBar(GetSpellInfo(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+						--elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
+						--	-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+						--	local _, _, _, id = UnitPosition("player")
+						--	if id == 30 or id == 628 then -- Alterac Valley, IoC
+						--		local bar = self:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
+						--		bar:Pause()
+						--		bar:SetTimeVisibility(false)
+						--		bar:Set("capping:customchat", function() end)
+						--	end
+						--end
+					end
+				end
 			end
 		end
 	end
@@ -211,7 +260,7 @@ do
 				if txt ~= prevText  then
 					hordeWinning = true
 					mod:StopBar(prevText)
-					mod:StartBar(txt, timeToWin, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+					mod:StartBar(txt, timeToWin-0.5, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
 					prevText = txt
 				end
 			elseif aTicksToWin < hTicksToWin then -- Alliance is winning
@@ -222,7 +271,7 @@ do
 				if txt ~= prevText then
 					hordeWinning = false
 					mod:StopBar(prevText)
-					mod:StartBar(txt, timeToWin, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+					mod:StartBar(txt, timeToWin-0.5, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
 					prevText = txt
 				end
 			end
@@ -239,9 +288,6 @@ do
 				return
 			end
 
-			if timer then timer:Cancel() end
-			timer = NewTicker(0.5, UpdatePredictor, 1)
-
 			local t = GetTime()
 			local elapsed = t - prevTime
 			prevTime = t
@@ -252,6 +298,12 @@ do
 				hscore = dataTbl.rightBarValue -- Horde Bar
 				aIncrease = ascore - prevAScore
 				hIncrease = hscore - prevHScore
+				if aIncrease < 0 then
+					--print("tick1failA", aIncrease, ascore, prevAScore)
+				end
+				if hIncrease < 0 then
+					--print("tick1failH", hIncrease, hscore, prevHScore)
+				end
 				aRemain = maxscore - ascore
 				hRemain = maxscore - hscore
 				-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
@@ -262,6 +314,8 @@ do
 				timeBetweenEachTick = elapsed % 1 >= 0.5 and math.ceil(elapsed) or math.floor(elapsed)
 
 				prevAScore, prevHScore = ascore, hscore
+				if timer then timer:Cancel() end
+				timer = NewTicker(0.5, UpdatePredictor, 1)
 			else
 				-- If elapsed < 0.5 then the event fired twice because both alliance and horde have bases.
 				-- 1st update = alliance, 2nd update = horde
@@ -270,6 +324,9 @@ do
 				-- In this one where we have 2 updates, we overwrite the horde stats from the 1st update.
 				hscore = dataTbl.rightBarValue -- Horde Bar
 				hIncrease = hscore - prevHScore
+				if hIncrease < 0 then
+					--print("tick2failH", hIncrease, hscore, prevHScore)
+				end
 				hRemain = maxscore - hscore
 				-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
 				-- If ticks are 0 (no bases) then set to a random huge number (10,000)
@@ -454,9 +511,17 @@ end
 do
 	------------------------------------------------ Deepwind Gorge -----------------------------------------------------
 	--local pointsPerSecond = {1.6, 3.2, 6.4} -- Updates every 5 seconds
+	local colors = {
+		["dg_capPts-leftIcon2-state1"] = "colorAlliance",
+		["dg_capPts-leftIcon3-state1"] = "colorAlliance",
+		["dg_capPts-leftIcon4-state1"] = "colorAlliance",
+		["dg_capPts-rightIcon2-state1"] = "colorHorde",
+		["dg_capPts-rightIcon3-state1"] = "colorHorde",
+		["dg_capPts-rightIcon4-state1"] = "colorHorde",
+	}
 
 	local function DeepwindGorge(self)
-		SetupAssault(61, 519)
+		SetupAssault(61, 519, colors)
 		NewEstimator()
 	end
 	mod:AddBG(1105, DeepwindGorge)
@@ -675,6 +740,16 @@ do
 	end
 	mod:AddBG(566, EyeOfTheStorm)
 
+	local colors = {
+		["eots_capPts-leftIcon2-state1"] = "colorAlliance",
+		["eots_capPts-leftIcon3-state1"] = "colorAlliance",
+		["eots_capPts-leftIcon4-state1"] = "colorAlliance",
+		["eots_capPts-leftIcon5-state1"] = "colorAlliance",
+		["eots_capPts-rightIcon2-state1"] = "colorHorde",
+		["eots_capPts-rightIcon3-state1"] = "colorHorde",
+		["eots_capPts-rightIcon4-state1"] = "colorHorde",
+		["eots_capPts-rightIcon5-state1"] = "colorHorde",
+	}
 	local function EyeOfTheStormRated(self)
 		if not mod.FlagUpdateRated then
 			function mod:FlagUpdateRated(msg)
@@ -686,7 +761,7 @@ do
 		end
 
 		NewEstimator()
-		SetupAssault(60, 397) -- In RBG the four points have flags that need to be assaulted, like AB
+		SetupAssault(60, 397, colors) -- In RBG the four points have flags that need to be assaulted, like AB
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagUpdateRated")
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagUpdateRated")
 	end
