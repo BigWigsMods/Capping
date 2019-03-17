@@ -431,7 +431,7 @@ do
 		SetupAssault(60, 93)
 		NewEstimator()
 	end
-	mod:AddBG(529, ArathiBasin)
+	mod:AddBG(2107, ArathiBasin)
 
 	local function ArathiBasinSnowyPvPBrawl(self)
 		SetupAssault(60, 837)
