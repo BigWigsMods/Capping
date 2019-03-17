@@ -9,9 +9,10 @@ local L = mod.L
 local ceil = math.ceil
 local strmatch, pairs, format, tonumber = strmatch, pairs, format, tonumber
 local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
+local GetDoubleStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetDoubleStatusBarWidgetVisualizationInfo
 local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
-local Timer, SendAddonMessage = C_Timer.After, C_ChatInfo.SendAddonMessage
+local Timer, SendAddonMessage, NewTicker = C_Timer.After, C_ChatInfo.SendAddonMessage, C_Timer.NewTicker
 
 local SetupAssault, GetIconData, UpdateAssault
 do -- POI handling
@@ -172,83 +173,110 @@ end
 -- initialize or update a final score estimation bar (AB and EotS uses this)
 local NewEstimator
 do
-	local allianceWidget, hordeWidget, prevTime, updateBases, hordeWinning = 0, 0, 0, false, false
-	local update = function() updateBases = true end
-	local MaxScore, prevText = 1500, ""
-	local ppsTable
-	function mod:ScorePredictor()
-		local t = GetTime()
-		-- Conditions:
-		-- 1) Amount of owned bases changed
-		-- 2) Two updates happened in a short space of time and we want the data from the 2nd update (latest score info)
-		-- This happens when both teams have bases, the first update (alliance) will be incomplete, the second update (horde) will give us a complete outlook of final scores
-		if updateBases or (t - prevTime) < 0.8 then
-			prevTime = t
+	local prevText = ""
+	local prevTime, prevAScore, prevHScore, prevAIncrease, prevHIncrease = 0, 0, 0, 0, 0
+	local timeBetweenEachTick = 0
+	local timer = nil
+	local maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
+	local aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
 
-			local ascore, abases = 0, 0
-			do
-				local dataTbl = GetIconAndTextWidgetVisualizationInfo(allianceWidget)
-				if not dataTbl then return end
-				local base, score = strmatch(dataTbl.text, "^[^%d]+(%d)[^%d]+(%d+)[^%d]+%d+$") -- Bases: %d  Resources: %d/%d
-				local ABases, AScore = tonumber(base), tonumber(score)
-				if ABases and AScore then
-					abases = ABases
-					ascore = AScore
-				end
+	local function UpdatePredictor()
+		timer = nil
+		if aIncrease ~= prevAIncrease or hIncrease ~= prevHIncrease then
+			if aIncrease > 60 or hIncrease > 60 then
+				mod:StopBar(prevText) -- Captured a flag/cart in EotS/DG
+				prevAIncrease, prevHIncrease = -1, -1
+				--print("Large increase, return", aIncrease, hIncrease)
+				return
 			end
+			prevAIncrease, prevHIncrease = aIncrease, hIncrease
+			--print("inc", aIncrease, hIncrease)
 
-			local hscore, hbases = 0, 0
-			do
-				local dataTbl = GetIconAndTextWidgetVisualizationInfo(hordeWidget)
-				if not dataTbl then return end
-				local base, score = strmatch(dataTbl.text, "^[^%d]+(%d)[^%d]+(%d+)[^%d]+%d+$") -- Bases: %d  Resources: %d/%d
-				local HBases, HScore = tonumber(base), tonumber(score)
-
-				if HBases and HScore then
-					hbases = HBases
-					hscore = HScore
-				end
-			end
-
-			local apps, hpps = ppsTable[abases], ppsTable[hbases]
-			-- timeTilFinal = ((remainingScore) / scorePerSec) - (timeSinceLastUpdate)
-			local ATime = apps and ((MaxScore - ascore) / apps) or 1000000
-			local HTime = hpps and ((MaxScore - hscore) / hpps) or 1000000
-
-			if HTime < ATime then -- Horde is winning
-				updateBases = false
-				local score = apps and (ascore + ceil(apps * HTime)) or ascore
-				local txt = format(L.finalScore, score, MaxScore)
-				if txt ~= prevText or not hordeWinning then
+			if hTicksToWin < aTicksToWin then -- Horde is winning
+				local timeToWin = hTicksToWin * timeBetweenEachTick
+				--print("hwin", timeToWin)
+				local finalAScore = ascore + (hTicksToWin * aIncrease)
+				local txt = format(L.finalScore, finalAScore, maxscore)
+				if txt ~= prevText  then
 					hordeWinning = true
-					self:StopBar(prevText)
-					self:StartBar(txt, HTime, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+					mod:StopBar(prevText)
+					mod:StartBar(txt, timeToWin, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
 					prevText = txt
 				end
-			elseif ATime < HTime then -- Alliance is winning
-				updateBases = false
-				local score = hpps and (hscore + ceil(hpps * ATime)) or hscore
-				local txt = format(L.finalScore, MaxScore, score)
-				if txt ~= prevText or hordeWinning then
+			elseif aTicksToWin < hTicksToWin then -- Alliance is winning
+				local timeToWin = hTicksToWin * timeBetweenEachTick
+				--print("awin", timeToWin)
+				local finalHScore = hscore + (aTicksToWin * hIncrease)
+				local txt = format(L.finalScore, maxscore, finalHScore)
+				if txt ~= prevText then
 					hordeWinning = false
-					self:StopBar(prevText)
-					self:StartBar(txt, ATime, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+					mod:StopBar(prevText)
+					mod:StartBar(txt, timeToWin, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
 					prevText = txt
 				end
 			end
 		end
 	end
-	NewEstimator = function(pointsPerSecond, aW, hW) -- resets estimator and sets new battleground
-		allianceWidget, hordeWidget = aW, hW
-		ppsTable = pointsPerSecond
-		updateBases = false
-		prevText = ""
-		Timer(2, update) -- Delay the first update so we don't get bad data
-		mod:RegisterTempEvent("UPDATE_UI_WIDGET", "ScorePredictor")
-	end
 
-	function mod:UpdateBases()
-		Timer(1, update) -- Delay the first update so we don't get bad data
+	function mod:ScorePredictor(widgetInfo)
+		if widgetInfo and widgetInfo.widgetID == 1671 then -- The 1671 widget is used for all BGs with score predictors
+			local dataTbl = GetDoubleStatusBarWidgetVisualizationInfo(widgetInfo.widgetID)
+			if not dataTbl or not dataTbl.leftBarMax then return end
+			if prevTime == 0 then
+				prevTime = GetTime()
+				prevAScore, prevHScore = dataTbl.leftBarValue, dataTbl.rightBarValue
+				return
+			end
+
+			if timer then timer:Cancel() end
+			timer = NewTicker(0.5, UpdatePredictor, 1)
+
+			local t = GetTime()
+			local elapsed = t - prevTime
+			prevTime = t
+			if elapsed > 0.5 then
+				-- If there's only 1 update, it could be either alliance or horde, so we update both stats in this one
+				maxscore = dataTbl.leftBarMax -- Total
+				ascore = dataTbl.leftBarValue -- Alliance Bar
+				hscore = dataTbl.rightBarValue -- Horde Bar
+				aIncrease = ascore - prevAScore
+				hIncrease = hscore - prevHScore
+				aRemain = maxscore - ascore
+				hRemain = maxscore - hscore
+				-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
+				-- If ticks are 0 (no bases) then set to a random huge number (10,000)
+				aTicksToWin = math.ceil(aIncrease == 0 and 10000 or aRemain / aIncrease)
+				hTicksToWin = math.ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
+				-- Round to the closest time
+				timeBetweenEachTick = elapsed % 1 >= 0.5 and math.ceil(elapsed) or math.floor(elapsed)
+
+				prevAScore, prevHScore = ascore, hscore
+			else
+				-- If elapsed < 0.5 then the event fired twice because both alliance and horde have bases.
+				-- 1st update = alliance, 2nd update = horde
+				-- If only one faction has bases, the event only fires once.
+				-- Unfortunately we need to wait for the 2nd event to fire (the horde update) to know the true horde stats.
+				-- In this one where we have 2 updates, we overwrite the horde stats from the 1st update.
+				hscore = dataTbl.rightBarValue -- Horde Bar
+				hIncrease = hscore - prevHScore
+				hRemain = maxscore - hscore
+				-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
+				-- If ticks are 0 (no bases) then set to a random huge number (10,000)
+				hTicksToWin = math.ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
+
+				prevHScore = hscore
+			end
+		end
+	end
+	NewEstimator = function() -- resets estimator and sets new battleground
+		prevText = ""
+		prevTime, prevAScore, prevHScore, prevAIncrease, prevHIncrease = 0, 0, 0, 0, 0
+		timeBetweenEachTick = 0
+		timer = nil
+		maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
+		aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
+
+		mod:RegisterTempEvent("UPDATE_UI_WIDGET", "ScorePredictor")
 	end
 end
 
@@ -397,47 +425,39 @@ end
 
 do
 	------------------------------------------------ Arathi Basin -----------------------------------------------------
-	local pointsPerSecond = {1, 1.5, 2, 3.5, 30} -- Updates every 2 seconds
+	--local pointsPerSecond = {1, 1.5, 2, 3.5, 30} -- Updates every 2 seconds
 
 	local function ArathiBasin(self)
 		SetupAssault(60, 93)
-		NewEstimator(pointsPerSecond, 495, 496) -- BG table, alliance score widget, horde score widget
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "UpdateBases")
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "UpdateBases")
+		NewEstimator()
 	end
 	mod:AddBG(529, ArathiBasin)
 
 	local function ArathiBasinSnowyPvPBrawl(self)
 		SetupAssault(60, 837)
-		NewEstimator(pointsPerSecond, 914, 915) -- BG table, alliance score widget, horde score widget
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "UpdateBases")
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "UpdateBases")
+		NewEstimator()
 	end
 	mod:AddBG(1681, ArathiBasinSnowyPvPBrawl)
 end
 
 do
 	------------------------------------------------ Deepwind Gorge -----------------------------------------------------
-	local pointsPerSecond = {1.6, 3.2, 6.4} -- Updates every 5 seconds
+	--local pointsPerSecond = {1.6, 3.2, 6.4} -- Updates every 5 seconds
 
 	local function DeepwindGorge(self)
 		SetupAssault(61, 519)
-		NewEstimator(pointsPerSecond, 734, 735) -- BG table, alliance score widget, horde score widget
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "UpdateBases")
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "UpdateBases")
+		NewEstimator()
 	end
 	mod:AddBG(1105, DeepwindGorge)
 end
 
 do
 	------------------------------------------------ Gilneas -----------------------------------------------------
-	local pointsPerSecond = {1, 3, 30} -- Updates every 1 second
+	--local pointsPerSecond = {1, 3, 30} -- Updates every 1 second
 
 	local function TheBattleForGilneas(self)
 		SetupAssault(60, 275) -- Base cap time, uiMapID
-		NewEstimator(pointsPerSecond, 699, 700) -- BG table, alliance score widget, horde score widget
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "UpdateBases")
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "UpdateBases")
+		NewEstimator()
 	end
 	mod:AddBG(761, TheBattleForGilneas) -- Instance ID
 end
@@ -457,7 +477,7 @@ do
 			hereFromTheStart = true
 			hasData = false
 			Timer(0.5, allow)
-			stopTimer = C_Timer.NewTicker(3, stop, 1)
+			stopTimer = NewTicker(3, stop, 1)
 			C_ChatInfo.SendAddonMessage("Capping", "tr", "INSTANCE_CHAT")
 		end
 	end
@@ -506,10 +526,10 @@ do
 				if msg == "tr" and sender ~= me then -- timer request
 					if hasData then -- Joined a late game, don't send data
 						if timer then timer:Cancel() end
-						timer = C_Timer.NewTicker(1, SendAVTimers, 1)
+						timer = NewTicker(1, SendAVTimers, 1)
 					elseif stopTimer then
 						stopTimer:Cancel()
-						stopTimer = C_Timer.NewTicker(3, stop, 1)
+						stopTimer = NewTicker(3, stop, 1)
 					end
 				elseif not hereFromTheStart and sender ~= me and msg:find("~", nil, true) then
 					hereFromTheStart = true
@@ -588,7 +608,7 @@ end
 
 do
 	------------------------------------------------ Eye of the Storm -------------------------------------------------
-	local pointsPerSecond = {1, 1.5, 2, 6} -- Updates every 2 seconds
+	--local pointsPerSecond = {1, 1.5, 2, 6} -- Updates every 2 seconds
 
 	local function EyeOfTheStorm(self)
 		if not mod.FlagUpdate then
@@ -597,7 +617,6 @@ do
 				if (found and found == "L'Alliance") or strmatch(msg, L.capturedTheTrigger) then -- frFR
 					self:StartBar(L.flagRespawns, 21, GetIconData(45), "colorOther") -- 45 = White flag
 				end
-				self:UpdateBases()
 			end
 			-- EotS PvP Brawl: Gravity Lapse
 			local ticker1, ticker2 = nil, nil
@@ -615,8 +634,8 @@ do
 					local name = GetSpellInfo(44224) -- Gravity Lapse
 					local icon = GetSpellTexture(44224)
 					self:StartBar(name, 55, icon, "colorOther")
-					ticker1 = C_Timer.NewTicker(55, StartNextGravTimer, 1) -- Compensate for being dead (you don't get the message)
-					ticker2 = C_Timer.NewTicker(50, PrintExtraMessage, 1)
+					ticker1 = NewTicker(55, StartNextGravTimer, 1) -- Compensate for being dead (you don't get the message)
+					ticker2 = NewTicker(50, PrintExtraMessage, 1)
 				end
 			end
 			function mod:CheckForGravity(msg)
@@ -638,8 +657,7 @@ do
 			end
 		end
 
-		-- setup for final score estimation (2 for EotS)
-		NewEstimator(pointsPerSecond, 523, 524) -- BG table, alliance score widget, horde score widget
+		NewEstimator()
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagUpdate")
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagUpdate")
 		self:RegisterTempEvent("RAID_BOSS_WHISPER", "CheckForGravity")
@@ -653,12 +671,10 @@ do
 				if (found and found == "L'Alliance") or strmatch(msg, L.capturedTheTrigger) then -- frFR
 					self:StartBar(L.flagRespawns, 21, GetIconData(45), "colorOther") -- 45 = White flag
 				end
-				self:UpdateBases()
 			end
 		end
 
-		-- setup for final score estimation (2 for EotS)
-		NewEstimator(pointsPerSecond, 704, 705) -- BG table, alliance score widget, horde score widget
+		NewEstimator()
 		SetupAssault(60, 397) -- In RBG the four points have flags that need to be assaulted, like AB
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "FlagUpdateRated")
 		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "FlagUpdateRated")
@@ -758,7 +774,7 @@ do
 			hereFromTheStart = true
 			hasData = false
 			Timer(0.5, allow)
-			stopTimer = C_Timer.NewTicker(3, stop, 1)
+			stopTimer = NewTicker(3, stop, 1)
 			SendAddonMessage("Capping", "gr", "INSTANCE_CHAT")
 		end
 	end
@@ -784,10 +800,10 @@ do
 				if msg == "gr" and sender ~= me then -- gate request
 					if hasData then -- Joined a late game, don't send data
 						if timer then timer:Cancel() end
-						timer = C_Timer.NewTicker(1, SendIoCGates, 1)
+						timer = NewTicker(1, SendIoCGates, 1)
 					elseif stopTimer then
 						stopTimer:Cancel()
-						stopTimer = C_Timer.NewTicker(3, stop, 1)
+						stopTimer = NewTicker(3, stop, 1)
 					end
 				elseif msg == "rb" or msg == "rbh" then -- Re-Build / Re-Build Halfway
 					local pois = GetAreaPOIForMap(169)
