@@ -1067,14 +1067,15 @@ do
 	local function Wintergrasp(self)
 		if not self.WinterAssaultBrawl then
 			wallid = { -- wall section locations
-				[6048] = "NW ", [6049] = "NW ", [6050] = "NW ", [6051] = "NW ",
-				[6047] = "SW ", [6046] = "SW ", [6045] = "S ",
-				[6043] = "S ", [6042] = "SE ", [6041] = "SE ",
-				[6040] = "NE ", [6039] = "NE ", [6038] = "NE ", [6037] = "NE ",
-				[6034] = "Inner W ", [6035] = "Inner W ", [6036] = "Inner W ",
-				[6033] = "Inner S ", [6032] = "Inner S ", [6031] = "Inner S ",
-				[6030] = "Inner E ", [6029] = "Inner E ", [6028] = "Inner E ",
-				[6056] = "", [6027] = "", -- front gate and fortress door
+				[6048] = L.northWest, [6049] = L.northWest, [6050] = L.northWest, [6051] = L.northWest,
+				[6047] = L.southWest, [6046] = L.southWest,
+				[6045] = L.south, [6043] = L.south,
+				[6042] = L.southEast, [6041] = L.southEast,
+				[6040] = L.northEast, [6039] = L.northEast, [6038] = L.northEast, [6037] = L.northEast,
+				[6034] = L.innerWest, [6035] = L.innerWest, [6036] = L.innerWest,
+				[6033] = L.innerSouth, [6032] = L.innerSouth, [6031] = L.innerSouth,
+				[6030] = L.innerEast, [6029] = L.innerEast, [6028] = L.innerEast,
+				[6056] = L.southGate, [6027] = L.mainEntrance, -- front gate and fortress door
 			}
 
 			-- POI icon texture id: gateH, gateA, horizWallH, horizWallA, vertWallH, vertWallA
@@ -1094,11 +1095,11 @@ do
 					local textureIndex = tbl.textureIndex
 					if tbl and ((ti and ti ~= textureIndex) or (not ti and wallid[POI])) then
 						if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
-							local msg = format("|cFF33FF99Capping|r: %s%s %s!", wallid[POI], tbl.name, ACTION_ENVIRONMENTAL_DAMAGE)
+							local msg = format(L.damaged, wallid[POI])
 							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", msg)
 							print(msg)
 						elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-							local msg = format("|cFF33FF99Capping|r: %s%s %s!", wallid[POI], tbl.name, ACTION_UNIT_DESTROYED)
+							local msg = format(L.destroyed, wallid[POI])
 							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", msg)
 							print(msg)
 						end

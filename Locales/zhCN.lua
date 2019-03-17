@@ -28,3 +28,17 @@ L.balinda = "巴琳达·斯通赫尔斯"
 -- 地精机械师喊道：它又坏了？！我会把它修好……但我可不保证它一定能好用。
 L.halfway = "我就要完成了"
 L.broken = "坏了"
+
+-- Wintergrasp
+--L.damaged = "|cFF33FF99Capping|r: %s damaged"
+--L.destroyed = "|cFF33FF99Capping|r: %s destroyed"
+--L.northWest = "North-West wall"
+--L.southWest = "South-West wall"
+--L.south = "South wall"
+--L.southEast = "South-East wall"
+--L.northEast = "North-East wall"
+--L.innerWest = "Inner-West wall"
+--L.innerSouth = "Inner-South wall"
+--L.innerEast = "Inner-East wall"
+--L.southGate = "South gate"
+--L.mainEntrance = "Main entrance"

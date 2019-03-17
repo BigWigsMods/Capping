@@ -28,3 +28,17 @@ L.capturedTheTrigger = "a pris le drapeau de"
 -- Goblin Mechanic yells: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
 --L.halfway = "halfway"
 --L.broken = "broken"
+
+-- Wintergrasp
+--L.damaged = "|cFF33FF99Capping|r: %s damaged"
+--L.destroyed = "|cFF33FF99Capping|r: %s destroyed"
+--L.northWest = "North-West wall"
+--L.southWest = "South-West wall"
+--L.south = "South wall"
+--L.southEast = "South-East wall"
+--L.northEast = "North-East wall"
+--L.innerWest = "Inner-West wall"
+--L.innerSouth = "Inner-South wall"
+--L.innerEast = "Inner-East wall"
+--L.southGate = "South gate"
+--L.mainEntrance = "Main entrance"
