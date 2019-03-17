@@ -18,7 +18,7 @@ L.allianceGate = "联盟大门"
 L.hordeBoss = "部落将军"
 L.allianceBoss = "联盟将军"
 L.galvangar = "加尔范上尉"
-L.balinda = "巴琳达·斯通赫尔斯"
+L.balinda = "巴琳达"
 
 --- Alliance IoC Workshop yells:
 -- 侏儒技师喊道：我就要完成了！挡住那帮部落的家伙。他们可不是在工程学校进行战斗教学！

@@ -18,7 +18,7 @@ L.capturedTheTrigger = "佔據了"
 --L.hordeBoss = "Horde Boss"
 --L.allianceBoss = "Alliance Boss"
 --L.galvangar = "Galvangar"
---L.balinda = "Balinda Stonehearth"
+--L.balinda = "Balinda"
 
 --- Alliance IoC Workshop yells:
 -- Gnomish Mechanic yells: I'm halfway there! Keep the Horde away from here.  They don't teach fighting in engineering school!

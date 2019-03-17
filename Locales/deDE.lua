@@ -18,7 +18,7 @@ L.allianceGate = "Allianztor"
 --L.hordeBoss = "Horde Boss"
 --L.allianceBoss = "Alliance Boss"
 --L.galvangar = "Galvangar"
-L.balinda = "Balinda Steinbruch" -- Hauptmann Balinda Steinbruch
+L.balinda = "Balinda" -- Hauptmann Balinda Steinbruch
 
 --- Alliance IoC Workshop yells:
 -- Gnomenmechaniker: Ich hab's gleich! Haltet die Horde von hier fern. Kämpfen stand in der Ingenieursschule nicht auf dem
