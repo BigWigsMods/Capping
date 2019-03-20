@@ -489,6 +489,12 @@ do
 		NewEstimator()
 	end
 	mod:AddBG(1681, ArathiBasinSnowyPvPBrawl)
+
+	local function ArathiBasinBrawlVsAI()
+		SetupAssault(60, 1383)
+		NewEstimator()
+	end
+	mod:AddBG(2177, ArathiBasinBrawlVsAI)
 end
 
 do
