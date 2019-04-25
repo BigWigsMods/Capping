@@ -759,7 +759,7 @@ end
 
 do
 	------------------------------------------------ Isle of Conquest --------------------------------------
-	local baseGateHealth = 1497600
+	local baseGateHealth = 1946880
 	local lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
 	local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 	local hordeGates, allianceGates = {}, {}
@@ -776,7 +776,7 @@ do
 					local bar = mod:GetBar(L.hordeGate)
 					if bar then
 						local hp = newHp / baseGateHealth * 100
-						if hp < 1 then
+						if hp < 0.5 then
 							bar:Stop()
 						else
 							bar.candyBarBar:SetValue(hp)
@@ -792,7 +792,7 @@ do
 					local bar = mod:GetBar(L.allianceGate)
 					if bar then
 						local hp = newHp / baseGateHealth * 100
-						if hp < 1 then
+						if hp < 0.5 then
 							bar:Stop()
 						else
 							bar.candyBarBar:SetValue(hp)
