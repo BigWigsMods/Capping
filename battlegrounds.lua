@@ -618,10 +618,6 @@ do
 					elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
 						SelectGossipAvailableQuest(1)
 					end
-				elseif mobId == 13617 or mobId == 13616 then -- Stormpike Stable Master, Frostwolf Stable Master
-					if GetGossipOptions() then
-						SelectGossipOption(1)
-					end
 				elseif mobId == 13236 then -- Primalist Thurloga
 					local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
 					if num > 0 then
@@ -633,7 +629,7 @@ do
 							SelectGossipAvailableQuest(1)
 						end
 					end
-				elseif mobId == 13442 then -- Arch Druid Renferal
+				elseif mobId == 13442 then -- Archdruid Renferal
 					local num = GetItemCount(17423) -- Storm Crystal 17423
 					if num > 0 then
 						if GetNumGossipActiveQuests() == 1 then
