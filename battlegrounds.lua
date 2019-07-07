@@ -624,17 +624,25 @@ do
 					end
 				elseif mobId == 13236 then -- Primalist Thurloga
 					local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
-					if num >= 5 then
-						SelectGossipAvailableQuest(2)
-					elseif num > 0 then
-						SelectGossipAvailableQuest(1)
+					if num > 0 then
+						if GetNumGossipActiveQuests() == 1 then
+							SelectGossipActiveQuest(1)
+						elseif num >= 5 then
+							SelectGossipAvailableQuest(2)
+						else
+							SelectGossipAvailableQuest(1)
+						end
 					end
 				elseif mobId == 13442 then -- Arch Druid Renferal
 					local num = GetItemCount(17423) -- Storm Crystal 17423
-					if num >= 5 then
-						SelectGossipAvailableQuest(2)
-					elseif num > 0 then
-						SelectGossipAvailableQuest(1)
+					if num > 0 then
+						if GetNumGossipActiveQuests() == 1 then
+							SelectGossipActiveQuest(1)
+						elseif num >= 5 then
+							SelectGossipAvailableQuest(2)
+						else
+							SelectGossipAvailableQuest(1)
+						end
 					end
 				elseif mobId == 13577 then -- Stormpike Ram Rider Commander
 					if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
