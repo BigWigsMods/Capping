@@ -1132,9 +1132,22 @@ do
 	mod:AddBG(2118, Wintergrasp) -- map id
 end
 
---do
---	------------------------------------------------ Ashran ------------------------------------------
---	local function Ashran(self)
+do
+	------------------------------------------------ Ashran ------------------------------------------
+	local function Ashran(self)
+		function mod:AshranTurnIn()
+			local target = UnitGUID("npc")
+			if target then
+				local _, _, _, _, _, id = strsplit("-", target)
+				local mobId = tonumber(id)
+				if mobId == 81870 or mobId == 83830 then -- Anenga (Alliance) / Kalgan (Horde)
+					local _, num = GetCurrencyInfo(944) -- Artifact Fragment
+					if num > 0 and GetNumGossipOptions() == 3 then -- Have the currency and boss isn't already summoned
+						SelectGossipOption(1)
+					end
+				end
+			end
+		end
 --		if not self.AshranControl then
 --			function mod:AshranControl(msg)
 --				--print(msg, ...)
@@ -1180,9 +1193,10 @@ end
 --		self:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "AshranControl")
 --		self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
 --		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "AshranTimeLeft")
---	end
---	mod:AddBG(X, Ashran) -- map id
---end
+		self:RegisterTempEvent("GOSSIP_SHOW", "AshranTurnIn")
+	end
+	mod:AddBG(1191, Ashran) -- map id
+end
 
 do
 	------------------------------------------------ Arena ------------------------------------------
