@@ -530,7 +530,7 @@ end
 
 do
 	------------------------------------------------ Alterac Valley ---------------------------------------------------
-	local hereFromTheStart, hasData = true, true
+	local hereFromTheStart, hasData, hasPrinted = true, true, false
 	local stopTimer = nil
 	local function allow() hereFromTheStart = false end
 	local function stop() hereFromTheStart = true hasData = true stopTimer = nil end
@@ -658,6 +658,10 @@ do
 			self:AVTurnIn()
 			if IsQuestCompletable() then
 				CompleteQuest()
+				if not hasPrinted then
+					hasPrinted = true
+					print(L.handIn)
+				end
 			end
 		end
 		function mod:AVTurnInComplete()
@@ -674,6 +678,7 @@ do
 		self:RegisterTempEvent("QUEST_PROGRESS", "AVTurnInProgress")
 		self:RegisterTempEvent("QUEST_COMPLETE", "AVTurnInComplete")
 		Timer(2, AVSyncRequest)
+		hasPrinted = false
 	end
 	mod:AddBG(30, AlteracValley)
 end
@@ -1140,6 +1145,7 @@ end
 
 do
 	------------------------------------------------ Ashran ------------------------------------------
+	local hasPrinted = false
 	local function Ashran(self)
 		function mod:AshranTurnIn()
 			local target = UnitGUID("npc")
@@ -1150,6 +1156,10 @@ do
 					local _, num = GetCurrencyInfo(944) -- Artifact Fragment
 					if num > 0 and GetNumGossipOptions() == 3 then -- Have the currency and boss isn't already summoned
 						SelectGossipOption(1)
+						if not hasPrinted then
+							hasPrinted = true
+							print(L.handIn)
+						end
 					end
 				end
 			end
@@ -1200,6 +1210,7 @@ do
 --		self:RegisterTempEvent("CHAT_MSG_MONSTER_EMOTE", "AshranEvents")
 --		self:RegisterTempEvent("WORLD_STATE_UI_TIMER_UPDATE", "AshranTimeLeft")
 		self:RegisterTempEvent("GOSSIP_SHOW", "AshranTurnIn")
+		hasPrinted = false
 	end
 	mod:AddBG(1191, Ashran) -- map id
 end

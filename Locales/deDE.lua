@@ -19,6 +19,7 @@ L.allianceGate = "Allianztor"
 --L.allianceBoss = "Alliance Boss"
 --L.galvangar = "Galvangar"
 L.balinda = "Balinda" -- Hauptmann Balinda Steinbruch
+--L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
 
 --- Alliance IoC Workshop yells:
 -- Gnomenmechaniker: Ich hab's gleich! Haltet die Horde von hier fern. Kämpfen stand in der Ingenieursschule nicht auf dem

@@ -19,6 +19,7 @@ L.hordeBoss = "部落将军"
 L.allianceBoss = "联盟将军"
 L.galvangar = "加尔范上尉"
 L.balinda = "巴琳达"
+--L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
 
 --- Alliance IoC Workshop yells:
 -- 侏儒技师喊道：我就要完成了！挡住那帮部落的家伙。他们可不是在工程学校进行战斗教学！
