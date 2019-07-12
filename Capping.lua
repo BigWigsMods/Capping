@@ -62,7 +62,6 @@ function mod:UnregisterEvent(event)
 end
 
 function mod:START_TIMER(_, timeSeconds)
-	self.prevTimer = GetTime() -- Used for some BG checks
 	local _, t = GetInstanceInfo();
 	if t == "pvp" or t == "arena" then
 		for i = 1, #TimerTracker.timerList do

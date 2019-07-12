@@ -14,6 +14,7 @@ local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 local Timer, SendAddonMessage, NewTicker = C_Timer.After, C_ChatInfo.SendAddonMessage, C_Timer.NewTicker
 local GetAtlasInfo = C_Texture.GetAtlasInfo
+local GetScoreInfo = C_PvP.GetScoreInfo
 
 local SetupAssault, GetIconData, UpdateAssault
 do -- POI handling
@@ -534,17 +535,19 @@ do
 	local function allow() hereFromTheStart = false end
 	local function stop() hereFromTheStart = true hasData = true stopTimer = nil end
 	local function AVSyncRequest()
-		local t = GetTime()
-		if mod.prevTimer and t - mod.prevTimer < 2 then -- mod.prevTimer set when START_TIMER fires (Capping.lua)
-			hereFromTheStart = true
-			hasData = true
-		else
-			hereFromTheStart = true
-			hasData = false
-			Timer(0.5, allow)
-			stopTimer = NewTicker(3, stop, 1)
-			C_ChatInfo.SendAddonMessage("Capping", "tr", "INSTANCE_CHAT")
+		for i = 1, 80 do
+			local scoreTbl = GetScoreInfo(i)
+			if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
+				hasData = false
+				Timer(0.5, allow)
+				stopTimer = NewTicker(3, stop, 1)
+				C_ChatInfo.SendAddonMessage("Capping", "tr", "INSTANCE_CHAT")
+				return
+			end
 		end
+
+		hereFromTheStart = true
+		hasData = true
 	end
 
 	local timer = nil
@@ -844,18 +847,21 @@ do
 	local function allow() hereFromTheStart = false end
 	local function stop() hereFromTheStart = true stopTimer = nil end
 	local function IoCSyncRequest()
-		local t = GetTime()
-		if mod.prevTimer and t - mod.prevTimer < 2 then -- mod.prevTimer set when START_TIMER fires (Capping.lua)
-			hereFromTheStart = true
-			hasData = true
-			initGateBars()
-		else
-			hereFromTheStart = true
-			hasData = false
-			Timer(0.5, allow)
-			stopTimer = NewTicker(3, stop, 1)
-			SendAddonMessage("Capping", "gr", "INSTANCE_CHAT")
+		for i = 1, 80 do
+			local scoreTbl = GetScoreInfo(i)
+			if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
+				hereFromTheStart = true
+				hasData = false
+				Timer(0.5, allow)
+				stopTimer = NewTicker(3, stop, 1)
+				SendAddonMessage("Capping", "gr", "INSTANCE_CHAT")
+				return
+			end
 		end
+
+		hereFromTheStart = true
+		hasData = true
+		initGateBars()
 	end
 
 	local timer = nil
