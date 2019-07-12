@@ -538,6 +538,7 @@ do
 		for i = 1, 80 do
 			local scoreTbl = GetScoreInfo(i)
 			if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
+				hereFromTheStart = true
 				hasData = false
 				Timer(0.5, allow)
 				stopTimer = NewTicker(3, stop, 1)
