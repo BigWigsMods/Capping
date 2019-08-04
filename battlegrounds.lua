@@ -15,6 +15,7 @@ local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 local Timer, SendAddonMessage, NewTicker = C_Timer.After, C_ChatInfo.SendAddonMessage, C_Timer.NewTicker
 local GetAtlasInfo = C_Texture.GetAtlasInfo
 local GetScoreInfo = C_PvP.GetScoreInfo
+local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 
 local SetupAssault, GetIconData, UpdateAssault
 do -- POI handling
@@ -678,6 +679,8 @@ do
 		self:RegisterTempEvent("GOSSIP_SHOW", "AVTurnIn")
 		self:RegisterTempEvent("QUEST_PROGRESS", "AVTurnInProgress")
 		self:RegisterTempEvent("QUEST_COMPLETE", "AVTurnInComplete")
+		RequestBattlefieldScoreData()
+		Timer(1, RequestBattlefieldScoreData)
 		Timer(2, AVSyncRequest)
 		hasPrinted = false
 	end
@@ -977,6 +980,8 @@ do
 		SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
 		mod:RegisterTempEvent("CHAT_MSG_ADDON", "IoCSync")
 		mod:RegisterTempEvent("CHAT_MSG_MONSTER_YELL", "RestartSiegeBar")
+		RequestBattlefieldScoreData()
+		Timer(1, RequestBattlefieldScoreData)
 		Timer(2, IoCSyncRequest)
 	end
 	mod:AddBG(628, IsleOfConquest)
