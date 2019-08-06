@@ -3,7 +3,7 @@ local addonName, mod = ...
 local frame = CreateFrame("Frame", "CappingFrame", UIParent)
 local L = mod.L
 
-local format, type = format, type
+local format = format
 local db
 
 local activeBars = { }
@@ -309,6 +309,7 @@ end
 frame.Test = mod.Test
 
 do
+	local type = type
 	local BarOnClick
 	do
 		local function ReportBar(bar, channel)
