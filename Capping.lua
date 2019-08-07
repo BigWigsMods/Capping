@@ -62,8 +62,8 @@ function mod:UnregisterEvent(event)
 end
 
 function mod:START_TIMER(_, timeSeconds)
-	local _, t = GetInstanceInfo();
-	if t == "pvp" or t == "arena" then
+	local _, t = GetInstanceInfo()
+	if t == "pvp" or t == "arena" or t == "scenario" then
 		for i = 1, #TimerTracker.timerList do
 			TimerTracker.timerList[i].bar:Hide() -- Hide the Blizz start timer
 		end
