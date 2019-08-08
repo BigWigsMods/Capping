@@ -1034,64 +1034,200 @@ do
 	mod:AddBG(726, WarsongGulch) -- Twin Peaks
 end
 
-do
-	------------------------------------------------ Wintergrasp ------------------------------------------
-	local wallid, walls = nil, nil
-	local function Wintergrasp(self)
-		if not self.WinterAssault then
-			wallid = { -- wall section locations
-				[2222] = "NW ", [2223] = "NW ", [2224] = "NW ", [2225] = "NW ",
-				[2226] = "SW ", [2227] = "SW ", [2228] = "S ",
-				[2230] = "S ", [2231] = "SE ", [2232] = "SE ",
-				[2233] = "NE ", [2234] = "NE ", [2235] = "NE ", [2236] = "NE ",
-				[2237] = "Inner W ", [2238] = "Inner W ", [2239] = "Inner W ",
-				[2240] = "Inner S ", [2241] = "Inner S ", [2242] = "Inner S ",
-				[2243] = "Inner E ", [2244] = "Inner E ", [2245] = "Inner E ",
-				[2229] = "", [2246] = "", -- front gate and fortress door
-			}
+--do
+--	------------------------------------------------ Wintergrasp ------------------------------------------
+--	local wallid, walls = nil, nil
+--	local function Wintergrasp(self)
+--		if not self.WinterAssault then
+--			wallid = { -- wall section locations
+--				[2222] = "NW ", [2223] = "NW ", [2224] = "NW ", [2225] = "NW ",
+--				[2226] = "SW ", [2227] = "SW ", [2228] = "S ",
+--				[2230] = "S ", [2231] = "SE ", [2232] = "SE ",
+--				[2233] = "NE ", [2234] = "NE ", [2235] = "NE ", [2236] = "NE ",
+--				[2237] = "Inner W ", [2238] = "Inner W ", [2239] = "Inner W ",
+--				[2240] = "Inner S ", [2241] = "Inner S ", [2242] = "Inner S ",
+--				[2243] = "Inner E ", [2244] = "Inner E ", [2245] = "Inner E ",
+--				[2229] = "", [2246] = "", -- front gate and fortress door
+--			}
+--
+--			-- POI icon texture id
+--			local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
+--			local damaged, destroyed, all = { }, { }, { }
+--			for k in pairs(intact) do
+--				damaged[k + 1] = true
+--				destroyed[k + 2] = true
+--				all[k], all[k + 1], all[k + 2] = true, true, true
+--			end
+--			function mod:WinterAssault() -- scans POI landmarks for changes in wall textures
+--				local pois = GetAreaPOIForMap(123) -- Wintergrasp
+--				for i = 1, #pois do
+--					local POI = pois[i]
+--					local tbl = GetAreaPOIInfo(123, POI)
+--					local ti = walls[POI]
+--					local textureIndex = tbl.textureIndex
+--					if tbl and ((ti and ti ~= textureIndex) or (not ti and wallid[POI])) then
+--						if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
+--							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, ACTION_ENVIRONMENTAL_DAMAGE))
+--						elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
+--							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, ACTION_UNIT_DESTROYED))
+--						end
+--						walls[POI] = all[textureIndex] and textureIndex or ti
+--					end
+--				end
+--			end
+--		end
+--		walls = { }
+--		local pois = GetAreaPOIForMap(123) -- Wintergrasp
+--		for i = 1, #pois do
+--			local POI = pois[i]
+--			local tbl = GetAreaPOIInfo(123, POI)
+--			if wallid[POI] and tbl.textureIndex then
+--				walls[POI] = tbl.textureIndex
+--			end
+--		end
+--		self:RegisterTempEvent("AREA_POIS_UPDATED", "WinterAssault")
+--	end
+--	mod:AddBG(-123, Wintergrasp) -- map id
+--end
 
-			-- POI icon texture id
-			local intact = { [77] = true, [80] = true, [86] = true, [89] = true, [95] = true, [98] = true, }
-			local damaged, destroyed, all = { }, { }, { }
-			for k in pairs(intact) do
-				damaged[k + 1] = true
-				destroyed[k + 2] = true
-				all[k], all[k + 1], all[k + 2] = true, true, true
-			end
-			function mod:WinterAssault() -- scans POI landmarks for changes in wall textures
-				local pois = GetAreaPOIForMap(123) -- Wintergrasp
-				for i = 1, #pois do
-					local POI = pois[i]
-					local tbl = GetAreaPOIInfo(123, POI)
-					local ti = walls[POI]
-					local textureIndex = tbl.textureIndex
-					if tbl and ((ti and ti ~= textureIndex) or (not ti and wallid[POI])) then
-						if intact[ti] and damaged[textureIndex] then -- intact before, damaged now
-							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, ACTION_ENVIRONMENTAL_DAMAGE))
-						elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-							RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", format("%s%s %s!", wallid[POI], tbl.name, ACTION_UNIT_DESTROYED))
-						end
-						walls[POI] = all[textureIndex] and textureIndex or ti
+do
+	------------------------------------------------ Wintergrasp Instance ------------------------------------------
+	local baseTowerHealth = 130000
+	local westHp, midHp, eastHp = baseTowerHealth, baseTowerHealth, baseTowerHealth
+	local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
+	local towers = {}
+	local towerNames = {
+		["308062"] = "West Tower", -- Shadowsight Tower (West)
+		["308013"] = "Middle Tower", -- Winter's Edge Tower (Mid)
+		["307935"] = "East Tower", -- Flamewatch Tower (East)
+	}
+	local towerNamesEnglish = {
+		["308062"] = "West Tower", -- Shadowsight Tower (West)
+		["308013"] = "Middle Tower", -- Winter's Edge Tower (Mid)
+		["307935"] = "East Tower", -- Flamewatch Tower (East)
+	}
+
+	function mod:CheckTowerHealth()
+		local _, event, _, _, _, _, _, destGUID, n, _, _, _, _, _, amount = CombatLogGetCurrentEventInfo()
+		if event == "SPELL_BUILDING_DAMAGE" then
+			local _, _, _, _, _, strid = strsplit("-", destGUID)
+			if towers[strid] then
+				local newHp = towers[strid] - amount
+				towers[strid] = newHp
+				local bar = mod:GetBar(towerNames[strid])
+				if bar then
+					local hp = newHp / baseTowerHealth * 100
+					if hp < 0.5 then
+						bar:Stop()
+					else
+						bar.candyBarBar:SetValue(hp)
+						bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 					end
 				end
 			end
 		end
-		walls = { }
-		local pois = GetAreaPOIForMap(123) -- Wintergrasp
-		for i = 1, #pois do
-			local POI = pois[i]
-			local tbl = GetAreaPOIInfo(123, POI)
-			if wallid[POI] and tbl.textureIndex then
-				walls[POI] = tbl.textureIndex
+	end
+
+	local function initTowerBars()
+		mod:RegisterTempEvent("COMBAT_LOG_EVENT_UNFILTERED", "CheckTowerHealth")
+		local color = "colorHorde"
+		local tbl = GetAreaPOIInfo(1334, 6027) -- Main entrance POI
+		if tbl and tbl.textureIndex == 77 then
+			color = "colorAlliance"
+		end
+		for towerId, towerName in next, towerNames do
+			local bar = mod:StartBar(towerName, 100, 237021, color, true) -- Interface/Icons/inv_essenceofwintergrasp
+			bar:Pause()
+			bar.candyBarBar:SetValue(100)
+			bar.candyBarDuration:SetText("100%")
+			bar:Set("capping:customchat", function()
+				if towerName ~= towerNamesEnglish[towerId] then
+					return towerNamesEnglish[towerId] .. "/".. towerName .." - ".. bar.candyBarDuration:GetText()
+				else
+					return towerName .." - ".. bar.candyBarDuration:GetText()
+				end
+			end)
+		end
+	end
+
+	local hereFromTheStart, hasData = true, true
+	local stopTimer = nil
+	local function allow() hereFromTheStart = false end
+	local function stop() hereFromTheStart = true stopTimer = nil end
+	local function WGSyncRequest()
+		for i = 1, 80 do
+			local scoreTbl = GetScoreInfo(i)
+			if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
+				hereFromTheStart = true
+				hasData = false
+				Timer(0.5, allow)
+				stopTimer = NewTicker(3, stop, 1)
+				SendAddonMessage("Capping", "twr", "INSTANCE_CHAT")
+				return
 			end
 		end
-		self:RegisterTempEvent("AREA_POIS_UPDATED", "WinterAssault")
-	end
-	mod:AddBG(-123, Wintergrasp) -- map id
-end
 
-do
-	------------------------------------------------ Wintergrasp Instance ------------------------------------------
+		hereFromTheStart = true
+		hasData = true
+		initTowerBars()
+	end
+
+	local timer = nil
+	local function SendWGTowers()
+		timer = nil
+		if IsInGroup(2) then -- We've not just ragequit
+			local msg = format(
+				"308062:%d:308013:%d:307935:%d",
+				towers["308062"], towers["308013"], towers["307935"] -- West, Mid, East
+			)
+			SendAddonMessage("Capping", msg, "INSTANCE_CHAT")
+		end
+	end
+
+	do
+		local me = UnitName("player").. "-" ..GetRealmName()
+		function mod:WGSync(prefix, msg, channel, sender)
+			if prefix == "Capping" and channel == "INSTANCE_CHAT" then
+				if msg == "twr" and sender ~= me then -- gate request
+					if hasData then -- Joined a late game, don't send data
+						if timer then timer:Cancel() end
+						timer = NewTicker(1, SendWGTowers, 1)
+					elseif stopTimer then
+						stopTimer:Cancel()
+						stopTimer = NewTicker(3, stop, 1)
+					end
+				elseif not hereFromTheStart and sender ~= me then
+					local west, westRawHp, mid, midRawHp, east, eastRawHp = strsplit(":", msg)
+					local westHp, midHp, eastHp = tonumber(westRawHp), tonumber(midRawHp), tonumber(eastRawHp)
+					if westHp and midHp and eastHp and -- Safety dance
+					west == "308062" and mid == "308013" and east == "307935" then
+						hereFromTheStart = true
+						hasData = true
+						initTowerBars()
+						towers = {
+							["308062"] = westHp, -- Shadowsight Tower (West)
+							["308013"] = midHp, -- Winter's Edge Tower (Mid)
+							["307935"] = eastHp, -- Flamewatch Tower (East)
+						}
+
+						for towerId, towerHp in next, towers do
+							local bar = mod:GetBar(towerNames[towerId])
+							if bar then
+								local hp = towerHp / baseTowerHealth * 100
+								if hp < 1 then
+									bar:Stop()
+								else
+									bar.candyBarBar:SetValue(hp)
+									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
 	local wallid, walls = nil, nil
 	local function Wintergrasp(self)
 		if not self.WinterAssaultBrawl then
@@ -1146,6 +1282,16 @@ do
 				walls[POI] = tbl.textureIndex
 			end
 		end
+		westHp, midHp, eastHp = baseTowerHealth, baseTowerHealth, baseTowerHealth
+		towers = {
+			["308062"] = baseTowerHealth, -- Shadowsight Tower (West)
+			["308013"] = baseTowerHealth, -- Winter's Edge Tower (Mid)
+			["307935"] = baseTowerHealth, -- Flamewatch Tower (East)
+		}
+		mod:RegisterTempEvent("CHAT_MSG_ADDON", "WGSync")
+		RequestBattlefieldScoreData()
+		Timer(1, RequestBattlefieldScoreData)
+		Timer(2, WGSyncRequest)
 		self:RegisterTempEvent("AREA_POIS_UPDATED", "WinterAssaultBrawl")
 	end
 	mod:AddBG(2118, Wintergrasp) -- map id
