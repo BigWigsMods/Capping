@@ -45,3 +45,6 @@ L.lokholar = "Lokholar" -- Lokholar, o Senhor do Gelo
 --L.innerEast = "Inner-East wall"
 --L.southGate = "South gate"
 --L.mainEntrance = "Main entrance"
+--L.westTower = "West Tower"
+--L.southTower = "South Tower"
+--L.eastTower = "East Tower"

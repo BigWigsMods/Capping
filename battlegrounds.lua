@@ -1097,18 +1097,18 @@ do
 	local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 	local towers = {}
 	local towerNames = {
-		["308062"] = "West Tower", -- Shadowsight Tower (West)
-		["308013"] = "Middle Tower", -- Winter's Edge Tower (Mid)
-		["307935"] = "East Tower", -- Flamewatch Tower (East)
+		["308062"] = L.westTower, -- Shadowsight Tower (West)
+		["308013"] = L.southTower, -- Winter's Edge Tower (Mid)
+		["307935"] = L.eastTower, -- Flamewatch Tower (East)
 	}
 	local towerNamesEnglish = {
 		["308062"] = "West Tower", -- Shadowsight Tower (West)
-		["308013"] = "Middle Tower", -- Winter's Edge Tower (Mid)
+		["308013"] = "South Tower", -- Winter's Edge Tower (Mid)
 		["307935"] = "East Tower", -- Flamewatch Tower (East)
 	}
 
 	function mod:CheckTowerHealth()
-		local _, event, _, _, _, _, _, destGUID, n, _, _, _, _, _, amount = CombatLogGetCurrentEventInfo()
+		local _, event, _, _, _, _, _, destGUID, _, _, _, _, _, _, amount = CombatLogGetCurrentEventInfo()
 		if event == "SPELL_BUILDING_DAMAGE" then
 			local _, _, _, _, _, strid = strsplit("-", destGUID)
 			if towers[strid] then
@@ -1132,7 +1132,7 @@ do
 		mod:RegisterTempEvent("COMBAT_LOG_EVENT_UNFILTERED", "CheckTowerHealth")
 		local color = "colorHorde"
 		local tbl = GetAreaPOIInfo(1334, 6027) -- Main entrance POI
-		if tbl and tbl.textureIndex == 77 then
+		if tbl and tbl.textureIndex == 77 then -- If main entrance is horde texture then towers are alliance
 			color = "colorAlliance"
 		end
 		for towerId, towerName in next, towerNames do
