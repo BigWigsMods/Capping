@@ -19,6 +19,8 @@ L.hordeBoss = "Horde Boss"
 L.allianceBoss = "Alliance Boss"
 L.galvangar = "Galvangar"
 L.balinda = "Balinda"
+L.ivus = "Ivus"
+L.lokholar = "Lokholar"
 L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
 
 --- Alliance IoC Workshop yells:

@@ -19,6 +19,8 @@ L.capturedTheTrigger = "a pris le drapeau de"
 --L.allianceBoss = "Alliance Boss"
 --L.galvangar = "Galvangar"
 --L.balinda = "Balinda"
+L.ivus = "Ivus" -- Ivus le Seigneur de la forêt
+L.lokholar = "Lokholar" -- Lokholar le Seigneur des glaces
 --L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
 
 --- Alliance IoC Workshop yells:

@@ -675,6 +675,8 @@ do
 		SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
 		SetupHealthCheck("11947", L.galvangar, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
 		SetupHealthCheck("11949", L.balinda, "Balinda", 236447, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Female
+		SetupHealthCheck("13419", L.ivus, "Ivus", 874581, "colorAlliance") -- Interface/Icons/inv_pet_ancientprotector_winter
+		SetupHealthCheck("13256", L.lokholar, "Lokholar", 1373132, "colorHorde") -- Interface/Icons/Inv_infernalmounice.blp
 		self:RegisterTempEvent("CHAT_MSG_ADDON", "AVSync")
 		self:RegisterTempEvent("GOSSIP_SHOW", "AVTurnIn")
 		self:RegisterTempEvent("QUEST_PROGRESS", "AVTurnInProgress")

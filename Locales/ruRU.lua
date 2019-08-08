@@ -19,6 +19,8 @@ L.capturedTheTrigger = "захватил"
 --L.allianceBoss = "Alliance Boss"
 --L.galvangar = "Galvangar"
 --L.balinda = "Balinda"
+L.ivus = "Ивус" -- Ивус Лесной Властелин
+L.lokholar = "Локолар" -- Локолар Владыка Льда
 --L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
 
 --- Alliance IoC Workshop yells:

@@ -19,6 +19,8 @@ L.capturedTheTrigger = "佔據了"
 --L.allianceBoss = "Alliance Boss"
 --L.galvangar = "Galvangar"
 --L.balinda = "Balinda"
+--L.ivus = "Ivus"
+--L.lokholar = "Lokholar"
 --L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
 
 --- Alliance IoC Workshop yells:

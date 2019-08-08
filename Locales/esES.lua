@@ -19,6 +19,8 @@ local L = mod.L
 --L.allianceBoss = "Alliance Boss"
 --L.galvangar = "Galvangar"
 --L.balinda = "Balinda"
+L.ivus = "Ivus" -- Ivus el Señor del Bosque
+L.lokholar = "Lokholar" -- Lokholar el Señor del Hielo
 --L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
 
 --- Alliance IoC Workshop yells:

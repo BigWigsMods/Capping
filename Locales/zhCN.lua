@@ -19,6 +19,8 @@ L.hordeBoss = "部落将军"
 L.allianceBoss = "联盟将军"
 L.galvangar = "加尔范上尉"
 L.balinda = "巴琳达"
+--L.ivus = "Ivus"
+--L.lokholar = "Lokholar"
 --L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
 
 --- Alliance IoC Workshop yells:

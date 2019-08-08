@@ -19,6 +19,8 @@ L.allianceGate = "Allianztor"
 --L.allianceBoss = "Alliance Boss"
 --L.galvangar = "Galvangar"
 L.balinda = "Balinda" -- Hauptmann Balinda Steinbruch
+L.ivus = "Ivus" -- Ivus der Waldlord
+L.lokholar = "Lokholar" -- Lokholar der Eislord
 --L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
 
 --- Alliance IoC Workshop yells:
