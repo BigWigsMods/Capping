@@ -322,7 +322,7 @@ do
 				if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
 				SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
 			else
-				local msg = custom()
+				local msg = custom(bar)
 				if msg then
 					SendChatMessage(format("Capping: %s", msg), channel)
 				end

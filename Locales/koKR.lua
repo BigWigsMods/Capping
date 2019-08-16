@@ -15,6 +15,10 @@ L.capturedTheTrigger = "([^ ]*)|1이;가; ([^!]*) 깃발 쟁탈에 성공했습�
 
 --L.hordeGate = "Horde Gate"
 --L.allianceGate = "Alliance Gate"
+--L.gatePosition = "%s (%s)"
+--L.west = "West"
+--L.front = "Front"
+--L.east = "East"
 --L.hordeBoss = "Horde Boss"
 --L.allianceBoss = "Alliance Boss"
 --L.galvangar = "Galvangar"

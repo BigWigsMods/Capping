@@ -460,7 +460,7 @@ do
 					bar:Pause()
 					bar.candyBarBar:SetValue(hp)
 					bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
-					bar:Set("capping:customchat", function()
+					bar:Set("capping:customchat", function(bar)
 						if tbl[1] ~= tbl[2] then
 							return tbl[2] .."/".. tbl[1] .." - ".. bar.candyBarDuration:GetText()
 						else
@@ -781,6 +781,15 @@ do
 	local lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
 	local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 	local hordeGates, allianceGates = {}, {}
+	local hordeGateBar, allianceGateBar = nil, nil
+	local englishNames = {
+		["195494"] = "Horde Gate (Front)/",
+		["195495"] = "Horde Gate (West)/",
+		["195496"] = "Horde Gate (East)/",
+		["195698"] = "Alliance Gate (Front)/",
+		["195699"] = "Alliance Gate (West)/",
+		["195700"] = "Alliance Gate (East)/",
+	}
 
 	function mod:CheckGateHealth()
 		local _, event, _, _, _, _, _, destGUID, _, _, _, _, _, _, amount = CombatLogGetCurrentEventInfo()
@@ -791,7 +800,7 @@ do
 				hordeGates[strid] = newHp
 				if newHp < lowestHordeHp then
 					lowestHordeHp = newHp
-					local bar = mod:GetBar(L.hordeGate)
+					local bar = hordeGateBar
 					if bar then
 						local hp = newHp / baseGateHealth * 100
 						if hp < 0.5 then
@@ -799,6 +808,9 @@ do
 						else
 							bar.candyBarBar:SetValue(hp)
 							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+							local gate = strid == "195494" and L.front or strid == "195495" and L.west or L.east
+							bar.candyBarLabel:SetFormattedText(L.gatePosition, L.hordeGate, gate)
+							bar:Set("capping:englishprint", englishNames[strid])
 						end
 					end
 				end
@@ -807,7 +819,7 @@ do
 				allianceGates[strid] = newHp
 				if newHp < lowestAllianceHp then
 					lowestAllianceHp = newHp
-					local bar = mod:GetBar(L.allianceGate)
+					local bar = allianceGateBar
 					if bar then
 						local hp = newHp / baseGateHealth * 100
 						if hp < 0.5 then
@@ -815,6 +827,9 @@ do
 						else
 							bar.candyBarBar:SetValue(hp)
 							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+							local gate = strid == "195698" and L.front or strid == "195699" and L.west or L.east
+							bar.candyBarLabel:SetFormattedText(L.gatePosition, L.allianceGate, gate)
+							bar:Set("capping:englishprint", englishNames[strid])
 						end
 					end
 				end
@@ -833,24 +848,27 @@ do
 		aBar:Pause()
 		aBar.candyBarBar:SetValue(100)
 		aBar.candyBarDuration:SetText("100%")
-		aBar:Set("capping:customchat", function()
+		aBar:Set("capping:englishprint", "Alliance Gate/")
+		aBar:Set("capping:customchat", function(bar)
 			if L.allianceGate ~= "Alliance Gate" then
-				return "Alliance Gate/".. L.allianceGate .." - ".. aBar.candyBarDuration:GetText()
+				return bar:Get("capping:englishprint") .. bar.candyBarLabel:GetText() .." - ".. bar.candyBarDuration:GetText()
 			else
-				return L.allianceGate .." - ".. aBar.candyBarDuration:GetText()
+				return bar.candyBarLabel:GetText() .." - ".. bar.candyBarDuration:GetText()
 			end
 		end)
 		local hBar = mod:StartBar(L.hordeGate, 100, 2054277, "colorAlliance", true) -- Interface/Icons/spell_tailor_defenceup01
 		hBar:Pause()
 		hBar.candyBarBar:SetValue(100)
 		hBar.candyBarDuration:SetText("100%")
-		hBar:Set("capping:customchat", function()
+		hBar:Set("capping:englishprint", "Horde Gate/")
+		hBar:Set("capping:customchat", function(bar)
 			if L.hordeGate ~= "Horde Gate" then
-				return "Horde Gate/".. L.hordeGate .." - ".. hBar.candyBarDuration:GetText()
+				return bar:Get("capping:englishprint") .. bar.candyBarLabel:GetText() .." - ".. bar.candyBarDuration:GetText()
 			else
-				return L.hordeGate .." - ".. hBar.candyBarDuration:GetText()
+				return bar.candyBarLabel:GetText() .." - ".. bar.candyBarDuration:GetText()
 			end
 		end)
+		allianceGateBar, hordeGateBar = aBar, hBar
 	end
 
 	local hereFromTheStart, hasData = true, true
@@ -931,7 +949,7 @@ do
 						allianceGates["195699"] = aGate2
 						allianceGates["195700"] = aGate3
 
-						local bar = mod:GetBar(L.hordeGate)
+						local bar = hordeGateBar
 						if bar then
 							local hp = lowestHordeHp / baseGateHealth * 100
 							if hp < 1 then
@@ -939,9 +957,14 @@ do
 							else
 								bar.candyBarBar:SetValue(hp)
 								bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+								if lowestHordeHp ~= baseGateHealth then
+									local gate = lowestHordeHp == hGate1 and h1 or lowestHordeHp == hGate2 and h2 or h3
+									bar.candyBarLabel:SetFormattedText(L.gatePosition, L.hordeGate, gate == h1 and L.front or gate == h2 and L.west or L.east)
+									bar:Set("capping:englishprint", englishNames[gate])
+								end
 							end
 						end
-						local bar = mod:GetBar(L.allianceGate)
+						local bar = allianceGateBar
 						if bar then
 							local hp = lowestAllianceHp / baseGateHealth * 100
 							if hp < 1 then
@@ -949,6 +972,11 @@ do
 							else
 								bar.candyBarBar:SetValue(hp)
 								bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+								if lowestAllianceHp ~= baseGateHealth then
+									local gate = lowestAllianceHp == aGate1 and a1 or lowestAllianceHp == aGate2 and a2 or a3
+									bar.candyBarLabel:SetFormattedText(L.gatePosition, L.allianceGate, gate == a1 and L.front or gate == a2 and L.west or L.east)
+									bar:Set("capping:englishprint", englishNames[gate])
+								end
 							end
 						end
 					end
@@ -1140,7 +1168,7 @@ do
 			bar:Pause()
 			bar.candyBarBar:SetValue(100)
 			bar.candyBarDuration:SetText("100%")
-			bar:Set("capping:customchat", function()
+			bar:Set("capping:customchat", function(bar)
 				if towerName ~= towerNamesEnglish[towerId] then
 					return towerNamesEnglish[towerId] .. "/".. towerName .." - ".. bar.candyBarDuration:GetText()
 				else
