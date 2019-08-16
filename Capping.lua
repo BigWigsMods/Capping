@@ -143,6 +143,13 @@ function mod:PLAYER_LOGIN()
 	self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
 	self:RegisterEvent("START_TIMER")
 	self:ZONE_CHANGED_NEW_AREA()
+
+	C_Timer.After(15, function()
+		local x = GetLocale()
+		if x ~= "enUS" and x ~= "enGB" then -- XXX temp
+			print("|cFF33FF99Capping|r is missing locale for", x, "and needs your help! Please visit the project page on GitHub for more info.")
+		end
+	end)
 end
 mod:RegisterEvent("PLAYER_LOGIN")
 
