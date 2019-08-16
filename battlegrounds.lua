@@ -1120,10 +1120,42 @@ end
 
 do
 	------------------------------------------------ Wintergrasp Instance ------------------------------------------
-	local baseTowerHealth = 130000
+	local baseTowerHealth, mainEntranceHealth, wallHealth, defenseTowerHealth = 130000, 91000, 301000, 81000
 	local westHp, midHp, eastHp = baseTowerHealth, baseTowerHealth, baseTowerHealth
 	local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-	local towers = {}
+	local towers, onDemandTrackers = {}, {}
+	local defensiveTowers = {
+		["307877"] = L.northEastKeep,
+		["307936"] = L.southEastKeep,
+		["307878"] = L.northWestKeep,
+		["307894"] = L.southWestKeep,
+	}
+	local wallNames = {
+		["308077"] = L.northWest, -- 1
+		["307922"] = L.northWest, -- 2
+		["307937"] = L.northWest, -- 3
+		["307907"] = L.northWest, -- 4
+		["308035"] = L.southWest, -- 1
+		["307897"] = L.southWest, -- 2
+		["307898"] = L.south, -- 1
+		["307893"] = L.southGate,
+		["307899"] = L.south, -- 2
+		["307879"] = L.southEast, -- 1
+		["307896"] = L.southEast, -- 2
+		["307927"] = L.northEast, -- 1
+		["307919"] = L.northEast, -- 2
+		["307867"] = L.northEast, -- 3
+		["308083"] = L.northEast, -- 4
+		["307963"] = L.innerWest, -- 1
+		["308078"] = L.innerWest, -- 2
+		["307908"] = L.innerWest, -- 3
+		["307941"] = L.innerSouth, -- 1
+		["307925"] = L.innerSouth, -- 2
+		["307916"] = L.innerSouth, -- 3
+		--[""] = L.innerEast, -- 1
+		--[""] = L.innerEast, -- 2
+		--[""] = L.innerEast, -- 3
+	}
 	local towerNames = {
 		["308062"] = L.westTower, -- Shadowsight Tower (West)
 		["308013"] = L.southTower, -- Winter's Edge Tower (Mid)
@@ -1134,6 +1166,26 @@ do
 		["308013"] = "South Tower", -- Winter's Edge Tower (Mid)
 		["307935"] = "East Tower", -- Flamewatch Tower (East)
 	}
+
+	local function startNewBar(name, english, icon)
+		local tbl = GetAreaPOIInfo(1334, 6027) -- Main entrance POI
+		local color = "colorAlliance"
+		if tbl and tbl.textureIndex == 77 then -- If main entrance is horde texture
+			color = "colorHorde"
+		end
+		local bar = mod:StartBar(name, 100, icon, color, true) -- Interface/Icons/inv_essenceofwintergrasp
+		bar:Pause()
+		bar.candyBarBar:SetValue(100)
+		bar.candyBarDuration:SetText("100%")
+		bar:Set("capping:customchat", function(bar)
+			if name ~= english then
+				return english .."/".. name .." - ".. bar.candyBarDuration:GetText()
+			else
+				return name .." - ".. bar.candyBarDuration:GetText()
+			end
+		end)
+		return bar
+	end
 
 	function mod:CheckTowerHealth()
 		local _, event, _, _, _, _, _, destGUID, _, _, _, _, _, _, amount = CombatLogGetCurrentEventInfo()
@@ -1152,6 +1204,62 @@ do
 						bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 					end
 				end
+			elseif wallNames[strid] then
+				if not onDemandTrackers[strid] then
+					onDemandTrackers[strid] = wallHealth
+				end
+				local newHp = onDemandTrackers[strid] - amount
+				onDemandTrackers[strid] = newHp
+				local hp = newHp / wallHealth * 100
+				if hp < 80 then
+					local bar = mod:GetBar(wallNames[strid])
+					if not bar then
+						bar = startNewBar(wallNames[strid], wallNames[strid], 134456)
+					end
+					if hp < 0.5 then
+						bar:Stop()
+					else
+						local value = bar.candyBarBar:GetValue()
+						if hp < value then
+							bar.candyBarBar:SetValue(hp)
+							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+						end
+					end
+				end
+			elseif defensiveTowers[strid] then
+				if not onDemandTrackers[strid] then
+					onDemandTrackers[strid] = defenseTowerHealth
+				end
+				local newHp = onDemandTrackers[strid] - amount
+				onDemandTrackers[strid] = newHp
+				local hp = newHp / defenseTowerHealth * 100
+				if hp < 90 then
+					local bar = mod:GetBar(defensiveTowers[strid])
+					if not bar then
+						bar = startNewBar(defensiveTowers[strid], defensiveTowers[strid], 237021) -- Interface/Icons/inv_essenceofwintergrasp
+					end
+					if hp < 1.5 then
+						bar:Stop()
+					else
+						bar.candyBarBar:SetValue(hp)
+						bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+					end
+				end
+			elseif strid == "307964" then -- Main Entrance
+				local bar = mod:GetBar(L.mainEntrance)
+				if not bar then
+					bar = startNewBar(L.mainEntrance, "Main entrance", 134957)
+					onDemandTrackers[strid] = mainEntranceHealth
+				end
+				local newHp = onDemandTrackers[strid] - amount
+				onDemandTrackers[strid] = newHp
+				local hp = newHp / mainEntranceHealth * 100
+				if hp < 0.5 then
+					bar:Stop()
+				else
+					bar.candyBarBar:SetValue(hp)
+					bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+				end
 			end
 		end
 	end
@@ -1164,7 +1272,7 @@ do
 			color = "colorAlliance"
 		end
 		for towerId, towerName in next, towerNames do
-			local bar = mod:StartBar(towerName, 100, 237021, color, true) -- Interface/Icons/inv_essenceofwintergrasp
+			local bar = mod:StartBar(towerName, 100, 236351, color, true)
 			bar:Pause()
 			bar.candyBarBar:SetValue(100)
 			bar.candyBarDuration:SetText("100%")
