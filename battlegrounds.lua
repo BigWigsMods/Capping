@@ -1248,7 +1248,7 @@ do
 			elseif strid == "307964" then -- Main Entrance
 				local bar = mod:GetBar(L.mainEntrance)
 				if not bar then
-					bar = startNewBar(L.mainEntrance, "Main entrance", 134957)
+					bar = startNewBar(L.mainEntrance, "Main Entrance", 134957)
 					onDemandTrackers[strid] = mainEntranceHealth
 				end
 				local newHp = onDemandTrackers[strid] - amount
