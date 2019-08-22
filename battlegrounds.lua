@@ -1152,9 +1152,9 @@ do
 		["307941"] = L.innerSouth, -- 1
 		["307925"] = L.innerSouth, -- 2
 		["307916"] = L.innerSouth, -- 3
-		--[""] = L.innerEast, -- 1
-		--[""] = L.innerEast, -- 2
-		--[""] = L.innerEast, -- 3
+		["307938"] = L.innerEast, -- 1
+		["307840"] = L.innerEast, -- 2
+		["307870"] = L.innerEast, -- 3
 	}
 	local towerNames = {
 		["308062"] = L.westTower, -- Shadowsight Tower (West)
