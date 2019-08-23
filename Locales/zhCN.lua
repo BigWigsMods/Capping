@@ -23,8 +23,8 @@ L.hordeBoss = "部落将军"
 L.allianceBoss = "联盟将军"
 L.galvangar = "加尔范上尉"
 L.balinda = "巴琳达"
-L.ivus = "Ivus"
-L.lokholar = "Lokholar"
+L.ivus = "森林之王伊弗斯"
+L.lokholar = "冰雪之王洛克霍拉"
 L.handIn = "|cFF33FF99Capping|r: 自动交任务品."
 
 --- Alliance IoC Workshop yells:
