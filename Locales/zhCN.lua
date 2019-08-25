@@ -15,7 +15,7 @@ L.capturedTheTrigger = "夺取"
 
 L.hordeGate = "部落大门"
 L.allianceGate = "联盟大门"
-L.gatePosition = "%s (%s)"
+L.gatePosition = "%s（%s）"
 L.west = "西"
 L.front = "前"
 L.east = "东"
@@ -33,7 +33,7 @@ L.handIn = "|cFF33FF99Capping|r: 自动交任务物品。"
 --- Horde IoC Workshop yells:
 -- 地精机械师喊道：我就要完成了！挡住那帮联盟的家伙，合同上没说我还得打仗！
 -- 地精机械师喊道：它又坏了？！我会把它修好……但我可不保证它一定能好用。
-L.halfway = "就要完成了"
+L.halfway = "我就要完成了"
 L.broken = "坏了"
 
 -- Wintergrasp 冬拥湖之战
