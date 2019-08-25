@@ -38,7 +38,7 @@ L.broken = "坏了"
 
 -- Wintergrasp 冬拥湖之战
 L.damaged = "|cFF33FF99Capping|r: %s 遭到破坏"
-L.destroyed = "|cFF33FF99Capping|r: %s Destroyed 被摧毁了"
+L.destroyed = "|cFF33FF99Capping|r: %s 被摧毁了"
 L.northEastKeep = "东北堡垒塔楼"
 L.southEastKeep = "东南堡垒塔楼"
 L.northWestKeep = "西北堡垒塔楼"
