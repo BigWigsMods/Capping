@@ -359,6 +359,278 @@ do
 	end
 
 	do
+		--local prevText = ""
+		--local prevTime, prevAScore, prevHScore, prevAIncrease, prevHIncrease = 0, 0, 0, 0, 0
+		--local timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
+		--local maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
+		--local aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
+		--
+		--local function UpdatePredictor()
+		--	if aIncrease ~= prevAIncrease or hIncrease ~= prevHIncrease or timeBetweenEachTick ~= prevTick then
+		--		if aIncrease > 60 or hIncrease > 60 or aIncrease < 0 or hIncrease < 0 then -- Scores can reduce in DG
+		--			mod:StopBar(prevText) -- >60 increase means captured a flag/cart in EotS/DG
+		--			prevAIncrease, prevHIncrease = -1, -1
+		--			return
+		--		end
+		--		prevAIncrease, prevHIncrease, prevTick = aIncrease, hIncrease, timeBetweenEachTick
+		--
+		--		if hTicksToWin < aTicksToWin then -- Horde is winning
+		--			local timeToWin = hTicksToWin * timeBetweenEachTick
+		--			local finalAScore = ascore + (hTicksToWin * aIncrease)
+		--			local txt = format(L.finalScore, finalAScore, maxscore)
+		--			if txt ~= prevText or timeToWin ~= prevTimeToWin then
+		--				prevTimeToWin = timeToWin
+		--				mod:StopBar(prevText)
+		--				mod:StartBar(txt, timeToWin-0.5, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+		--				prevText = txt
+		--			end
+		--		elseif aTicksToWin < hTicksToWin then -- Alliance is winning
+		--			local timeToWin = aTicksToWin * timeBetweenEachTick
+		--			local finalHScore = hscore + (aTicksToWin * hIncrease)
+		--			local txt = format(L.finalScore, maxscore, finalHScore)
+		--			if txt ~= prevText or timeToWin ~= prevTimeToWin then
+		--				prevTimeToWin = timeToWin
+		--				mod:StopBar(prevText)
+		--				mod:StartBar(txt, timeToWin-0.5, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+		--				prevText = txt
+		--			end
+		--		end
+		--	end
+		--end
+		--
+		--function mod:ScorePredictor(widgetInfo)
+		--	if widgetInfo and widgetInfo.widgetID == 1671 then -- The 1671 widget is used for all BGs with score predictors
+		--		local dataTbl = GetDoubleStatusBarWidgetVisualizationInfo(widgetInfo.widgetID)
+		--		if not dataTbl or not dataTbl.leftBarMax then return end
+		--		if prevTime == 0 then
+		--			prevTime = GetTime()
+		--			prevAScore, prevHScore = dataTbl.leftBarValue, dataTbl.rightBarValue
+		--			return
+		--		end
+		--
+		--		local t = GetTime()
+		--		local elapsed = t - prevTime
+		--		prevTime = t
+		--		if elapsed > 0.5 then
+		--			-- If there's only 1 update, it could be either alliance or horde, so we update both stats in this one
+		--			maxscore = dataTbl.leftBarMax -- Total
+		--			ascore = dataTbl.leftBarValue -- Alliance Bar
+		--			hscore = dataTbl.rightBarValue -- Horde Bar
+		--			aIncrease = ascore - prevAScore
+		--			hIncrease = hscore - prevHScore
+		--			aRemain = maxscore - ascore
+		--			hRemain = maxscore - hscore
+		--			-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
+		--			-- If ticks are 0 (no bases) then set to a random huge number (10,000)
+		--			aTicksToWin = ceil(aIncrease == 0 and 10000 or aRemain / aIncrease)
+		--			hTicksToWin = ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
+		--			-- Round to the closest time
+		--			timeBetweenEachTick = elapsed % 1 >= 0.5 and ceil(elapsed) or floor(elapsed)
+		--
+		--			prevAScore, prevHScore = ascore, hscore
+		--			Timer(0.5, UpdatePredictor)
+		--		else
+		--			-- If elapsed < 0.5 then the event fired twice because both alliance and horde have bases.
+		--			-- 1st update = alliance, 2nd update = horde
+		--			-- If only one faction has bases, the event only fires once.
+		--			-- Unfortunately we need to wait for the 2nd event to fire (the horde update) to know the true horde stats.
+		--			-- In this one where we have 2 updates, we overwrite the horde stats from the 1st update.
+		--			hscore = dataTbl.rightBarValue -- Horde Bar
+		--			hIncrease = hscore - prevHScore
+		--			hRemain = maxscore - hscore
+		--			-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
+		--			-- If ticks are 0 (no bases) then set to a random huge number (10,000)
+		--			hTicksToWin = ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
+		--
+		--			prevHScore = hscore
+		--		end
+		--	end
+		--end
+		--NewEstimator = function() -- resets estimator and sets new battleground
+		--	prevText = ""
+		--	prevTime, prevAScore, prevHScore, prevAIncrease, prevHIncrease = 0, 0, 0, 0, 0
+		--	timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
+		--	maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
+		--	aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
+		--
+		--	mod:RegisterTempEvent("UPDATE_UI_WIDGET", "ScorePredictor")
+		--end
+	end
+
+	do
+		--local iconDataConflict = {
+		--	-- Graveyard
+		--	[4] = "colorAlliance",
+		--	[14] = "colorHorde",
+		--	-- Tower
+		--	[9] = "colorAlliance",
+		--	[12] = "colorHorde",
+		--	-- Mine/Stone
+		--	[17] = "colorAlliance",
+		--	[19] = "colorHorde",
+		--	-- Lumber/Wood
+		--	[22] = "colorAlliance",
+		--	[24] = "colorHorde",
+		--	-- Blacksmith/Anvil
+		--	[27] = "colorAlliance",
+		--	[29] = "colorHorde",
+		--	-- Farm/House
+		--	[32] = "colorAlliance",
+		--	[34] = "colorHorde",
+		--	-- Stables/Horse
+		--	[37] = "colorAlliance",
+		--	[39] = "colorHorde",
+		--	-- Workshop/Tent
+		--	[137] = "colorAlliance",
+		--	[139] = "colorHorde",
+		--	-- Hangar/Mushroom
+		--	[142] = "colorAlliance",
+		--	[144] = "colorHorde",
+		--	-- Docks/Anchor
+		--	[147] = "colorAlliance",
+		--	[149] = "colorHorde",
+		--	-- Oil/Refinery
+		--	[152] = "colorAlliance",
+		--	[154] = "colorHorde",
+		--}
+		--local atlasColors = nil
+		--local GetPOITextureCoords = GetPOITextureCoords
+		--local capTime = 0
+		--local curMapID = 0
+		--local path = {136441}
+		--GetIconData = function(icon)
+		--	path[2], path[3], path[4], path[5] = GetPOITextureCoords(icon)
+		--	return path
+		--end
+		--local landmarkCache = {}
+		--SetupAssault = function(bgcaptime, uiMapID, colors)
+		--	atlasColors = colors
+		--	capTime = bgcaptime -- cap time
+		--	curMapID = uiMapID -- current map
+		--	landmarkCache = {}
+		--	local pois = GetAreaPOIForMap(uiMapID)
+		--	for i = 1, #pois do
+		--		local tbl = GetAreaPOIInfo(uiMapID, pois[i])
+		--		local icon = tbl.textureIndex
+		--		local atlasName = tbl.atlasName
+		--		if icon then
+		--			landmarkCache[tbl.name] = icon
+		--			if icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
+		--				-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+		--				local _, _, _, id = UnitPosition("player")
+		--				if id == 30 or id == 628 then -- Alterac Valley, IoC
+		--					local bar = mod:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
+		--					bar:Pause()
+		--					bar:SetTimeVisibility(false)
+		--					bar:Set("capping:customchat", function() end)
+		--				end
+		--			end
+		--		elseif atlasName then
+		--			--local atlasTbl = GetAtlasInfo(atlasName)
+		--			landmarkCache[tbl.name] = atlasName
+		--			-- This can stay commented out until the day IoC/AV is converted to atlasNames
+		--			--if atlasName == 2 or atlasName == 3 or atlasName == 151 or atlasName == 153 or atlasName == 18 or atlasName == 20 then
+		--			--	-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+		--			--	local _, _, _, id = UnitPosition("player")
+		--			--	if id == 30 or id == 628 then -- Alterac Valley, IoC
+		--			--		local bar = mod:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
+		--			--		bar:Pause()
+		--			--		bar:SetTimeVisibility(false)
+		--			--		bar:Set("capping:customchat", function() end)
+		--			--	end
+		--			--end
+		--		end
+		--	end
+		--	mod:RegisterTempEvent("AREA_POIS_UPDATED")
+		--end
+		-------------------------------------
+		--function mod:AREA_POIS_UPDATED()
+		-------------------------------------
+		--	local pois = GetAreaPOIForMap(curMapID)
+		--	for i = 1, #pois do
+		--		local tbl = GetAreaPOIInfo(curMapID, pois[i])
+		--		local name, icon, atlasName, areaPoiID = tbl.name, tbl.textureIndex, tbl.atlasName, tbl.areaPoiID
+		--		if icon then
+		--			if landmarkCache[name] ~= icon then
+		--				landmarkCache[name] = icon
+		--				if iconDataConflict[icon] then
+		--					local bar = self:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
+		--					bar:Set("capping:poiid", areaPoiID)
+		--					if icon == 137 or icon == 139 then -- Workshop in IoC
+		--						self:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
+		--					end
+		--				else
+		--					self:StopBar(name)
+		--					if icon == 136 or icon == 138 then -- Workshop in IoC
+		--						self:StartBar(GetSpellInfo(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+		--					elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
+		--						-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+		--						local _, _, _, id = UnitPosition("player")
+		--						if id == 30 or id == 628 then -- Alterac Valley, IoC
+		--							local bar = self:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
+		--							bar:Pause()
+		--							bar:SetTimeVisibility(false)
+		--							bar:Set("capping:customchat", function() end)
+		--						end
+		--					end
+		--				end
+		--			end
+		--		elseif atlasName then
+		--			local atlasTbl = GetAtlasInfo(atlasName)
+		--			if landmarkCache[name] ~= atlasName then
+		--				--print(name, atlasName)
+		--				landmarkCache[name] = atlasName
+		--				if atlasColors[atlasName] then
+		--					local bar = self:StartBar(
+		--						name,
+		--						capTime,
+		--						{ -- Begin Icon Texture
+		--							atlasTbl.file,
+		--							atlasTbl.leftTexCoord,
+		--							atlasTbl.rightTexCoord,
+		--							atlasTbl.topTexCoord,
+		--							atlasTbl.bottomTexCoord,
+		--						}, -- End Icon Texture
+		--						atlasColors[atlasName] -- Color
+		--					)
+		--					bar:Set("capping:poiid", areaPoiID)
+		--					--if atlasName == WORKSHOPHORDE or atlasName == WORKSHOPALLIANCE then -- Workshop in IoC
+		--					--	self:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
+		--					--end
+		--				else
+		--					self:StopBar(name)
+		--					--if icon == 136 or icon == 138 then -- Workshop in IoC
+		--					--	self:StartBar(GetSpellInfo(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+		--					--elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
+		--					--	-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+		--					--	local _, _, _, id = UnitPosition("player")
+		--					--	if id == 30 or id == 628 then -- Alterac Valley, IoC
+		--					--		local bar = self:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
+		--					--		bar:Pause()
+		--					--		bar:SetTimeVisibility(false)
+		--					--		bar:Set("capping:customchat", function() end)
+		--					--	end
+		--					--end
+		--				end
+		--			end
+		--		end
+		--	end
+		--end
+		--
+		--UpdateAssault = function(uiMapID, inProgressDataTbl, maxBarTime)
+		--	local pois = GetAreaPOIForMap(uiMapID)
+		--	for i = 1, #pois do
+		--		local tbl = GetAreaPOIInfo(uiMapID, pois[i])
+		--		local name, icon, areaPoiID = tbl.name, tbl.textureIndex, tbl.areaPoiID
+		--		local timer = inProgressDataTbl[areaPoiID]
+		--		if timer and iconDataConflict[icon] then
+		--			mod:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon], nil, maxBarTime)
+		--		end
+		--	end
+		--end
+	end
+
+	do
 		local mods = {}
 		function mod:NewMod(name)
 			local t = {}
@@ -454,7 +726,7 @@ do
 		local _, _, _, _, _, _, _, id = GetInstanceInfo()
 		if zoneIds[id] then
 			prevZone = id
-			zoneIds[id]:EnterZone()
+			zoneIds[id]:EnterZone(id)
 		else
 			if zoneIds[prevZone] then
 				self:StopAllBars()
