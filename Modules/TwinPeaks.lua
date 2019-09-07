@@ -40,8 +40,8 @@ do
 	end
 
 	function mod:EnterZone()
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "CHAT_MSG")
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "CHAT_MSG")
+		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "CHAT_MSG")
+		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "CHAT_MSG")
 
 		local func = function() GetTimeRemaining(self) end
 		self:Timer(5, func)

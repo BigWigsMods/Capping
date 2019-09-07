@@ -73,7 +73,7 @@ do
 end
 
 local function initGateBars()
-	mod:RegisterTempEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	mod:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	local aBar = mod:StartBar(L.allianceGate, 100, 2054277, "colorHorde", true) -- Interface/Icons/spell_tailor_defenceup01
 	aBar:Pause()
 	aBar.candyBarBar:SetValue(100)

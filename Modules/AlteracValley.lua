@@ -172,10 +172,10 @@ do
 		--SetupHealthCheck("13419", L.ivus, "Ivus", 874581, "colorAlliance") -- Interface/Icons/inv_pet_ancientprotector_winter
 		--SetupHealthCheck("13256", L.lokholar, "Lokholar", 1373132, "colorHorde") -- Interface/Icons/Inv_infernalmounice.blp
 
-		self:RegisterTempEvent("CHAT_MSG_ADDON")
-		self:RegisterTempEvent("GOSSIP_SHOW")
-		self:RegisterTempEvent("QUEST_PROGRESS")
-		self:RegisterTempEvent("QUEST_COMPLETE")
+		self:RegisterEvent("CHAT_MSG_ADDON")
+		self:RegisterEvent("GOSSIP_SHOW")
+		self:RegisterEvent("QUEST_PROGRESS")
+		self:RegisterEvent("QUEST_COMPLETE")
 		RequestBattlefieldScoreData()
 		self:Timer(1, RequestBattlefieldScoreData)
 		self:Timer(2, AVSyncRequest)

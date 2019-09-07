@@ -74,10 +74,10 @@ do
 	}
 	function mod:EnterZone(id)
 		--NewEstimator()
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_HORDE", "CHAT_MSG")
-		self:RegisterTempEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "CHAT_MSG")
+		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "CHAT_MSG")
+		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "CHAT_MSG")
 		if id == 566 then -- Normal/Brawl
-			self:RegisterTempEvent("RAID_BOSS_WHISPER")
+			self:RegisterEvent("RAID_BOSS_WHISPER")
 		else -- Rated
 			--SetupAssault(60, 397, colors)
 		end
@@ -85,7 +85,9 @@ do
 end
 
 function mod:ExitZone()
-	self:UnregisterEvent("GOSSIP_SHOW")
+	self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_HORDE")
+	self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE")
+	self:UnregisterEvent("RAID_BOSS_WHISPER")
 end
 
 mod:RegisterZone(566)
