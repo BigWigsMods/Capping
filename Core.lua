@@ -288,8 +288,7 @@ function core:ADDON_LOADED(addon)
 		C_CVar.SetCVar("showArenaEnemyFrames", "1")
 		C_CVar.SetCVar("showArenaEnemyPets", "1")
 
-		self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-		self:ZONE_CHANGED_NEW_AREA()
+		self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 		C_Timer.After(15, function()
 			local x = GetLocale()
@@ -304,16 +303,15 @@ core:RegisterEvent("ADDON_LOADED")
 do
 	local prevZone = 0
 	local GetInstanceInfo = GetInstanceInfo
-	function core:ZONE_CHANGED_NEW_AREA()
+	function core:PLAYER_ENTERING_WORLD()
 		local _, _, _, _, _, _, _, id = GetInstanceInfo()
 		if zoneIds[id] then
 			prevZone = id
-			self:StopAllBars()
 			zoneIds[id]:EnterZone()
 		else
 			if zoneIds[prevZone] then
 				self:StopAllBars()
-				zoneIds[id]:ExitZone()
+				zoneIds[prevZone]:ExitZone()
 			end
 			prevZone = id
 		end
