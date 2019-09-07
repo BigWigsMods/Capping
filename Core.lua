@@ -211,6 +211,11 @@ do
 		zoneIds[id] = self
 	end
 
+	local Timer = C_Timer.After
+	function API:Timer(duration, func)
+		Timer(duration, func)
+	end
+
 	do
 		local mods = {}
 		function mod:NewMod(name)
@@ -290,7 +295,7 @@ function core:ADDON_LOADED(addon)
 
 		self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-		C_Timer.After(15, function()
+		self:Timer(15, function()
 			local x = GetLocale()
 			if x ~= "enUS" and x ~= "enGB" then -- XXX temp
 				print("|cFF33FF99Capping|r is missing locale for", x, "and needs your help! Please visit the project page on GitHub for more info.")
