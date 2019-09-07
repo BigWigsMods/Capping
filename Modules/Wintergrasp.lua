@@ -325,6 +325,7 @@ do
 		RequestBattlefieldScoreData()
 		self:Timer(1, RequestBattlefieldScoreData)
 		self:Timer(2, WGSyncRequest)
+		C_ChatInfo.RegisterAddonMessagePrefix("Capping")
 		self:RegisterEvent("CHAT_MSG_ADDON")
 		self:RegisterEvent("AREA_POIS_UPDATED")
 	end
