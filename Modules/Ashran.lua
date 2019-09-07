@@ -1,8 +1,8 @@
 
-local mod
+local mod, L
 do
 	local _, core = ...
-	mod = core:NewMod("Ashran")
+	mod, L = core:NewMod("Ashran")
 end
 
 local hasPrinted = false
