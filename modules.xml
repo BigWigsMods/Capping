@@ -4,6 +4,8 @@
 <Script file="Modules\Arena.lua"/>
 <Script file="Modules\Ashran.lua"/>
 <Script file="Modules\QueueTimers.lua"/>
+<Script file="Modules\TwinPeaks.lua"/>
+<Script file="Modules\WarsongGulch.lua"/>
 <Script file="Modules\Wintergrasp.lua"/>
 <!--<Script file="Modules\battlegrounds.lua"/>-->
 <!--@debug@-->
