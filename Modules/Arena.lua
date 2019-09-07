@@ -1,8 +1,8 @@
 
-local mod, L, cap
+local mod
 do
 	local _, core = ...
-	mod, L, cap = core:NewMod("QueueTimers")
+	mod = core:NewMod("Arena")
 end
 
 do
