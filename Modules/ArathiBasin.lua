@@ -12,12 +12,13 @@ local instanceIdToMapId = {
 }
 
 function mod:EnterZone(id)
-	--SetupAssault(60, instanceIdToMapId[id])
-	--NewEstimator()
+	self:StartFlagCaptures(60, instanceIdToMapId[id])
+	self:StartScoreEstimator()
 end
 
 function mod:ExitZone()
-	
+	self:StopScoreEstimator()
+	self:StopFlagCaptures()
 end
 
 for k in next, instanceIdToMapId do

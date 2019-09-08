@@ -15,13 +15,14 @@ do
 		["dg_capPts-rightIcon4-state1"] = "colorHorde",
 	}
 	function mod:EnterZone()
-		--SetupAssault(61, 519, colors)
-		--NewEstimator()
+		self:StartFlagCaptures(61, 519, colors)
+		self:StartScoreEstimator()
 	end
 end
 
 function mod:ExitZone()
-	
+	self:StopScoreEstimator()
+	self:StopFlagCaptures()
 end
 
 mod:RegisterZone(1105)

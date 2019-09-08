@@ -119,7 +119,7 @@ do
 	end
 
 	do
-		local function Unwrap(...)
+		local function Unwrap(self, ...)
 			local inProgressDataTbl = {}
 			for i = 1, select("#", ...) do
 				local arg = select(i, ...)
@@ -133,7 +133,7 @@ do
 			end
 
 			if next(inProgressDataTbl) then
-				--UpdateAssault(91, inProgressDataTbl, 242)
+				self:RestoreFlagCaptures(91, inProgressDataTbl, 242)
 			end
 		end
 
@@ -152,7 +152,7 @@ do
 				elseif not hereFromTheStart and sender ~= me and msg:find("~", nil, true) then
 					hereFromTheStart = true
 					hasData = true
-					Unwrap(strsplit("~", msg))
+					Unwrap(self, strsplit("~", msg))
 				end
 			end
 		end
@@ -163,15 +163,13 @@ do
 	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 	function mod:EnterZone()
 		hasPrinted = false
-	 
-		--SetupAssault(242, 91)
+		self:StartFlagCaptures(242, 91)
 		--SetupHealthCheck("11946", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
 		--SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
 		--SetupHealthCheck("11947", L.galvangar, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
 		--SetupHealthCheck("11949", L.balinda, "Balinda", 236447, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Female
 		--SetupHealthCheck("13419", L.ivus, "Ivus", 874581, "colorAlliance") -- Interface/Icons/inv_pet_ancientprotector_winter
 		--SetupHealthCheck("13256", L.lokholar, "Lokholar", 1373132, "colorHorde") -- Interface/Icons/Inv_infernalmounice.blp
-
 		self:RegisterEvent("CHAT_MSG_ADDON")
 		self:RegisterEvent("GOSSIP_SHOW")
 		self:RegisterEvent("QUEST_PROGRESS")
@@ -187,6 +185,7 @@ function mod:ExitZone()
 	self:UnregisterEvent("QUEST_PROGRESS")
 	self:UnregisterEvent("QUEST_COMPLETE")
 	self:UnregisterEvent("CHAT_MSG_ADDON")
+	self:StopFlagCaptures()
 end
 
 mod:RegisterZone(30)

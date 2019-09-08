@@ -73,13 +73,13 @@ do
 		["eots_capPts-rightIcon5-state1"] = "colorHorde",
 	}
 	function mod:EnterZone(id)
-		--NewEstimator()
+		self:StartScoreEstimator()
 		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "CHAT_MSG")
 		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "CHAT_MSG")
 		if id == 566 then -- Normal/Brawl
 			self:RegisterEvent("RAID_BOSS_WHISPER")
 		else -- Rated
-			--SetupAssault(60, 397, colors)
+			self:StartFlagCaptures(60, 397, colors)
 		end
 	end
 end
@@ -88,6 +88,8 @@ function mod:ExitZone()
 	self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_HORDE")
 	self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE")
 	self:UnregisterEvent("RAID_BOSS_WHISPER")
+	self:StopScoreEstimator()
+	self:StopFlagCaptures()
 end
 
 mod:RegisterZone(566)
