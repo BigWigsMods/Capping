@@ -8,7 +8,7 @@ end
 do
 	local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
 	local tonumber, gsub, match, GetSpellInfo = tonumber, string.gsub, string.match, GetSpellInfo
-	function mod:ArenaTimers(tbl)
+	function mod:UPDATE_UI_WIDGET(tbl)
 		if tbl.widgetSetID == 1 and tbl.widgetType == 0 then
 			local id = tbl.widgetID
 			local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
@@ -38,7 +38,7 @@ function mod:EnterZone()
 	-- What we CAN use for Shadow Sight timer
 	-- CHAT_MSG_BG_SYSTEM_NEUTRAL#The Arena battle has begun! - Requires localization
 	-- UPDATE_UI_WIDGET The first event fired with a valid remaining time (the current chosen method)
-	self:RegisterEvent("UPDATE_UI_WIDGET", "ArenaTimers")
+	self:RegisterEvent("UPDATE_UI_WIDGET")
 end
 
 function mod:ExitZone()
