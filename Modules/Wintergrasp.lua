@@ -230,6 +230,7 @@ do
 	local function allow() hereFromTheStart = false end
 	local function stop() hereFromTheStart = true stopTimer = nil end
 	local GetScoreInfo = C_PvP.GetScoreInfo
+	local SendAddonMessage = C_ChatInfo.SendAddonMessage
 	function WGSyncRequest()
 		for i = 1, 80 do
 			local scoreTbl = GetScoreInfo(i)

@@ -5,6 +5,7 @@ do
 	mod, L = core:NewMod()
 end
 
+local SendAddonMessage = C_ChatInfo.SendAddonMessage
 local baseGateHealth = 1946880
 local lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
 local hordeGates, allianceGates = {}, {}
@@ -128,7 +129,7 @@ do
 			if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
 				hereFromTheStart = true
 				hasData = false
-				Timer(0.5, allow)
+				mod:Timer(0.5, allow)
 				stopTimer = NewTicker(3, stop, 1)
 				SendAddonMessage("Capping", "gr", "INSTANCE_CHAT")
 				return
@@ -143,7 +144,6 @@ do
 	local me = UnitName("player").. "-" ..GetRealmName()
 	function mod:CHAT_MSG_ADDON(prefix, msg, channel, sender)
 		if prefix == "Capping" and channel == "INSTANCE_CHAT" then
-			self:HealthUpdate(prefix, msg, channel, sender)
 			if msg == "gr" and sender ~= me then -- gate request
 				if hasData then -- Joined a late game, don't send data
 					if timer then timer:Cancel() end
@@ -241,8 +241,8 @@ do
 			["195700"] = baseGateHealth,
 		}
 		self:StartFlagCaptures(61, 169)
-		--self:SetupHealthCheck("34922", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
-		--self:SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
+		self:SetupHealthCheck("34922", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
+		self:SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
 		C_ChatInfo.RegisterAddonMessagePrefix("Capping")
 		self:RegisterEvent("CHAT_MSG_ADDON")
 		self:RegisterEvent("CHAT_MSG_MONSTER_YELL")
