@@ -142,6 +142,8 @@ do
 	end
 
 	local me = UnitName("player").. "-" ..GetRealmName()
+	local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
+	local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 	function mod:CHAT_MSG_ADDON(prefix, msg, channel, sender)
 		if prefix == "Capping" and channel == "INSTANCE_CHAT" then
 			if msg == "gr" and sender ~= me then -- gate request
