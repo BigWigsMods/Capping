@@ -16,5 +16,6 @@ move-folders:
     Capping/Options: Capping_Options
 
 ignore:
+  - .luacheckrc
   - .travis.yml
   - README.md
