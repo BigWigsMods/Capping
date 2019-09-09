@@ -300,7 +300,7 @@ do
 					end
 				end
 
-				if k in next, blocked then
+				for k in next, blocked do
 					blocked[k] = nil
 				end
 				for i = 1, count1 do
