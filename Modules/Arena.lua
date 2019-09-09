@@ -2,7 +2,7 @@
 local mod
 do
 	local _, core = ...
-	mod = core:NewMod("Arena")
+	mod = core:NewMod()
 end
 
 do

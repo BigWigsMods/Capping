@@ -2,7 +2,7 @@
 local mod, L
 do
 	local _, core = ...
-	mod, L = core:NewMod("Deepwind Gorge")
+	mod, L = core:NewMod()
 end
 
 do

@@ -2,7 +2,7 @@
 local mod, L
 do
 	local _, core = ...
-	mod, L = core:NewMod("Wintergrasp")
+	mod, L = core:NewMod()
 end
 
 local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap

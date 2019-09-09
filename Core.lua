@@ -642,21 +642,17 @@ do
 		end
 	end
 
-	do
-		local mods = {}
-		function mod:NewMod(name)
-			local t = {}
-			for k,v in next, API do
-				t[k] = v
-			end
-			mods[name] = t
-			return t, L, frame
+	function mod:NewMod()
+		local t = {}
+		for k,v in next, API do
+			t[k] = v
 		end
+		return t, L, frame
 	end
 end
 
 -- CORE
-local core = mod:NewMod("Core")
+local core = mod:NewMod()
 function core:ADDON_LOADED(addon)
 	if addon == addonName then
 		self:UnregisterEvent("ADDON_LOADED")

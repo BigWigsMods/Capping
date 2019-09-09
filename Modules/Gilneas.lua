@@ -2,7 +2,7 @@
 local mod, L
 do
 	local _, core = ...
-	mod, L = core:NewMod("Gilneas")
+	mod, L = core:NewMod()
 end
 
 function mod:EnterZone()

@@ -2,7 +2,7 @@
 local mod, L, cap
 do
 	local _, core = ...
-	mod, L, cap = core:NewMod("QueueTimers")
+	mod, L, cap = core:NewMod()
 end
 
 function mod:START_TIMER(_, timeSeconds)
@@ -26,6 +26,7 @@ do -- estimated wait timer and port timer
 
 	function mod:PLAYER_ENTERING_WORLD()
 		self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
+		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	end
 
 	function mod:UPDATE_BATTLEFIELD_STATUS(queueId)

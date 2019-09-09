@@ -2,7 +2,7 @@
 local mod, L
 do
 	local _, core = ...
-	mod, L = core:NewMod("Isle of Conquest")
+	mod, L = core:NewMod()
 end
 
 local baseGateHealth = 1946880

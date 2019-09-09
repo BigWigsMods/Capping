@@ -2,16 +2,12 @@
 local mod, L
 do
 	local _, core = ...
-	mod, L = core:NewMod("Warsong Gulch")
+	mod, L = core:NewMod()
 end
 
 do
-	local icon = {136441}
-	--[1]=0.21484375
-	--[2]=0.28125
-	--[3]=0.107421875
-	--[4]=0.140625
-	icon[2], icon[3], icon[4], icon[5] = GetPOITextureCoords(45)
+	-- GetPOITextureCoords(45)
+	local icon = {136441, 0.21484375, 0.28125, 0.107421875, 0.140625}
 	function mod:CHAT_MSG(msg)
 		if strmatch(msg, L.capturedTheTrigger) then -- flag was captured
 			self:StartBar(L.flagRespawns, 12, icon, "colorOther") -- White flag
