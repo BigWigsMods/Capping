@@ -266,7 +266,6 @@ do
 					msg2 = format("%s%s-%d~", msg2, k, v)
 				end
 			end
-			print(msg1, msg2)
 			if msg2 ~= "z:" and string.len(msg2) < 251 then
 				SendAddonMessage("Capping", msg2, "INSTANCE_CHAT")
 			end
