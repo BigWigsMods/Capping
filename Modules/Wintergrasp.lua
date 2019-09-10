@@ -28,61 +28,59 @@ local towerNames = {
 	["308013"] = L.southTower, -- Winter's Edge Tower (Mid)
 	["307935"] = L.eastTower, -- Flamewatch Tower (East)
 }
+local defensiveTowers = {
+	["307877"] = L.northEastKeep,
+	["307936"] = L.southEastKeep,
+	["307878"] = L.northWestKeep,
+	["307894"] = L.southWestKeep,
+}
+local objectWallNames = {
+	["308077"] = L.northWest, -- 1
+	["307922"] = L.northWest, -- 2
+	["307937"] = L.northWest, -- 3
+	["307907"] = L.northWest, -- 4
+	["308035"] = L.southWest, -- 1
+	["307897"] = L.southWest, -- 2
+	["307898"] = L.south, -- 1
+	["307893"] = L.southGate,
+	["307899"] = L.south, -- 2
+	["307879"] = L.southEast, -- 1
+	["307896"] = L.southEast, -- 2
+	["307927"] = L.northEast, -- 1
+	["307919"] = L.northEast, -- 2
+	["307867"] = L.northEast, -- 3
+	["308083"] = L.northEast, -- 4
+	["307963"] = L.innerWest, -- 1
+	["308078"] = L.innerWest, -- 2
+	["307908"] = L.innerWest, -- 3
+	["307941"] = L.innerSouth, -- 1
+	["307925"] = L.innerSouth, -- 2
+	["307916"] = L.innerSouth, -- 3
+	["307938"] = L.innerEast, -- 1
+	["307840"] = L.innerEast, -- 2
+	["307870"] = L.innerEast, -- 3
+}
+local function StartNewBar(self, name, english, icon)
+	local tbl = GetAreaPOIInfo(1334, 6027) -- Main entrance POI
+	local color = "colorAlliance"
+	if tbl and tbl.textureIndex == 77 then -- If main entrance is horde texture
+		color = "colorHorde"
+	end
+	local bar = self:StartBar(name, 100, icon, color, true) -- Interface/Icons/inv_essenceofwintergrasp
+	bar:Pause()
+	bar.candyBarBar:SetValue(100)
+	bar.candyBarDuration:SetText("100%")
+	bar:Set("capping:customchat", function(bar)
+		if name ~= english then
+			return english .."/".. name .." - ".. bar.candyBarDuration:GetText()
+		else
+			return name .." - ".. bar.candyBarDuration:GetText()
+		end
+	end)
+	return bar
+end
 
 do
-	local defensiveTowers = {
-		["307877"] = L.northEastKeep,
-		["307936"] = L.southEastKeep,
-		["307878"] = L.northWestKeep,
-		["307894"] = L.southWestKeep,
-	}
-	local objectWallNames = {
-		["308077"] = L.northWest, -- 1
-		["307922"] = L.northWest, -- 2
-		["307937"] = L.northWest, -- 3
-		["307907"] = L.northWest, -- 4
-		["308035"] = L.southWest, -- 1
-		["307897"] = L.southWest, -- 2
-		["307898"] = L.south, -- 1
-		["307893"] = L.southGate,
-		["307899"] = L.south, -- 2
-		["307879"] = L.southEast, -- 1
-		["307896"] = L.southEast, -- 2
-		["307927"] = L.northEast, -- 1
-		["307919"] = L.northEast, -- 2
-		["307867"] = L.northEast, -- 3
-		["308083"] = L.northEast, -- 4
-		["307963"] = L.innerWest, -- 1
-		["308078"] = L.innerWest, -- 2
-		["307908"] = L.innerWest, -- 3
-		["307941"] = L.innerSouth, -- 1
-		["307925"] = L.innerSouth, -- 2
-		["307916"] = L.innerSouth, -- 3
-		["307938"] = L.innerEast, -- 1
-		["307840"] = L.innerEast, -- 2
-		["307870"] = L.innerEast, -- 3
-	}
-
-	local function StartNewBar(self, name, english, icon)
-		local tbl = GetAreaPOIInfo(1334, 6027) -- Main entrance POI
-		local color = "colorAlliance"
-		if tbl and tbl.textureIndex == 77 then -- If main entrance is horde texture
-			color = "colorHorde"
-		end
-		local bar = self:StartBar(name, 100, icon, color, true) -- Interface/Icons/inv_essenceofwintergrasp
-		bar:Pause()
-		bar.candyBarBar:SetValue(100)
-		bar.candyBarDuration:SetText("100%")
-		bar:Set("capping:customchat", function(bar)
-			if name ~= english then
-				return english .."/".. name .." - ".. bar.candyBarDuration:GetText()
-			else
-				return name .." - ".. bar.candyBarDuration:GetText()
-			end
-		end)
-		return bar
-	end
-
 	local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 	function mod:COMBAT_LOG_EVENT_UNFILTERED()
 		local _, event, _, _, _, _, _, destGUID, _, _, _, _, _, _, amount = CombatLogGetCurrentEventInfo()
@@ -91,7 +89,7 @@ do
 			if towers[strid] then
 				local newHp = towers[strid] - amount
 				towers[strid] = newHp
-				local bar = mod:GetBar(towerNames[strid])
+				local bar = self:GetBar(towerNames[strid])
 				if bar then
 					local hp = newHp / baseTowerHealth * 100
 					if hp < 0.5 then
@@ -109,7 +107,7 @@ do
 				onDemandTrackers[strid] = newHp
 				local hp = newHp / wallHealth * 100
 				if hp < 80 then
-					local bar = mod:GetBar(objectWallNames[strid])
+					local bar = self:GetBar(objectWallNames[strid])
 					if not bar then
 						bar = StartNewBar(self, objectWallNames[strid], objectWallNames[strid], 134456)
 					end
@@ -131,7 +129,7 @@ do
 				onDemandTrackers[strid] = newHp
 				local hp = newHp / defenseTowerHealth * 100
 				if hp < 90 then
-					local bar = mod:GetBar(defensiveTowers[strid])
+					local bar = self:GetBar(defensiveTowers[strid])
 					if not bar then
 						bar = StartNewBar(self, defensiveTowers[strid], defensiveTowers[strid], 237021) -- Interface/Icons/inv_essenceofwintergrasp
 					end
@@ -143,7 +141,7 @@ do
 					end
 				end
 			elseif strid == "307964" then -- Main Entrance
-				local bar = mod:GetBar(L.mainEntrance)
+				local bar = self:GetBar(L.mainEntrance)
 				if not bar then
 					bar = StartNewBar(self, L.mainEntrance, "Main Entrance", 134957)
 					onDemandTrackers[strid] = mainEntranceHealth
@@ -253,11 +251,75 @@ do
 	local function SendWGTowers()
 		timer = nil
 		if IsInGroup(2) then -- We've not just ragequit
-			local msg = format(
-				"308062:%d:308013:%d:307935:%d",
-				towers["308062"], towers["308013"], towers["307935"] -- West, Mid, East
+			local msg1 = format(
+				"w:%d:m:%d:e:%d:ne:%d:se:%d:sw:%d:nw:%d",
+				towers["308062"], towers["308013"], towers["307935"], -- West, Mid, East
+				onDemandTrackers["307877"] or defenseTowerHealth, -- North-East
+				onDemandTrackers["307936"] or defenseTowerHealth, -- South-East
+				onDemandTrackers["307878"] or defenseTowerHealth, -- North-West
+				onDemandTrackers["307894"] or defenseTowerHealth -- South-West
 			)
-			SendAddonMessage("Capping", msg, "INSTANCE_CHAT")
+			local msg2 = "z:"
+			for k, v in next, onDemandTrackers do
+				if not defensiveTowers[k] then
+					k = k:sub(3) -- Trim first 2 numbers
+					msg2 = format("%s%s-%d~", msg2, k, v)
+				end
+			end
+			print(msg1, msg2)
+			if msg2 ~= "z:" and string.len(msg2) < 251 then
+				SendAddonMessage("Capping", msg2, "INSTANCE_CHAT")
+			end
+			SendAddonMessage("Capping", msg1, "INSTANCE_CHAT")
+		end
+	end
+
+	local function Unwrap(self, ...)
+		for i = 1, select("#", ...) do
+			local arg = select(i, ...)
+			local idStr, hpStr = strsplit("-", arg)
+			if idStr and hpStr then
+				local id, hp = tonumber(idStr), tonumber(hpStr)
+				if id and hp and id > 0 and hp >= 0 then
+					idStr = "30" .. idStr
+					if objectWallNames[idStr] or idStr == "307964" then -- Tower, Wall, Main Entrance
+						onDemandTrackers[idStr] = hp
+					end
+				end
+			end
+		end
+
+		for k, v in next, onDemandTrackers do
+			if k == "307964" then -- Main Entrance
+				local bar = self:GetBar(L.mainEntrance)
+				if not bar then
+					bar = StartNewBar(self, L.mainEntrance, "Main Entrance", 134957)
+				end
+				local hp = v / mainEntranceHealth * 100
+				if hp < 0.5 then
+					bar:Stop()
+				else
+					bar.candyBarBar:SetValue(hp)
+					bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+				end
+			elseif objectWallNames[k] then
+				local hp = v / wallHealth * 100
+				if hp < 80 then
+					local bar = self:GetBar(objectWallNames[k])
+					if not bar then
+						bar = StartNewBar(self, objectWallNames[k], objectWallNames[k], 134456)
+					end
+					if hp < 0.5 then
+						bar:Stop()
+					else
+						local value = bar.candyBarBar:GetValue()
+						if hp < value then
+							bar.candyBarBar:SetValue(hp)
+							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+						end
+					end
+				end
+			end
 		end
 	end
 
@@ -273,10 +335,13 @@ do
 					stopTimer = NewTicker(3, stop, 1)
 				end
 			elseif not hereFromTheStart and sender ~= me then
-				local west, westRawHp, mid, midRawHp, east, eastRawHp = strsplit(":", msg)
+				local west, westRawHp, mid, midRawHp, east, eastRawHp, ne, neRawHp, se, seRawHp, sw, swRawHp, nw, nwRawHp = strsplit(":", msg)
 				local westHp, midHp, eastHp = tonumber(westRawHp), tonumber(midRawHp), tonumber(eastRawHp)
-				if westHp and midHp and eastHp and -- Safety dance
-				west == "308062" and mid == "308013" and east == "307935" then
+				local neHp, seHp, swHp, nwHp = tonumber(neRawHp), tonumber(seRawHp), tonumber(swRawHp), tonumber(nwRawHp)
+				if westHp and midHp and eastHp and neHp and seHp and swHp and nwHp and -- Safety dance
+				west == "w" and mid == "m" and east == "e" and ne == "ne" and se == "se" and sw == "sw" and nw == "nw" and
+				neHp >= 0 and seHp >= 0 and swHp >= 0 and nwHp >= 0 and
+				neHp <= defenseTowerHealth and seHp <= defenseTowerHealth and swHp <= defenseTowerHealth and nwHp <= defenseTowerHealth then
 					hereFromTheStart = true
 					hasData = true
 					initTowerBars()
@@ -285,6 +350,10 @@ do
 						["308013"] = midHp, -- Winter's Edge Tower (Mid)
 						["307935"] = eastHp, -- Flamewatch Tower (East)
 					}
+					onDemandTrackers["307877"] = neRawHp ~= defenseTowerHealth and neRawHp or nil
+					onDemandTrackers["307936"] = seRawHp ~= defenseTowerHealth and seRawHp or nil
+					onDemandTrackers["307878"] = swRawHp ~= defenseTowerHealth and swRawHp or nil
+					onDemandTrackers["307894"] = nwRawHp ~= defenseTowerHealth and nwRawHp or nil
 
 					for towerId, towerHp in next, towers do
 						local bar = self:GetBar(towerNames[towerId])
@@ -298,6 +367,27 @@ do
 							end
 						end
 					end
+
+					for k in next, defensiveTowers do
+						local raw = onDemandTrackers[k]
+						if raw then
+							local hp = raw / defenseTowerHealth * 100
+							if hp < 90 then
+								local bar = self:GetBar(defensiveTowers[k])
+								if not bar then
+									bar = StartNewBar(self, defensiveTowers[k], defensiveTowers[k], 237021) -- Interface/Icons/inv_essenceofwintergrasp
+								end
+								if hp < 1.5 then
+									bar:Stop()
+								else
+									bar.candyBarBar:SetValue(hp)
+									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+								end
+							end
+						end
+					end
+				elseif west == "z" and not next(onDemandTrackers) then
+					Unwrap(self, strsplit("~", westRawHp))
 				end
 			end
 		end
