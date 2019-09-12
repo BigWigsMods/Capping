@@ -322,7 +322,7 @@ do
 			if prefix == "Capping" and channel == "INSTANCE_CHAT" then
 				local strid, strhp = strsplit(":", msg)
 				local hp = tonumber(strhp)
-				if strid and hp and collection[strid] and hp < 100.1 and hp > 0 then
+				if strid and hp and collection[strid] and hp <= 100 and hp >= 0 then
 					if collection[strid].candyBarBar then
 						if hp < 100 then
 							reset[strid] = 0
@@ -520,6 +520,7 @@ do
 		local landmarkCache = {}
 		local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 		local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
+		local GetAtlasInfo = C_Texture.GetAtlasInfo
 
 		local function UpdatePOI()
 			local pois = GetAreaPOIForMap(curMapID)
