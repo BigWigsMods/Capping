@@ -37,8 +37,8 @@ L.barBackground = "Задний план полоски"
 
 -- Features
 L.features = "Возможности" -- возможно нужно заменить
-L.queueBarsDesc = "Включить полоски, отображающие в какие очереди вы записаны и ориентировочное время до окончания ожидания " -- Enable the bars showing which queues you have joined and the estimated time you will be in the queue for."
-L.barClickDesc = "Установить модификаторы клавиатуры, используя которые, при клике по полоске, будут направляться оповещения в чат. Если установить "Нет" для всех 3х полосок, будут разрешены клики "сквозь" строки" -- "Configure the keyboard modifier you wish to use for specific chat output when clicking on a bar. Setting all 3 to 'None' will disable clickable bars, allowing you to click through them."
+L.queueBarsDesc = "Включить полоски, отображающие в какие очереди вы записаны и ориентировочное время до окончания ожидания" -- Enable the bars showing which queues you have joined and the estimated time you will be in the queue for."
+L.barClickDesc = "Установить модификаторы клавиатуры, используя которые, при клике по полоске, будут направляться оповещения в чат. Если установить 'Нет' для всех 3х полосок, будут разрешены клики 'сквозь' строки" -- "Configure the keyboard modifier you wish to use for specific chat output when clicking on a bar. Setting all 3 to 'None' will disable clickable bars, allowing you to click through them."
 L.shiftClick = "Shift + клик"
 L.controlClick = "Control + клик"
 L.altClick = "Alt + клик"
