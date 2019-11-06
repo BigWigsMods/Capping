@@ -730,7 +730,7 @@ function core:ADDON_LOADED(addon)
 
 		self:Timer(15, function()
 			local x = GetLocale()
-			if x ~= "enUS" and x ~= "enGB" and x ~= "zhCN" then -- XXX temp
+			if x ~= "enUS" and x ~= "enGB" and x ~= "zhCN" and x ~= "ruRU" then -- XXX temp
 				print("|cFF33FF99Capping|r is missing locale for", x, "and needs your help! Please visit the project page on GitHub for more info.")
 			end
 		end)
