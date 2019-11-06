@@ -543,7 +543,7 @@ do
 							elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
 								-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
 								local _, _, _, id = UnitPosition("player")
-								if id == 30 or id == 628 then -- Alterac Valley, IoC
+								if id == 30 or id == 628 or id == 2197 then -- Alterac Valley, IoC, Korrak's Revenge (WoW 15th)
 									local bar = curMod:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
 									bar:Pause()
 									bar:SetTimeVisibility(false)
@@ -610,7 +610,7 @@ do
 					if icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
 						-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
 						local _, _, _, id = UnitPosition("player")
-						if id == 30 or id == 628 then -- Alterac Valley, IoC
+						if id == 30 or id == 628 or id == 2197 then -- Alterac Valley, IoC, Korrak's Revenge (WoW 15th)
 							local bar = self:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
 							bar:Pause()
 							bar:SetTimeVisibility(false)
