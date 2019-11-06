@@ -223,7 +223,7 @@ end
 function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg:find(L.broken, nil, true) then
 		SendAddonMessage("Capping", "rb", "INSTANCE_CHAT")
-	elseif msg:find(L.halfway, nil, true) then
+	elseif msg:find(L.halfway) then -- Need pattern matching for ruRU
 		SendAddonMessage("Capping", "rbh", "INSTANCE_CHAT")
 	end
 end
