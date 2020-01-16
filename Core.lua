@@ -411,7 +411,7 @@ do
 		local GetDoubleStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetDoubleStatusBarWidgetVisualizationInfo
 		local ceil, floor = ceil, floor
 		local function ScorePredictor(widgetInfo)
-			if widgetInfo and widgetInfo.widgetID == 1671 then -- The 1671 widget is used for all BGs with score predictors
+			if widgetInfo and (widgetInfo.widgetID == 1671 or widgetInfo.widgetID == 2074) then -- The 1671 widget is used for all BGs with score predictors, but DG uses 2074
 				local dataTbl = GetDoubleStatusBarWidgetVisualizationInfo(widgetInfo.widgetID)
 				if not dataTbl or not dataTbl.leftBarMax then return end
 				if prevTime == 0 then
@@ -472,6 +472,46 @@ do
 	end
 
 	do
+		-- Easy world map icon checker
+		--local start = function(self) self:StartMoving() end
+		--local stop = function(self) self:StopMovingOrSizing() end
+		--local frames = {}
+		--do
+		--	local f = CreateFrame("Frame", nil, UIParent)
+		--	f:SetPoint("CENTER")
+		--	f:SetSize(24,24)
+		--	f:EnableMouse(true)
+		--	f:SetMovable(true)
+		--	f:RegisterForDrag("LeftButton")
+		--	f:SetScript("OnDragStart", start)
+		--	f:SetScript("OnDragStop", stop)
+		--	frames[1] = f
+		--	local tx = f:CreateTexture()
+		--	tx:SetAllPoints(f)
+		--	tx:SetTexture(136441) -- Interface\\Minimap\\POIIcons
+		--	tx:SetTexCoord(GetPOITextureCoords(1))
+		--	local n = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+		--	n:SetPoint("BOTTOM", f, "TOP")
+		--	n:SetText(1)
+		--end
+		--for i = 2, 250 do
+		--	local f = CreateFrame("Frame", nil, UIParent)
+		--	f:SetPoint("LEFT", frames[i-1], "RIGHT", 10, 0)
+		--	f:SetSize(24,24)
+		--	f:EnableMouse(true)
+		--	f:SetMovable(true)
+		--	f:RegisterForDrag("LeftButton")
+		--	f:SetScript("OnDragStart", start)
+		--	f:SetScript("OnDragStop", stop)
+		--	frames[i] = f
+		--	local tx = f:CreateTexture()
+		--	tx:SetAllPoints(f)
+		--	tx:SetTexture(136441) -- Interface\\Minimap\\POIIcons
+		--	tx:SetTexCoord(GetPOITextureCoords(i))
+		--	local n = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+		--	n:SetPoint("BOTTOM", f, "TOP")
+		--	n:SetText(i)
+		--end
 		local iconDataConflict = {
 			-- Graveyard
 			[4] = "colorAlliance",
@@ -506,6 +546,15 @@ do
 			-- Oil/Refinery
 			[152] = "colorAlliance",
 			[154] = "colorHorde",
+			-- Market
+			[208] = "colorAlliance",
+			[209] = "colorHorde",
+			-- Ruins
+			[213] = "colorAlliance",
+			[214] = "colorHorde",
+			-- Shrine
+			[218] = "colorAlliance",
+			[219] = "colorHorde",
 		}
 		local atlasColors = nil
 		local GetPOITextureCoords = GetPOITextureCoords
