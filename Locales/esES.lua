@@ -28,11 +28,11 @@ L.lokholar = "Lokholar" -- Lokholar el Señor del Hielo
 L.handIn = "|cFF33FF99Capping|r: Entrega automática de objetos de misión."
 
 --- Alliance IoC Workshop yells:
--- Gnomish Mechanic yells: I'm halfway there! Keep the Horde away from here.  They don't teach fighting in engineering school!
--- Gnomish Mechanic yells: It's broken already?! No worries. It's nothing I can't fix.
+Gnomish Mechanic yells: "¡Ya estoy a medio camino! Mantened a la Horda lejos de aquí. ¡No enseñan a luchar en la escuela de ingeniería!"
+Gnomish Mechanic yells: "¡¿Ya está roto?! No os preocupéis. No existe nada que no pueda reparar."
 --- Horde IoC Workshop yells:
--- Goblin Mechanic yells: I'm about halfway done! Keep the Alliance away - fighting's not in my contract!
--- Goblin Mechanic yells: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
+Goblin Mechanic yells: "¡Ya llevo la mitad del camino! Mantened a la Alianza lejos - ¡luchar no está en mi contrato!"
+Goblin Mechanic yells: "¡¿Otra vez roto?! Lo arreglaré... es sólo que dudo que la garantía lo cubra."
 L.halfway = "medio camino"
 L.broken = "destruido"
 
