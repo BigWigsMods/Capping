@@ -5,7 +5,7 @@
 ## Notes: Battleground timers and other PvP features.
 ## Notes-deDE: Battleground timers and other PvP features.
 ## Notes-ruRU: Battleground timers and other PvP features.
-## Notes-zhCN: Battleground timers and other PvP features.
+## Notes-zhCN: 战场计时工具和其他 PvP 特性。
 ## Notes-zhTW: Battleground timers and other PvP features.
 ## Notes-koKR: 전장 타이머와 기타 PvP 기능입니다.
 ## Notes-frFR: Battleground timers and other PvP features.
