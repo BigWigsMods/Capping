@@ -9,7 +9,7 @@ L.flagRespawns = "Flaggen"
 
 L.takenTheFlagTrigger = "^(.+) hat die Fahne erobert!"
 L.hasTakenTheTrigger = "eingenommen!"
---L.upgradeToTrigger = "Upgrade to" -- todo: muss Schmied Regzar bzw. Murgot Tiefenschmied Gossip-Option sein!
+L.upgradeToTrigger = "Verbessert zu" -- todo: muss Schmied Regzar bzw. Murgot Tiefenschmied Gossip-Option sein!
 L.droppedTrigger = "fallen lassen!"
 L.capturedTheTrigger = "errungen!"
 
@@ -19,7 +19,7 @@ L.gatePosition = "%s (%s)"
 L.west = "West"
 L.front = "Vorne"
 L.east = "Ost"
-L.hordeBoss = "Hordenboss"
+L.hordeBoss = "Hordeboss"
 L.allianceBoss = "Allianzboss"
 L.galvangar = "Galvangar" -- Hauptmann Galvangar
 L.balinda = "Balinda" -- Hauptmann Balinda Steinbruch
@@ -33,21 +33,21 @@ L.handIn = "|cFF33FF99Capping|r: Gebe Quest-Gegenstände automatisch ab."
 --- Horde IoC Workshop yells:
 -- Goblinmechaniker: Ich hab's gleich! Haltet mir die Allianz vom Leib. Kämpfen steht nicht in meinem Vertrag!
 -- Goblinmechaniker: Schon wieder kaputt?! Ich werde es richten... Ihr solltet allerdings nicht davon ausgehen, dass das noch unter die Garantie
-L.halfway = "gleich!"
-L.broken = "kaputt?"
+L.halfway = "Gleich!"
+L.broken = "Kaputt?"
 
 -- Wintergrasp
 L.damaged = "|cFF33FF99Capping|r: %s beschädigt"
 L.destroyed = "|cFF33FF99Capping|r: %s zerstört"
-L.northEastKeep = "Nord-östlicher Festungsturm"
-L.southEastKeep = "Süd-östlicher Festungsturm"
-L.northWestKeep = "Nord-westlicher Festungsturm"
-L.southWestKeep = "Süd-westlicher Festungsturm"
-L.northWest = "Nord-westliche Wand"
-L.southWest = "Süd-westliche Wand"
+L.northEastKeep = "Nordöstlicher Festungsturm"
+L.southEastKeep = "Südöstlicher Festungsturm"
+L.northWestKeep = "Nordwestlicher Festungsturm"
+L.southWestKeep = "Südwestlicher Festungsturm"
+L.northWest = "Nordwestliche Wand"
+L.southWest = "Südwestliche Wand"
 L.south = "Südliche Wand"
-L.southEast = "Süd-östliche Wand"
-L.northEast = "Nord-östliche Wand"
+L.southEast = "Südöstliche Wand"
+L.northEast = "Nordöstliche Wand"
 L.innerWest = "Innere westliche Wand"
 L.innerSouth = "Innere südliche Wand"
 L.innerEast = "Innere östliche Wand"
