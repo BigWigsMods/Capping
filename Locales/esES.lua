@@ -3,7 +3,7 @@ if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then return end
 local _, mod = ...
 local L = mod.L
 
---L.battleBegins = "La batalla comienza"
+--L.battleBegins = "La batalla comienza en"
 --L.finalScore = "Final: %d - %d"
 --L.flagRespawns = "Reaparición de Banderas"
 
@@ -14,7 +14,7 @@ local L = mod.L
 --L.capturedTheTrigger = "Capturó"
 
 --L.hordeGate = "Portón de la horda"
---L.allianceGate = "Pottón de la alianza"
+--L.allianceGate = "Portón de la alianza"
 --L.gatePosition = "%s (%s)"
 --L.west = "Oeste"
 --L.front = "Frente"
