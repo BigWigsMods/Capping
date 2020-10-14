@@ -7,8 +7,8 @@ end
 
 local hasPrinted = false
 do
-	local UnitGUID, strsplit, GetNumGossipActiveQuests, SelectGossipActiveQuest = UnitGUID, strsplit, GetNumGossipActiveQuests, SelectGossipActiveQuest
-	local tonumber, SelectGossipOption, GetGossipOptions, GetItemCount, SelectGossipAvailableQuest = tonumber, SelectGossipOption, GetGossipOptions, GetItemCount, SelectGossipAvailableQuest
+	local UnitGUID, strsplit, GetNumGossipActiveQuests, SelectGossipActiveQuest = UnitGUID, strsplit, C_GossipInfo.GetNumActiveQuests, C_GossipInfo.SelectActiveQuest
+	local tonumber, SelectGossipOption, GetGossipOptions, GetItemCount, SelectGossipAvailableQuest = tonumber, C_GossipInfo.SelectOption, C_GossipInfo.GetOptions, GetItemCount, C_GossipInfo.SelectAvailableQuest
 	function mod:GOSSIP_SHOW()
 		local target = UnitGUID("npc")
 		if target then
@@ -16,7 +16,8 @@ do
 			local mobId = tonumber(id)
 			if mobId == 13176 or mobId == 13257 then -- Smith Regzar, Murgot Deepforge
 				-- Open Quest to Smith or Murgot
-				if GetGossipOptions() and strmatch(GetGossipOptions(), L.upgradeToTrigger) then
+				local tbl = GetGossipOptions()
+				if tbl[1] and tbl[1].name and strmatch(tbl[1].name, L.upgradeToTrigger) then
 					SelectGossipOption(1)
 				elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
 					SelectGossipAvailableQuest(1)
