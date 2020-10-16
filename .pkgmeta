@@ -17,5 +17,4 @@ move-folders:
 
 ignore:
   - .luacheckrc
-  - .travis.yml
   - README.md
