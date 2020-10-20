@@ -17,4 +17,3 @@ move-folders:
 
 ignore:
   - .luacheckrc
-  - README.md
