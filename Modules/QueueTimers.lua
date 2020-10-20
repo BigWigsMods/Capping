@@ -5,7 +5,15 @@ do
 	mod, L, cap = core:NewMod()
 end
 
-function mod:START_TIMER(_, timeSeconds)
+--[[
+Timer.lua line 2
+TIMER_TYPE_PVP = 1;
+TIMER_TYPE_CHALLENGE_MODE = 2;
+TIMER_TYPE_PLAYER_COUNTDOWN = 3; 
+]]
+function mod:START_TIMER(timerType, timeSeconds)
+	if timerType == 3 then return end
+
 	for i = 1, #TimerTracker.timerList do
 		TimerTracker.timerList[i].bar:Hide() -- Hide the Blizz start timer
 	end
