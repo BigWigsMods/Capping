@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - master
-      - classic
     tags:
       - '*'
+    paths-ignore:
+      - '.github/**'
 
 jobs:
   build:
