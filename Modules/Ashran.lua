@@ -7,7 +7,7 @@ end
 
 local hasPrinted = false
 do
-	local UnitGUID, GetCurrencyInfo, GetNumGossipOptions, strsplit = UnitGUID, C_CurrencyInfo.GetCurrencyInfo, C_GossipInfo.GetNumOptions(), strsplit
+	local UnitGUID, GetCurrencyInfo, GetNumGossipOptions, strsplit = UnitGUID, C_CurrencyInfo.GetCurrencyInfo, C_GossipInfo.GetNumOptions, strsplit
 	local tonumber, SelectGossipOption = tonumber, C_GossipInfo.SelectOption
 	function mod:GOSSIP_SHOW()
 		local target = UnitGUID("npc")
