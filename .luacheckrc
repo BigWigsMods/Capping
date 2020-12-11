@@ -5,7 +5,8 @@ exclude_files = {
 	"**/Libs",
 }
 ignore = {
-	"11/SLASH_Capping1", -- slash handlers
+	"111/SLASH_Capping1", -- slash handlers
+	"212/self", -- (W212) unused argument self
 }
 globals = {
 	-- Addon
