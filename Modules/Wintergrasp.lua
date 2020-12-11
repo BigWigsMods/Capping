@@ -21,7 +21,6 @@ local poiWallNames = { -- wall section locations
 	[6056] = L.southGate, [6027] = L.mainEntrance, -- front gate and fortress door
 }
 local baseTowerHealth, mainEntranceHealth, wallHealth, defenseTowerHealth = 130000, 91000, 301000, 81000
-local westHp, midHp, eastHp = baseTowerHealth, baseTowerHealth, baseTowerHealth
 local towers, onDemandTrackers = {}, {}
 local towerNames = {
 	["308062"] = L.westTower, -- Shadowsight Tower (West)
@@ -70,11 +69,11 @@ local function StartNewBar(self, name, english, icon)
 	bar:Pause()
 	bar.candyBarBar:SetValue(100)
 	bar.candyBarDuration:SetText("100%")
-	bar:Set("capping:customchat", function(bar)
+	bar:Set("capping:customchat", function(candyBar)
 		if name ~= english then
-			return english .."/".. name .." - ".. bar.candyBarDuration:GetText()
+			return english .."/".. name .." - ".. candyBar.candyBarDuration:GetText()
 		else
-			return name .." - ".. bar.candyBarDuration:GetText()
+			return name .." - ".. candyBar.candyBarDuration:GetText()
 		end
 	end)
 	return bar
@@ -179,11 +178,11 @@ do
 			local textureIndex = tbl.textureIndex
 			if tbl and ((ti and ti ~= textureIndex) or (not ti and poiWallNames[POI])) then
 				if intactTextures[ti] and damaged[textureIndex] then -- intact before, damaged now
-					local msg = format(L.damaged, poiWallNames[POI])
+					local msg = string.format(L.damaged, poiWallNames[POI])
 					RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", msg)
 					print(msg)
 				elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-					local msg = format(L.destroyed, poiWallNames[POI])
+					local msg = string.format(L.destroyed, poiWallNames[POI])
 					RaidWarningFrame_OnEvent(RaidBossEmoteFrame, "CHAT_MSG_RAID_WARNING", msg)
 					print(msg)
 				end
@@ -212,11 +211,11 @@ do
 			bar:Pause()
 			bar.candyBarBar:SetValue(100)
 			bar.candyBarDuration:SetText("100%")
-			bar:Set("capping:customchat", function(bar)
+			bar:Set("capping:customchat", function(candyBar)
 				if towerName ~= towerNamesEnglish[towerId] then
-					return towerNamesEnglish[towerId] .. "/".. towerName .." - ".. bar.candyBarDuration:GetText()
+					return towerNamesEnglish[towerId] .. "/".. towerName .." - ".. candyBar.candyBarDuration:GetText()
 				else
-					return towerName .." - ".. bar.candyBarDuration:GetText()
+					return towerName .." - ".. candyBar.candyBarDuration:GetText()
 				end
 			end)
 		end
@@ -251,7 +250,7 @@ do
 	local function SendWGTowers()
 		timer = nil
 		if IsInGroup(2) then -- We've not just ragequit
-			local msg1 = format(
+			local msg1 = string.format(
 				"w:%d:m:%d:e:%d:ne:%d:se:%d:sw:%d:nw:%d",
 				towers["308062"], towers["308013"], towers["307935"], -- West, Mid, East
 				onDemandTrackers["307877"] or defenseTowerHealth, -- North-East
@@ -263,7 +262,7 @@ do
 			for k, v in next, onDemandTrackers do
 				if not defensiveTowers[k] then
 					k = k:sub(3) -- Trim first 2 numbers
-					msg2 = format("%s%s-%d~", msg2, k, v)
+					msg2 = string.format("%s%s-%d~", msg2, k, v)
 				end
 			end
 			if msg2 ~= "z:" and string.len(msg2) < 251 then
@@ -407,7 +406,6 @@ do
 			end
 		end
 
-		westHp, midHp, eastHp = baseTowerHealth, baseTowerHealth, baseTowerHealth
 		towers = {
 			["308062"] = baseTowerHealth, -- Shadowsight Tower (West)
 			["308013"] = baseTowerHealth, -- Winter's Edge Tower (Mid)

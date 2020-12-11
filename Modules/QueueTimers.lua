@@ -9,7 +9,7 @@ end
 Timer.lua line 2
 TIMER_TYPE_PVP = 1;
 TIMER_TYPE_CHALLENGE_MODE = 2;
-TIMER_TYPE_PLAYER_COUNTDOWN = 3; 
+TIMER_TYPE_PLAYER_COUNTDOWN = 3;
 ]]
 function mod:START_TIMER(timerType, timeSeconds)
 	if timerType == 3 then return end
@@ -20,7 +20,7 @@ function mod:START_TIMER(timerType, timeSeconds)
 
 	local bar = self:GetBar(L.battleBegins)
 	if not bar or timeSeconds > bar.remaining+1 or timeSeconds < bar.remaining-1 then -- Don't restart bars for subtle changes +/- 1s
-		bar = self:StartBar(L.battleBegins, timeSeconds, 618859, "colorOther") -- 618859 = Interface/Icons/achievement_challengemode_platinum
+		self:StartBar(L.battleBegins, timeSeconds, 618859, "colorOther") -- 618859 = Interface/Icons/achievement_challengemode_platinum
 	end
 end
 mod:RegisterEvent("START_TIMER")
@@ -41,7 +41,7 @@ do -- estimated wait timer and port timer
 		local status, mapName, _, _, _, queueType, gameType = GetBattlefieldStatus(queueId)
 
 		if queueType == "ARENASKIRMISH" then
-			mapName = format("%s (%d)", ARENA, queueId) -- No size or name distinction given for casual arena 2v2/3v3, separate them manually. Messy :(
+			mapName = string.format("%s (%d)", ARENA, queueId) -- No size or name distinction given for casual arena 2v2/3v3, separate them manually. Messy :(
 		end
 
 		if status == "confirm" then -- BG has popped, time until cancelled

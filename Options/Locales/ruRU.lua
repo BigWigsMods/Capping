@@ -45,5 +45,5 @@ L.altClick = "Alt + клик"
 L.sayChat = "Общий (/s) чат"
 L.raidChat = "Группой чат"
 L.clickableBars = "Полоски, реагирующие на клик"
-L.loudQueue = "Звук очереди" -- loud, посмотреть на проде // spellcheck on live 
+L.loudQueue = "Звук очереди" -- loud, посмотреть на проде // spellcheck on live
 L.loudQueueDesc = "Когда наступит очередь, звуковое оповещение будет принудительно направлено через основной звуковой канал" -- посмотреть на проде // spellcheck on live // "When the queue is ready the sound notification will be forced to play over the 'Master' sound channel."

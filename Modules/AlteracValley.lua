@@ -79,7 +79,7 @@ do
 end
 
 local NewTicker = C_Timer.NewTicker
-local hereFromTheStart, hasData, hasPrinted = true, true, false
+local hereFromTheStart, hasData = true, true
 local stopTimer = nil
 local function allow() hereFromTheStart = false end
 local function stop() hereFromTheStart = true hasData = true stopTimer = nil end
@@ -111,7 +111,7 @@ do
 			for bar in next, CappingFrame.bars do
 				local poiId = bar:Get("capping:poiid")
 				if poiId then
-					str = format("%s%d-%d~", str, poiId, floor(bar.remaining))
+					str = string.format("%s%d-%d~", str, poiId, math.floor(bar.remaining))
 				end
 			end
 

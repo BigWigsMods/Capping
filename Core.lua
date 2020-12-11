@@ -4,7 +4,7 @@ local addonName, mod = ...
 local frame = CreateFrame("Frame", "CappingFrame", UIParent)
 local L = mod.L
 
-local format, type = format, type
+local format, type = string.format, type
 local db, core
 local zoneIds = {}
 
@@ -63,9 +63,8 @@ do
 					return a.remaining < b.remaining
 				end
 			end
-			local tmp = {}
 			RearrangeBars = function()
-				wipe(tmp)
+				local tmp = {}
 				for bar in next, activeBars do
 					tmp[#tmp + 1] = bar
 				end
@@ -335,11 +334,11 @@ do
 						bar:Pause()
 						bar.candyBarBar:SetValue(hp)
 						bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
-						bar:Set("capping:customchat", function(bar)
+						bar:Set("capping:customchat", function(candyBar)
 							if tbl[1] ~= tbl[2] then
-								return tbl[2] .."/".. tbl[1] .." - ".. bar.candyBarDuration:GetText()
+								return tbl[2] .."/".. tbl[1] .." - ".. candyBar.candyBarDuration:GetText()
 							else
-								return tbl[1] .." - ".. bar.candyBarDuration:GetText()
+								return tbl[1] .." - ".. candyBar.candyBarDuration:GetText()
 							end
 						end)
 						bar:Set("capping:hpdata", tbl)
@@ -409,7 +408,7 @@ do
 		end
 
 		local GetDoubleStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetDoubleStatusBarWidgetVisualizationInfo
-		local ceil, floor = ceil, floor
+		local ceil, floor = math.ceil, math.floor
 		local function ScorePredictor(widgetInfo)
 			if widgetInfo and (widgetInfo.widgetID == 1671 or widgetInfo.widgetID == 2074) then -- The 1671 widget is used for all BGs with score predictors, but DG uses 2074
 				local dataTbl = GetDoubleStatusBarWidgetVisualizationInfo(widgetInfo.widgetID)

@@ -109,7 +109,7 @@ do
 	local function SendIoCGates()
 		timer = nil
 		if IsInGroup(2) then -- We've not just ragequit
-			local msg = format(
+			local msg = string.format(
 				"195494:%d:195495:%d:195496:%d:195698:%d:195699:%d:195700:%d",
 				hordeGates["195494"], hordeGates["195495"], hordeGates["195496"],
 				allianceGates["195698"], allianceGates["195699"], allianceGates["195700"]
@@ -184,33 +184,31 @@ do
 					allianceGates["195699"] = aGate2
 					allianceGates["195700"] = aGate3
 
-					local bar = hordeGateBar
-					if bar then
+					if hordeGateBar then
 						local hp = lowestHordeHp / baseGateHealth * 100
 						if hp < 1 then
-							bar:Stop()
+							hordeGateBar:Stop()
 						else
-							bar.candyBarBar:SetValue(hp)
-							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+							hordeGateBar.candyBarBar:SetValue(hp)
+							hordeGateBar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 							if lowestHordeHp ~= baseGateHealth then
 								local gate = lowestHordeHp == hGate1 and h1 or lowestHordeHp == hGate2 and h2 or h3
-								bar.candyBarLabel:SetFormattedText(L.gatePosition, L.hordeGate, gate == h1 and L.front or gate == h2 and L.west or L.east)
-								bar:Set("capping:englishprint", englishNames[gate])
+								hordeGateBar.candyBarLabel:SetFormattedText(L.gatePosition, L.hordeGate, gate == h1 and L.front or gate == h2 and L.west or L.east)
+								hordeGateBar:Set("capping:englishprint", englishNames[gate])
 							end
 						end
 					end
-					local bar = allianceGateBar
-					if bar then
+					if allianceGateBar then
 						local hp = lowestAllianceHp / baseGateHealth * 100
 						if hp < 1 then
-							bar:Stop()
+							allianceGateBar:Stop()
 						else
-							bar.candyBarBar:SetValue(hp)
-							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
+							allianceGateBar.candyBarBar:SetValue(hp)
+							allianceGateBar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 							if lowestAllianceHp ~= baseGateHealth then
 								local gate = lowestAllianceHp == aGate1 and a1 or lowestAllianceHp == aGate2 and a2 or a3
-								bar.candyBarLabel:SetFormattedText(L.gatePosition, L.allianceGate, gate == a1 and L.front or gate == a2 and L.west or L.east)
-								bar:Set("capping:englishprint", englishNames[gate])
+								allianceGateBar.candyBarLabel:SetFormattedText(L.gatePosition, L.allianceGate, gate == a1 and L.front or gate == a2 and L.west or L.east)
+								allianceGateBar:Set("capping:englishprint", englishNames[gate])
 							end
 						end
 					end

@@ -4,7 +4,7 @@ local _, mod = ...
 local L = mod.L
 
 -- Options
---L.general = "General"
+L.general = "General"
 --L.test = "Test"
 --L.lock = "Lock"
 --L.barIcon = "Bar Icon"

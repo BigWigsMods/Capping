@@ -1,8 +1,8 @@
 
-local mod, L
+local mod
 do
 	local _, core = ...
-	mod, L = core:NewMod()
+	mod = core:NewMod()
 end
 
 local instanceIdToMapId = {
