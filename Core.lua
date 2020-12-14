@@ -750,6 +750,12 @@ function core:ADDON_LOADED(addon)
 		}
 		db = LibStub("AceDB-3.0"):New("CappingSettings", defaults, true)
 		CappingFrame.db = db
+		do
+			local rl = function() ReloadUI() end
+			db.RegisterCallback(self, "OnProfileChanged", rl)
+			db.RegisterCallback(self, "OnProfileCopied", rl)
+			db.RegisterCallback(self, "OnProfileReset", rl)
+		end
 
 		frame:ClearAllPoints()
 		frame:SetPoint(db.profile.position[1], UIParent, db.profile.position[2], db.profile.position[3], db.profile.position[4])
