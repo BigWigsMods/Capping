@@ -28,7 +28,7 @@ L.lokholar = "Lokholar" -- Lokholar le Seigneur des glaces
 L.handIn = "|cFF33FF99Capping|r: Remise automatique des objets de quête."
 
 --- Alliance IoC Workshop yells:
--- Gnomish Mechanic yells: I'm halfway there! Keep the Horde away from here.  They don't teach fighting in engineering school!
+Mécano gnome crie : J'en suis à la moitié ! Tenez la Horde à distance. On n'apprend pas à se battre dans les écoles d'ingénieurs !
 -- Gnomish Mechanic yells: It's broken already?! No worries. It's nothing I can't fix.
 --- Horde IoC Workshop yells:
 -- Goblin Mechanic yells: I'm about halfway done! Keep the Alliance away - fighting's not in my contract!
