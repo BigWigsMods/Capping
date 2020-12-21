@@ -29,7 +29,7 @@ L.handIn = "|cFF33FF99Capping|r: Remise automatique des objets de quête."
 
 --- Alliance IoC Workshop yells:
 Mécano gnome crie : J'en suis à la moitié ! Tenez la Horde à distance. On n'apprend pas à se battre dans les écoles d'ingénieurs !
--- Gnomish Mechanic yells: It's broken already?! No worries. It's nothing I can't fix.
+Mécano gnome crie : Déjà cassé ?! Pas de souci. Ce n'est que je ne puisse pas réparer.
 --- Horde IoC Workshop yells:
 -- Goblin Mechanic yells: I'm about halfway done! Keep the Alliance away - fighting's not in my contract!
 -- Goblin Mechanic yells: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
