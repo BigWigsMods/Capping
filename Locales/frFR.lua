@@ -28,12 +28,12 @@ L.lokholar = "Lokholar" -- Lokholar le Seigneur des glaces
 L.handIn = "|cFF33FF99Capping|r: Remise automatique des objets de quête."
 
 --- Alliance IoC Workshop yells:
---Mécano gnome crie : J'en suis à la moitié ! Tenez la Horde à distance. On n'apprend pas à se battre dans les écoles d'ingénieurs !
---Mécano gnome crie : Déjà cassé ?! Pas de souci. Ce n'est que je ne puisse pas réparer.
+-- Mécano gnome crie : J'en suis à la moitié ! Tenez la Horde à distance. On n'apprend pas à se battre dans les écoles d'ingénieurs !
+-- Mécano gnome crie : Déjà cassé ?! Pas de souci. Ce n'est que je ne puisse pas réparer.
 --- Horde IoC Workshop yells:
---Mécano goblin crie : J'en suis à la moitié ! Tenez l'alliance à distance - combattre n'est pas dans mon contrat !
---cano goblin crie : C'est déjà cassé ?! Je le répare... Ne pensez pas que la garantie va couvrir ça.
-L.halfway = "moitié
+-- Mécano goblin crie : J'en suis à la moitié ! Tenez l'alliance à distance - combattre n'est pas dans mon contrat !
+-- Mécano goblin crie : C'est déjà cassé ?! Je le répare... Ne pensez pas que la garantie va couvrir ça.
+L.halfway = "moitié"
 L.broken = "cassé"
 
 -- Wintergrasp
