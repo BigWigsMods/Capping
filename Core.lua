@@ -781,16 +781,28 @@ function core:ADDON_LOADED(addon)
 		C_CVar.SetCVar("showArenaEnemyPets", "1")
 
 		self:RegisterEvent("PLAYER_ENTERING_WORLD")
-
-		self:Timer(15, function()
-			local x = GetLocale()
-			if x ~= "enUS" and x ~= "enGB" and x ~= "zhCN" and x ~= "ruRU" and x ~= "frFR" then -- XXX temp
-				print("|cFF33FF99Capping|r is missing locale for", x, "and needs your help! Please visit the project page on GitHub for more info.")
-			end
-		end)
 	end
 end
 core:RegisterEvent("ADDON_LOADED")
+function core:LOADING_SCREEN_DISABLED()
+	self:UnregisterEvent("LOADING_SCREEN_DISABLED")
+	self:Timer(15, function()
+		local x = GetLocale()
+		local needsLocale = {
+			deDE = "German",
+			esES = "Spanish",
+			esMX = "Spanish MX",
+			itIT = "Italian",
+			koKR = "Korean",
+			ptBR = "Brasil",
+			zhTW = "zhTW",
+		}
+		if needsLocale[x] then -- XXX temp
+			print("|cFF33FF99Capping|r is missing locale for", needsLocale[x], "and needs your help! Please visit the project page on GitHub for more info.")
+		end
+	end)
+end
+core:RegisterEvent("LOADING_SCREEN_DISABLED")
 
 do
 	local prevZone = 0
