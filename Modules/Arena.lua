@@ -56,3 +56,4 @@ mod:RegisterZone(1672) -- Blade's Edge Arena
 mod:RegisterZone(1825) -- Hook Point
 mod:RegisterZone(1911) -- Mugambala
 mod:RegisterZone(2167) -- The Robodrome
+mod:RegisterZone(2373) -- Empyrean Domain
