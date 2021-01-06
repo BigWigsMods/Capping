@@ -811,14 +811,14 @@ do
 		local _, _, _, _, _, _, _, id = GetInstanceInfo()
 		if zoneIds[id] then
 			prevZone = id
+			self:RegisterEvent("PLAYER_LEAVING_WORLD")
 			zoneIds[id]:EnterZone(id)
-		else
-			if zoneIds[prevZone] then
-				self:StopAllBars()
-				zoneIds[prevZone]:ExitZone()
-			end
-			prevZone = id
 		end
+	end
+	function core:PLAYER_LEAVING_WORLD()
+		self:UnregisterEvent("PLAYER_LEAVING_WORLD")
+		self:StopAllBars()
+		zoneIds[prevZone]:ExitZone()
 	end
 end
 
