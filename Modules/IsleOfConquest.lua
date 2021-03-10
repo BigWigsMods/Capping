@@ -6,7 +6,7 @@ do
 end
 
 local SendAddonMessage = C_ChatInfo.SendAddonMessage
-local baseGateHealth = 1946880
+local baseGateHealth = 2336256
 local lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
 local hordeGates, allianceGates = {}, {}
 local hordeGateBar, allianceGateBar = nil, nil
