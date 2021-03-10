@@ -20,7 +20,7 @@ local poiWallNames = { -- wall section locations
 	[6030] = L.innerEast, [6029] = L.innerEast, [6028] = L.innerEast,
 	[6056] = L.southGate, [6027] = L.mainEntrance, -- front gate and fortress door
 }
-local baseTowerHealth, mainEntranceHealth, wallHealth, defenseTowerHealth = 130000, 91000, 301000, 81000
+local baseTowerHealth, mainEntranceHealth, wallHealth, defenseTowerHealth = 130000, 91000, 240800, 81000
 local towers, onDemandTrackers = {}, {}
 local towerNames = {
 	["308062"] = L.westTower, -- Shadowsight Tower (West)
