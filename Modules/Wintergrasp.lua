@@ -20,7 +20,7 @@ local poiWallNames = { -- wall section locations
 	[6030] = L.innerEast, [6029] = L.innerEast, [6028] = L.innerEast,
 	[6056] = L.southGate, [6027] = L.mainEntrance, -- front gate and fortress door
 }
-local baseTowerHealth, mainEntranceHealth, wallHealth, defenseTowerHealth = 130000, 91000, 240800, 81000
+local attackerTowerHealth, mainEntranceHealth, wallHealth, defenseTowerHealth = 130000, 91000, 240000, 80000
 local towers, onDemandTrackers = {}, {}
 local towerNames = {
 	["308062"] = L.westTower, -- Shadowsight Tower (West)
@@ -90,7 +90,7 @@ do
 				towers[strid] = newHp
 				local bar = self:GetBar(towerNames[strid])
 				if bar then
-					local hp = newHp / baseTowerHealth * 100
+					local hp = newHp / attackerTowerHealth * 100
 					if hp < 0.5 then
 						bar:Stop()
 					else
@@ -356,7 +356,7 @@ do
 					for towerId, towerHp in next, towers do
 						local bar = self:GetBar(towerNames[towerId])
 						if bar then
-							local hp = towerHp / baseTowerHealth * 100
+							local hp = towerHp / attackerTowerHealth * 100
 							if hp < 1 then
 								bar:Stop()
 							else
@@ -407,9 +407,9 @@ do
 		end
 
 		towers = {
-			["308062"] = baseTowerHealth, -- Shadowsight Tower (West)
-			["308013"] = baseTowerHealth, -- Winter's Edge Tower (Mid)
-			["307935"] = baseTowerHealth, -- Flamewatch Tower (East)
+			["308062"] = attackerTowerHealth, -- Shadowsight Tower (West)
+			["308013"] = attackerTowerHealth, -- Winter's Edge Tower (Mid)
+			["307935"] = attackerTowerHealth, -- Flamewatch Tower (East)
 		}
 		RequestBattlefieldScoreData()
 		self:Timer(1, RequestBattlefieldScoreData)
