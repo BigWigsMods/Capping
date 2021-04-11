@@ -3,21 +3,21 @@ if GetLocale() ~= "ptBR" then return end
 local _, mod = ...
 local L = mod.L
 
-L.battleBegins = "Batalha Começou"
+L.battleBegins = "Batalha Começa"
 --L.finalScore = "Final: %d - %d"
 --L.flagRespawns = "Flag respawns"
 
-L.takenTheFlagTrigger = "^(.+) pegou a bandeira!"
+--L.takenTheFlagTrigger = "^(.+) pegou a bandeira!"
 --L.hasTakenTheTrigger = "has taken the"
 --L.upgradeToTrigger = "Upgrade to"
-L.droppedTrigger = "derrubou"
-L.capturedTheTrigger = "capturou"
+--L.droppedTrigger = "largou"
+--L.capturedTheTrigger = "capturou"
 
 L.hordeGate = "Portão da Horda"
 L.allianceGate = "Portão da Aliança"
 --L.gatePosition = "%s (%s)"
 L.west = "Oeste" --West
---L.front = "Front"
+L.front = "Frente"
 L.east = "Leste" --East
 L.hordeBoss = "Chefe da Horda" -- Horde Boss
 L.allianceBoss = "Chefe da Aliança" -- Alliance Boss
@@ -35,12 +35,12 @@ L.handIn = "|cFF33FF99Capping|r: Automaticamente entregando items de quest."
 --- Horde IoC Workshop yells:
 -- Goblin Mechanic yells: I'm about halfway done! Keep the Alliance away - fighting's not in my contract!
 -- Goblin Mechanic yells: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
---L.halfway = "halfway"
---L.broken = "broken"
+--L.halfway = "acabando!" --need some tests
+--L.broken = "quebrado" --need some tests
 
 -- Wintergrasp
-L.damaged = "|cFF33FF99Capping|r: %s Danificado"
-L.destroyed = "|cFF33FF99Capping|r: %s Destruído"
+L.damaged = "|cFF33FF99Capping|r: %s Danificada"
+L.destroyed = "|cFF33FF99Capping|r: %s Destruída"
 L.northEastKeep = "Torre Nordeste da Fortaleza"
 L.southEastKeep = "Torre Sudeste da Fortaleza"
 L.northWestKeep = "Torre Noroeste da Fortaleza"
