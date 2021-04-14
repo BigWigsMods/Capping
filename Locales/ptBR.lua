@@ -10,7 +10,7 @@ L.flagRespawns = "Bandeira reaparece"
 L.takenTheFlagTrigger = "^(.+) pegou a bandeira!"
 --L.hasTakenTheTrigger = "has taken the"
 --L.upgradeToTrigger = "Upgrade to"
---L.droppedTrigger = "largada!"
+L.droppedTrigger = "largada!"
 L.capturedTheTrigger = "capturou"
 
 L.hordeGate = "Portão da Horda"
