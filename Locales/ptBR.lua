@@ -4,7 +4,7 @@ local _, mod = ...
 local L = mod.L
 
 L.battleBegins = "Batalha Começa"
---L.finalScore = "Final: %d - %d"
+L.finalScore = "Final: %d - %d"
 L.flagRespawns = "Bandeira reaparece"
 
 L.takenTheFlagTrigger = "^(.+) pegou a bandeira!"
@@ -15,26 +15,26 @@ L.capturedTheTrigger = "capturou"
 
 L.hordeGate = "Portão da Horda"
 L.allianceGate = "Portão da Aliança"
---L.gatePosition = "%s (%s)"
-L.west = "Oeste" --West
+L.gatePosition = "%s (%s)"
+L.west = "Oeste"
 L.front = "Frente"
-L.east = "Leste" --East
-L.hordeBoss = "Chefe da Horda" -- Horde Boss
-L.allianceBoss = "Chefe da Aliança" -- Alliance Boss
+L.east = "Leste"
+L.hordeBoss = "Chefe da Horda"
+L.allianceBoss = "Chefe da Aliança"
 L.hordeGuardian = "Guardião da Horda"
 L.allianceGuardian = "Guardião da Aliança"
 L.galvangar = "Galvangar"
 L.balinda = "Balinda"
-L.ivus = "Ivus" -- Ivus, o Senhor da Floresta
-L.lokholar = "Lokholar" -- Lokholar, o Senhor do Gelo
+L.ivus = "Ivus"
+L.lokholar = "Lokholar"
 L.handIn = "|cFF33FF99Capping|r: Automaticamente entregando items de quest."
 
 --- Alliance IoC Workshop yells:
--- Mecânico Gnômico grita: Estou na metade do caminho! Mantenha a Horda longe. Não ensinam luta na faculdade de engenharia! 
+-- Mecânico Gnômico grita: Estou na metade do caminho! Mantenha a Horda longe. Não ensinam luta na faculdade de engenharia!
 -- Mecânico Gnômico grita: Já quebrou?! Não esquenta. Não é nada que eu não possa consertar.
 --- Horde IoC Workshop yells:
 -- Mecânico Goblin grita: Estou quase acabando! Mantenha a Aliança longe de mim. Lutar não está no meu contrato!
--- Mecânico Goblin grita: Quebrou de novo?! Eu conserto... Mas não fique esperando que a garantia cubra isso. 
+-- Mecânico Goblin grita: Quebrou de novo?! Eu conserto... Mas não fique esperando que a garantia cubra isso.
 L.halfway = "Estou"
 L.broken = "quebrou"
 
