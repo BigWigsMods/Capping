@@ -10,7 +10,7 @@ L.flagRespawns = "Bandeira reaparece"
 L.takenTheFlagTrigger = "^(.+) pegou a bandeira!"
 --L.hasTakenTheTrigger = "has taken the"
 --L.upgradeToTrigger = "Upgrade to"
-L.droppedTrigger = "largada!"
+L.droppedTrigger = "largada"
 L.capturedTheTrigger = "capturou"
 
 L.hordeGate = "Portão da Horda"
@@ -33,10 +33,10 @@ L.handIn = "|cFF33FF99Capping|r: Automaticamente entregando items de quest."
 -- Mecânico Gnômico grita: Estou na metade do caminho! Mantenha a Horda longe. Não ensinam luta na faculdade de engenharia! 
 -- Mecânico Gnômico grita: Já quebrou?! Não esquenta. Não é nada que eu não possa consertar.
 --- Horde IoC Workshop yells:
--- Goblin Mechanic yells: I'm about halfway done! Keep the Alliance away - fighting's not in my contract!
--- Goblin Mechanic yells: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
-L.halfway = "caminho!" --need some tests
-L.broken = "quebrou?!" --need some tests
+-- Mecânico Goblin grita: Estou quase acabando! Mantenha a Aliança longe de mim. Lutar não está no meu contrato!
+-- Mecânico Goblin grita: Quebrou de novo?! Eu conserto... Mas não fique esperando que a garantia cubra isso. 
+L.halfway = "Estou"
+L.broken = "quebrou"
 
 -- Wintergrasp
 L.damaged = "|cFF33FF99Capping|r: %s Danificada"
@@ -56,5 +56,5 @@ L.innerEast = "Muralha Interior Leste"
 L.southGate = "Portão Sul"
 L.mainEntrance = "Entrada Principal"
 L.westTower = "Torre Oeste"
-L.southTower = "Torre Sul" --"South Tower"
-L.eastTower = "Torre Leste" --East Tower
+L.southTower = "Torre Sul"
+L.eastTower = "Torre Leste"
