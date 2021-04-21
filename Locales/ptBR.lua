@@ -35,8 +35,8 @@ L.handIn = "|cFF33FF99Capping|r: Automaticamente entregando items de quest."
 --- Horde IoC Workshop yells:
 -- Mecânico Goblin grita: Estou quase acabando! Mantenha a Aliança longe de mim. Lutar não está no meu contrato!
 -- Mecânico Goblin grita: Quebrou de novo?! Eu conserto... Mas não fique esperando que a garantia cubra isso.
-L.halfway = "Estou"
-L.broken = "quebrou"
+L.halfway = "[Ll]utar? "
+L.broken = "uebrou"
 
 -- Wintergrasp
 L.damaged = "|cFF33FF99Capping|r: %s Danificada"
