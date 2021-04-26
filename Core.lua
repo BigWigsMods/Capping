@@ -784,25 +784,29 @@ function core:ADDON_LOADED(addon)
 	end
 end
 core:RegisterEvent("ADDON_LOADED")
-function core:LOADING_SCREEN_DISABLED()
-	self:UnregisterEvent("LOADING_SCREEN_DISABLED")
-	self:Timer(15, function()
-		local x = GetLocale()
-		local needsLocale = {
-			deDE = "German",
-			esES = "Spanish",
-			esMX = "Spanish MX",
-			itIT = "Italian",
-			koKR = "Korean",
-			ptBR = "Brasil",
-			zhTW = "zhTW",
-		}
-		if needsLocale[x] then -- XXX temp
-			print("|cFF33FF99Capping|r is missing locale for", needsLocale[x], "and needs your help! Please visit the project page on GitHub for more info.")
+
+do
+	local loc = GetLocale()
+	local needsLocale = {
+		deDE = "German",
+		esES = "Spanish",
+		esMX = "Spanish MX",
+		itIT = "Italian",
+		koKR = "Korean",
+		zhTW = "zhTW",
+	}
+	if needsLocale[loc] then
+		function core:LOADING_SCREEN_DISABLED()
+			self:UnregisterEvent("LOADING_SCREEN_DISABLED")
+			self:Timer(0, function() -- Timers aren't fully functional until 1 frame after loading is done
+				self:Timer(15, function()
+					print("|cFF33FF99Capping|r is missing locale for", needsLocale[loc], "and needs your help! Please visit the project page on GitHub for more info.")
+				end)
+			end)
 		end
-	end)
+		core:RegisterEvent("LOADING_SCREEN_DISABLED")
+	end
 end
-core:RegisterEvent("LOADING_SCREEN_DISABLED")
 
 do
 	local prevZone = 0
