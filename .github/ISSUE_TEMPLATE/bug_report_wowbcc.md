@@ -1,8 +1,8 @@
 ---
-name: Issue for Retail/Live
-about: Create a report about current WoW.
+name: Issue for Burning Crusade Classic
+about: Create a report about Burning Crusade Classic WoW.
 title: ''
-labels: retail
+labels: bcc
 assignees: ''
 ---
 
