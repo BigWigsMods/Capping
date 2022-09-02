@@ -28,7 +28,7 @@ embeds.xml
 locales.xml
 
 Core_Vanilla.lua
-Modules\AlteracValley.lua
+Modules\AlteracValley_Vanilla.lua
 Modules\ArathiBasin.lua
 Modules\QueueTimers.lua
 Modules\WarsongGulch.lua

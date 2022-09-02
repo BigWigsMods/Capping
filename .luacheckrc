@@ -71,4 +71,12 @@ globals = {
 	-- WoW (global strings)
 	"ARENA",
 	"TIME_REMAINING",
+
+	-- Classic WoW
+	"GetBattlefieldScore",
+	"GetGossipOptions",
+	"GetNumGossipActiveQuests",
+	"SelectGossipActiveQuest",
+	"SelectGossipAvailableQuest",
+	"SelectGossipOption",
 }

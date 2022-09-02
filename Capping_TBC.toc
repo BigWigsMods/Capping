@@ -28,7 +28,7 @@ embeds.xml
 locales.xml
 
 Core_BCC.lua
-Modules\AlteracValley.lua
+Modules\AlteracValley_TBC.lua
 Modules\ArathiBasin.lua
 Modules\Arena.lua
 Modules\EyeOfTheStorm.lua
