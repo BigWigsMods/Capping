@@ -29,10 +29,10 @@ locales.xml
 
 Core_Wrath.lua
 Modules\AlteracValley_Wrath.lua
-Modules\ArathiBasin.lua
+Modules\ArathiBasin_Classic.lua
 Modules\Arena.lua
-Modules\EyeOfTheStorm.lua
-Modules\IsleOfConquest.lua
+Modules\EyeOfTheStorm_Wrath.lua
+Modules\IsleOfConquest_Wrath.lua
 Modules\QueueTimers.lua
 Modules\WarsongGulch.lua
 

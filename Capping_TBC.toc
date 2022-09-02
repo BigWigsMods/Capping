@@ -29,9 +29,9 @@ locales.xml
 
 Core_BCC.lua
 Modules\AlteracValley_TBC.lua
-Modules\ArathiBasin.lua
+Modules\ArathiBasin_Classic.lua
 Modules\Arena.lua
-Modules\EyeOfTheStorm.lua
+Modules\EyeOfTheStorm_TBC.lua
 Modules\QueueTimers.lua
 Modules\WarsongGulch.lua
 
