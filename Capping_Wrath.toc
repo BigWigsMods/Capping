@@ -1,0 +1,29 @@
+## Interface: 30400
+## Version: @project-version@
+## Title: Capping
+## Author: Funkydude
+## Notes: Battleground timers and other PvP features.
+## Notes-deDE: Battleground timers and other PvP features.
+## Notes-ruRU: Battleground timers and other PvP features.
+## Notes-zhCN: 战场计时工具和其他 PvP 特性。
+## Notes-zhTW: Battleground timers and other PvP features.
+## Notes-koKR: 전장 타이머와 기타 PvP 기능입니다.
+## Notes-frFR: Battleground timers and other PvP features.
+## Notes-esES: Battleground timers and other PvP features.
+## Notes-esMX: Battleground timers and other PvP features.
+## Notes-itIT: Battleground timers and other PvP features.
+## Notes-ptBR: Battleground timers and other PvP features.
+## SavedVariables: CappingSettings
+
+## X-Category: Battlegrounds/PvP
+## X-Credits: TotalPackage
+## X-Website: https://github.com/BigWigsMods/Capping
+## OptionalDeps: Ace3, LibSharedMedia-3.0, LibCandyBar-3.0, LibChatAnims, LibDDI-1.0
+## X-Embeds: Ace3, LibSharedMedia-3.0, LibCandyBar-3.0, LibChatAnims, LibDDI-1.0
+## X-License: All Rights Reserved: You are free to fork and modify on GitHub, please ask us about anything else.
+## X-Curse-Project-ID: 20143
+## X-WoWI-ID: 11177
+
+embeds.xml
+locales.xml
+modules.xml
