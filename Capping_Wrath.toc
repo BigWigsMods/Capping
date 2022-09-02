@@ -35,6 +35,6 @@ Modules\Arena.lua
 Modules\EyeOfTheStorm_Wrath.lua
 Modules\IsleOfConquest_Wrath.lua
 Modules\QueueTimers.lua
-Modules\WarsongGulch.lua
+Modules\WarsongGulch_Wrath.lua
 
 modules.xml

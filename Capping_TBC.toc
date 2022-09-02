@@ -34,6 +34,6 @@ Modules\ArathiBasin_Classic.lua
 Modules\Arena.lua
 Modules\EyeOfTheStorm_TBC.lua
 Modules\QueueTimers.lua
-Modules\WarsongGulch.lua
+Modules\WarsongGulch_TBC.lua
 
 modules.xml
