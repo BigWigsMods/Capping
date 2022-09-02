@@ -75,7 +75,7 @@ end
 
 local function initGateBars()
 	mod:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	local aBar = mod:StartBar(L.allianceGate, 100, 2054277, "colorHorde", true) -- Interface/Icons/spell_tailor_defenceup01
+	local aBar = mod:StartBar(L.allianceGate, 100, 132362, "colorHorde", true) -- Interface/Icons/ability_warrior_shieldwall
 	aBar:Pause()
 	aBar.candyBarBar:SetValue(100)
 	aBar.candyBarDuration:SetText("100%")
@@ -87,7 +87,7 @@ local function initGateBars()
 			return bar.candyBarLabel:GetText() .." - ".. bar.candyBarDuration:GetText()
 		end
 	end)
-	local hBar = mod:StartBar(L.hordeGate, 100, 2054277, "colorAlliance", true) -- Interface/Icons/spell_tailor_defenceup01
+	local hBar = mod:StartBar(L.hordeGate, 100, 132362, "colorAlliance", true) -- Interface/Icons/ability_warrior_shieldwall
 	hBar:Pause()
 	hBar.candyBarBar:SetValue(100)
 	hBar.candyBarDuration:SetText("100%")
