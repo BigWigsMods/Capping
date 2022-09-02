@@ -33,7 +33,7 @@ Modules\AlteracValley_TBC.lua
 Modules\ArathiBasin_Classic.lua
 Modules\Arena.lua
 Modules\EyeOfTheStorm_TBC.lua
-Modules\QueueTimers.lua
+Modules\QueueTimers_TBC.lua
 Modules\WarsongGulch_TBC.lua
 
 modules.xml
