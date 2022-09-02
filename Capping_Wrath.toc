@@ -27,11 +27,12 @@
 embeds.xml
 locales.xml
 
-Core.lua
+Core_Wrath.lua
 Modules\AlteracValley_Wrath.lua
 Modules\ArathiBasin.lua
 Modules\Arena.lua
 Modules\EyeOfTheStorm.lua
+Modules\IsleOfConquest.lua
 Modules\QueueTimers.lua
 Modules\WarsongGulch.lua
 
