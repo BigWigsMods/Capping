@@ -58,3 +58,6 @@ L.capturedTheTrigger = "([^ ]*)|1이;가; ([^!]*) 깃발 쟁탈에 성공했습�
 --L.westTower = "West Tower"
 --L.southTower = "South Tower"
 --L.eastTower = "East Tower"
+
+-- Arena
+--L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

@@ -58,3 +58,6 @@ L.capturedTheTrigger = "佔據了"
 --L.westTower = "West Tower"
 --L.southTower = "South Tower"
 --L.eastTower = "East Tower"
+
+-- Arena
+--L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

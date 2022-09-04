@@ -58,3 +58,6 @@ L.mainEntrance = "堡垒塔楼之门（最后一面墙）"
 L.westTower = "影目塔楼（西塔）"
 L.southTower = "冬缘塔楼（南塔）"
 L.eastTower = "火光塔楼（东塔）"
+
+-- Arena
+--L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

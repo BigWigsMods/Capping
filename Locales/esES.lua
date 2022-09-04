@@ -58,3 +58,6 @@ L.lokholar = "Lokholar" -- Lokholar el Señor del Hielo
 --L.westTower = "West Tower"
 --L.southTower = "South Tower"
 --L.eastTower = "East Tower"
+
+-- Arena
+--L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

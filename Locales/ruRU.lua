@@ -58,3 +58,6 @@ L.mainEntrance = "Главный вход"
 L.westTower = "Западная башня"
 L.southTower = "Южная башня"
 L.eastTower = "Восточная башня"
+
+-- Arena
+--L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly
