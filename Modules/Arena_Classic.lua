@@ -6,8 +6,7 @@ do
 end
 
 do
-	local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
-	local tonumber, gsub, match, GetSpellInfo = tonumber, string.gsub, string.match, GetSpellInfo
+	local GetSpellInfo = GetSpellInfo
 	function mod:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
 		if msg == L.arenaStartTrigger then
 			self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
