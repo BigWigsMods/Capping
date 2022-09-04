@@ -16,35 +16,27 @@ do
 end
 
 do
-	--local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
-	--local tonumber, gsub = tonumber, string.gsub
-	--local function GetTimeRemaining(self)
-	--	local tbl = GetIconAndTextWidgetVisualizationInfo(6)
-	--	if tbl and tbl.state == 1 then
-	--		local minutes, seconds = strmatch(tbl.text, "(%d+):(%d+)")
-	--		minutes = tonumber(minutes)
-	--		seconds = tonumber(seconds)
-	--		if minutes and seconds then
-	--			local remaining = seconds + (minutes*60) + 1
-	--			local text = gsub(TIME_REMAINING, ":", "")
-	--			local bar = self:GetBar(text)
-	--			if remaining > 3 and (not bar or bar.remaining > remaining+5 or bar.remaining < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
-	--				self:StartBar(text, remaining, 134420, "colorOther") -- Interface/Icons/INV_Misc_Rune_07
-	--			end
-	--		end
-	--	end
-	--end
+	local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
+	local tonumber, gsub, strmatch = tonumber, string.gsub, string.match
+	function mod:WSGTimeLeft(widgetInfo)
+		if widgetInfo and widgetInfo.widgetID == 4330 then
+			local tbl = GetIconAndTextWidgetVisualizationInfo(widgetInfo.widgetID)
+			if tbl and tbl.state == 1 then
+				local minutes = strmatch(tbl.text, "(%d+)")
+				minutes = tonumber(minutes)
+				if minutes and minutes < 16 then -- Starts at 25min, wait until 15min is left
+					local remaining = minutes * 60
+					local text = gsub(TIME_REMAINING, ":", "")
+					self:StartBar(text, remaining, 134420, "colorOther", nil, minutes > 5 and 900 or 300) -- Interface/Icons/INV_Misc_Rune_07
+				end
+			end
+		end
+	end
 
 	function mod:EnterZone()
 		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "CHAT_MSG")
 		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "CHAT_MSG")
-
-		--local func = function() GetTimeRemaining(self) end
-		--self:Timer(5, func)
-		--self:Timer(30, func)
-		--self:Timer(60, func)
-		--self:Timer(130, func)
-		--self:Timer(240, func)
+		self:RegisterEvent("UPDATE_UI_WIDGET", "WSGTimeLeft")
 	end
 end
 
