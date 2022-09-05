@@ -60,7 +60,7 @@ L.southTower = "冬缘塔楼（南塔）"
 L.eastTower = "火光塔楼（东塔）"
 
 -- Arena
---L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly
---L.arenaStart60s = "One minute until the Arena battle begins!" -- Needs to match the in game text exactly
---L.arenaStart30s = "Thirty seconds until the Arena battle begins!" -- Needs to match the in game text exactly
---L.arenaStart15s = "Fifteen seconds until the Arena battle begins!" -- Needs to match the in game text exactly
+L.arenaStartTrigger = "竞技场战斗开始了！"
+L.arenaStart60s = "竞技场战斗将在一分钟后开始！"
+L.arenaStart30s = "竞技场战斗将在三十秒后开始！"
+L.arenaStart15s = "竞技场战斗将在十五秒后开始！"
