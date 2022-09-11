@@ -753,7 +753,7 @@ function core:ADDON_LOADED(addon)
 
 		frame:ClearAllPoints()
 		frame:SetPoint(db.profile.position[1], UIParent, db.profile.position[2], db.profile.position[3], db.profile.position[4])
-		local bg = frame:CreateTexture(nil, "PARENT")
+		local bg = frame:CreateTexture()
 		bg:SetAllPoints(frame)
 		bg:SetColorTexture(0, 1, 0, 0.3)
 		frame.bg = bg
