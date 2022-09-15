@@ -21,8 +21,8 @@ L.front = "Vorne"
 L.east = "Ost"
 L.hordeBoss = "Hordenboss"
 L.allianceBoss = "Allianzboss"
---L.hordeGuardian = "Horde Guardian"
---L.allianceGuardian = "Alliance Guardian"
+L.hordeGuardian = "Horde Wächter"
+L.allianceGuardian = "Allianz Wächter"
 L.galvangar = "Galvangar" -- Hauptmann Galvangar
 L.balinda = "Balinda" -- Hauptmann Balinda Steinbruch
 L.ivus = "Ivus" -- Ivus der Waldlord
@@ -60,7 +60,7 @@ L.southTower = "Südlicher Turm"
 L.eastTower = "Östlicher Turm"
 
 -- Arena
---L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly
---L.arenaStart60s = "One minute until the Arena battle begins!" -- Needs to match the in game text exactly
---L.arenaStart30s = "Thirty seconds until the Arena battle begins!" -- Needs to match the in game text exactly
---L.arenaStart15s = "Fifteen seconds until the Arena battle begins!" -- Needs to match the in game text exactly
+L.arenaStartTrigger = "Der Arenakampf hat begonnen!"
+L.arenaStart60s = "Noch eine Minute bis der Arenakampf beginnt!"
+L.arenaStart30s = "Noch dreißig Sekunden bis der Arenakampf beginnt!"
+L.arenaStart15s = "Noch fünfzehn Sekunden bis der Arenakampf beginnt!"
