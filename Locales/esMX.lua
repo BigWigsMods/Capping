@@ -1,5 +1,5 @@
 
-if GetLocale() ~= "esES" then return end
+if GetLocale() ~= "esMX" then return end
 local _, mod = ...
 local L = mod.L
 
@@ -28,7 +28,7 @@ local L = mod.L
 L.ivus = "Ivus" -- Ivus el Señor del Bosque
 L.lokholar = "Lokholar" -- Lokholar el Señor del Hielo
 --L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
-L.anchorTooltip = "|cffeda55fRight-Clic|r para acceder a las opciones"
+L.anchorTooltip = "|cffeda55fClic derecho|r para acceder a las opciones"
 --L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."
 
 --- Alliance IoC Workshop yells:
