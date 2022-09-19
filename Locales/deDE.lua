@@ -28,6 +28,8 @@ L.balinda = "Balinda" -- Hauptmann Balinda Steinbruch
 L.ivus = "Ivus" -- Ivus der Waldlord
 L.lokholar = "Lokholar" -- Lokholar der Eislord
 L.handIn = "|cFF33FF99Capping|r: Gebe Quest-Gegenstände automatisch ab."
+L.anchorTooltip = "|cffeda55fRechtsklick|r, um auf die Optionen zuzugreifen"
+--L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."
 
 --- Alliance IoC Workshop yells:
 -- Gnomenmechaniker: Ich hab's gleich! Haltet die Horde von hier fern. Kämpfen stand in der Ingenieursschule nicht auf dem

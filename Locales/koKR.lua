@@ -28,6 +28,8 @@ L.capturedTheTrigger = "([^ ]*)|1이;가; ([^!]*) 깃발 쟁탈에 성공했습�
 --L.ivus = "Ivus"
 --L.lokholar = "Lokholar"
 --L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
+L.anchorTooltip = "옵션에 접근하려면 |cffeda55f오른쪽 클릭|r하세요"
+--L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."
 
 --- Alliance IoC Workshop yells:
 -- Gnomish Mechanic yells: I'm halfway there! Keep the Horde away from here.  They don't teach fighting in engineering school!

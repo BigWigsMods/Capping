@@ -28,6 +28,8 @@ L.balinda = "Balinda" -- Capitaine Balinda Gîtepierre
 L.ivus = "Ivus" -- Ivus le Seigneur de la forêt
 L.lokholar = "Lokholar" -- Lokholar le Seigneur des glaces
 L.handIn = "|cFF33FF99Capping|r: Remise automatique des objets de quête."
+L.anchorTooltip = "|cffeda55fClic droit|r pour accéder aux options."
+--L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."
 
 --- Alliance IoC Workshop yells:
 -- Mécano gnome crie : J'en suis à la moitié ! Tenez la Horde à distance. On n'apprend pas à se battre dans les écoles d'ingénieurs !

@@ -28,6 +28,8 @@ L.balinda = "巴琳达"
 L.ivus = "伊弗斯"
 L.lokholar = "洛克霍拉"
 L.handIn = "|cFF33FF99Capping|r: 自动交任务物品。"
+L.anchorTooltip = "|cffeda55f右击|r打开选项"
+--L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."
 
 --- Alliance IoC Workshop yells:
 -- 侏儒技师喊道：我就要完成了！挡住那帮部落的家伙。他们可不是在工程学校进行战斗教学！

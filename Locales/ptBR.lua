@@ -28,6 +28,8 @@ L.balinda = "Balinda"
 L.ivus = "Ivus"
 L.lokholar = "Lokholar"
 L.handIn = "|cFF33FF99Capping|r: Automaticamente entregando items de quest."
+L.anchorTooltip = "|cffeda55fClique-Direito|r para acessar as opções"
+--L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."
 
 --- Alliance IoC Workshop yells:
 -- Mecânico Gnômico grita: Estou na metade do caminho! Mantenha a Horda longe. Não ensinam luta na faculdade de engenharia!
