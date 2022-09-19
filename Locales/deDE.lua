@@ -9,9 +9,13 @@ L.flagRespawns = "Flaggen"
 
 L.takenTheFlagTrigger = "^(.+) hat die Fahne erobert!"
 L.hasTakenTheTrigger = "eingenommen!"
---L.upgradeToTrigger = "Upgrade to" -- todo: muss Schmied Regzar bzw. Murgot Tiefenschmied Gossip-Option sein!
 L.droppedTrigger = "fallen lassen!"
 L.capturedTheTrigger = "errungen!"
+
+--- Alterac Valley
+--- This is the trigger option when talking to the NPC to auto hand in the quest items
+--- This chat interaction only appears when the NPC is ready to start an upgrade, and you need to confirm it
+--L.upgradeToTrigger = "Upgrade to" -- todo: muss Schmied Regzar bzw. Murgot Tiefenschmied Gossip-Option sein! -- Needs to match the in game text exactly
 
 L.hordeGate = "Hordentor"
 L.allianceGate = "Allianztor"

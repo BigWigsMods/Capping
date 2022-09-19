@@ -9,9 +9,13 @@ L.flagRespawns = "旗帜即将刷新"
 
 L.takenTheFlagTrigger = "^(.+)夺走了旗帜！"
 L.hasTakenTheTrigger = "夺取了"
-L.upgradeToTrigger = "升级到"
 L.droppedTrigger = "丢掉了"
 L.capturedTheTrigger = "夺取"
+
+--- Alterac Valley
+--- This is the trigger option when talking to the NPC to auto hand in the quest items
+--- This chat interaction only appears when the NPC is ready to start an upgrade, and you need to confirm it
+L.upgradeToTrigger = "升级到"
 
 L.hordeGate = "部落大门"
 L.allianceGate = "联盟大门"

@@ -9,9 +9,13 @@ local L = mod.L
 
 --L.takenTheFlagTrigger = "^(.+) has taken the flag!"
 --L.hasTakenTheTrigger = "has taken the"
---L.upgradeToTrigger = "Upgrade to"
 --L.droppedTrigger = "dropped"
 --L.capturedTheTrigger = "captured the"
+
+--- Alterac Valley
+--- This is the trigger option when talking to the NPC to auto hand in the quest items
+--- This chat interaction only appears when the NPC is ready to start an upgrade, and you need to confirm it
+--L.upgradeToTrigger = "Upgrade to" -- Needs to match the in game text exactly
 
 --L.hordeGate = "Horde Gate"
 --L.allianceGate = "Alliance Gate"
@@ -37,8 +41,8 @@ L.anchorTooltip = "|cffeda55fRight-Clic|r para acceder a las opciones"
 --- Horde IoC Workshop yells:
 -- Goblin Mechanic yells: I'm about halfway done! Keep the Alliance away - fighting's not in my contract!
 -- Goblin Mechanic yells: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
---L.halfway = "halfway"
---L.broken = "broken"
+--L.halfway = "halfway" -- Needs to match the in game text exactly
+--L.broken = "broken" -- Needs to match the in game text exactly
 
 -- Wintergrasp
 --L.damaged = "|cFF33FF99Capping|r: %s Damaged"

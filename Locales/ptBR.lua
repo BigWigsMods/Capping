@@ -9,9 +9,13 @@ L.flagRespawns = "Bandeira reaparece"
 
 L.takenTheFlagTrigger = "^(.+) pegou a bandeira!"
 --L.hasTakenTheTrigger = "has taken the"
---L.upgradeToTrigger = "Upgrade to"
 L.droppedTrigger = "largada"
 L.capturedTheTrigger = "capturou"
+
+--- Alterac Valley
+--- This is the trigger option when talking to the NPC to auto hand in the quest items
+--- This chat interaction only appears when the NPC is ready to start an upgrade, and you need to confirm it
+--L.upgradeToTrigger = "Upgrade to" -- Needs to match the in game text exactly
 
 L.hordeGate = "Portão da Horda"
 L.allianceGate = "Portão da Aliança"
