@@ -3,10 +3,12 @@ if GetLocale() ~= "koKR" then return end
 local _, mod = ...
 local L = mod.L
 
--- Options
+--- Options
+--L.introduction = "The options below can always be accessed by typing the following command in chat: /capping"
 --L.general = "General"
 --L.test = "Test"
 L.lock = "고정시키기"
+--L.lockDesc = "Enable the lock to hide the bar moving anchor, preventing the bars from being moved."
 L.barIcon = "바 아이콘"
 L.showTime = "시간 표시"
 L.fillBar = "바 채우기"
@@ -35,7 +37,7 @@ L.textColor = "문자 색상"
 --L.otherBars = "Other Bars"
 L.barBackground = "바 배경"
 
--- Features
+--- Features
 --L.features = "Features"
 --L.queueBarsDesc = "Enable the bars showing which queues you have joined and the estimated time you will be in the queue for."
 --L.barClickDesc = "Configure the keyboard modifier you wish to use for specific chat output when clicking on a bar. Setting all 3 to 'None' will disable clickable bars, allowing you to click through them."

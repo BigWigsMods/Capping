@@ -3,10 +3,12 @@ if GetLocale() ~= "frFR" then return end
 local _, mod = ...
 local L = mod.L
 
--- Options
+--- Options
+--L.introduction = "The options below can always be accessed by typing the following command in chat: /capping"
 L.general = "Général"
 L.test = "Test"
 L.lock = "Verrouiller"
+--L.lockDesc = "Enable the lock to hide the bar moving anchor, preventing the bars from being moved."
 L.barIcon = "Icône sur la barre "
 L.showTime = "Afficher le temps"
 L.fillBar = "Remplissage des barres"
@@ -35,7 +37,7 @@ L.queueBars = "Barre de des files d'attentes"
 L.otherBars = "Autre barres"
 L.barBackground = "Fond de la barre"
 
--- Features
+--- Features
 L.features = "Fonctionnalités"
 L.queueBarsDesc = "Activez les barres indiquant les files d'attente auxquelles vous vous êtes joint et le temps estimé pendant lequel vous serez dans la file d'attente."
 L.barClickDesc = "Configurez le modificateur de clavier que vous souhaitez utiliser pour une sortie de discussion spécifique lorsque vous cliquez sur une barre. Régler les 3 sur «Aucun» désactivera les barres cliquables, vous permettant de cliquer dessus."

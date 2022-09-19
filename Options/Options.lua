@@ -51,6 +51,13 @@ local options = function()
 			cap.db.profile[info[#info]] = value
 		end,
 		args = {
+			introduction = {
+				type = "description",
+				name = L.introduction,
+				order = 0,
+				fontSize = "small",
+				width = "full",
+			},
 			general = {
 				name = L.general,
 				order = 1, type = "group",
@@ -67,6 +74,7 @@ local options = function()
 					lock = {
 						type = "toggle",
 						name = L.lock,
+						desc = L.lockDesc,
 						order = 1,
 						set = function(_, value)
 							cap.db.profile.lock = value

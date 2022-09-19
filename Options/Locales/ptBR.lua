@@ -3,10 +3,12 @@ if GetLocale() ~= "ptBR" then return end
 local _, mod = ...
 local L = mod.L
 
--- Options
+--- Options
+--L.introduction = "The options below can always be accessed by typing the following command in chat: /capping"
 L.general = "Geral"
 L.test = "Teste"
 L.lock = "Fixar"
+--L.lockDesc = "Enable the lock to hide the bar moving anchor, preventing the bars from being moved."
 L.barIcon = "Ícone da barra"
 L.showTime = "Exibir Tempo"
 L.fillBar = "Preencher barra"
@@ -35,7 +37,7 @@ L.queueBars = "Barras de Filas"
 L.otherBars = "Outras Barras"
 L.barBackground = "Fundo da Barra"
 
--- Features
+--- Features
 L.features = "Características"
 L.queueBarsDesc = "Ativa as barras que mostram em quais filas você entrou e o tempo estimado que ficará na fila."
 L.barClickDesc = "Configure o modificador de teclado que deseja usar para saída de bate-papo específica ao clicar em uma barra. Definir todos os 3 como 'Nenhuma' desativará as barras clicáveis, permitindo que você clique através delas."

@@ -3,10 +3,12 @@ if GetLocale() ~= "zhCN" then return end
 local _, mod = ...
 local L = mod.L
 
--- Options
+--- Options
+--L.introduction = "The options below can always be accessed by typing the following command in chat: /capping"
 L.general = "常规"
 L.test = "测试"
 L.lock = "锁定"
+--L.lockDesc = "Enable the lock to hide the bar moving anchor, preventing the bars from being moved."
 L.barIcon = "条图标"
 L.showTime = "显示时间"
 L.fillBar = "反转条"
@@ -35,7 +37,7 @@ L.queueBars = "队列条"
 L.otherBars = "其他条"
 L.barBackground = "条背景"
 
--- Features
+--- Features
 L.features ="特色"
 L.queueBarsDesc ="启用条形图，显示您已加入的队列以及您在队列中的估计时间。"
 L.barClickDesc ="在单击栏时配置您希望用于特定聊天输出的键盘修改器。将所有3设置为'无'将禁用可点击的栏，允许您点击它们。"
