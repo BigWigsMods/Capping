@@ -4,11 +4,11 @@ local _, mod = ...
 local L = mod.L
 
 --- Options
---L.introduction = "The options below can always be accessed by typing the following command in chat: /capping"
+L.introduction = "始终可以通过在聊天框内输入命令来访问选项。输入: /capping"
 L.general = "常规"
 L.test = "测试"
 L.lock = "锁定"
---L.lockDesc = "Enable the lock to hide the bar moving anchor, preventing the bars from being moved."
+L.lockDesc = "启用锁定来隐藏计时条的移动锚点，防止被移动。"
 L.barIcon = "条图标"
 L.showTime = "显示时间"
 L.fillBar = "反转条"
