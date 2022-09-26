@@ -4,7 +4,7 @@ local _, mod = ...
 local L = mod.L
 
 L.battleBegins = "開始"
-L.finalScore = "估計最終比數: %d - %d"
+L.finalScore = "預估最終比數：%d - %d"
 L.flagRespawns = "旗幟已重置"
 
 L.takenTheFlagTrigger = "^(.+)已經奪走了旗幟!"
@@ -32,8 +32,8 @@ L.upgradeToTrigger = "升級成"
 --L.ivus = "Ivus"
 --L.lokholar = "Lokholar"
 --L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
-L.anchorTooltip = "|cffeda55f右擊|r打開選項"
---L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."
+L.anchorTooltip = "|cffeda55f右鍵點擊|r打開選項"
+L.anchorTooltipNote = "打開選項，並鎖定位置，就能隱藏此綠色條。"
 
 --- Alliance IoC Workshop yells:
 -- Gnomish Mechanic yells: I'm halfway there! Keep the Horde away from here.  They don't teach fighting in engineering school!
