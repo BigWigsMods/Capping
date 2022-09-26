@@ -14,7 +14,7 @@ local instanceIdToMapId = {
 
 function mod:EnterZone(id)
 	self:StartFlagCaptures(60, instanceIdToMapId[id])
-	self:StartScoreEstimator()
+	self:StartScoreEstimatorAB()
 end
 
 function mod:ExitZone()

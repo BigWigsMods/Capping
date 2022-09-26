@@ -373,11 +373,14 @@ do
 		local timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
 		local maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
 		local aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
+		local aBases, hBases = 0, 0
+		local aTime, hTime = 0, 0
+		local prevfinalAScore, prevfinalHScore = 0, 0
 		local curMod = nil
 
 		local function UpdatePredictor()
 			if aIncrease ~= prevAIncrease or hIncrease ~= prevHIncrease or timeBetweenEachTick ~= prevTick then
-				if aIncrease > 60 or hIncrease > 60 or aIncrease < 0 or hIncrease < 0 then -- Scores can reduce in DG
+				if aIncrease > 60 or hIncrease > 60 --[[or aIncrease < 0 or hIncrease < 0]] then -- Scores can reduce in DG
 					curMod:StopBar(prevText) -- >60 increase means captured a flag/cart in EotS/DG
 					prevAIncrease, prevHIncrease = -1, -1
 					return
@@ -410,12 +413,15 @@ do
 		local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
 		local ceil, floor = math.ceil, math.floor
 		local function ScorePredictor(widgetInfo)
-			if widgetInfo and widgetInfo.widgetID == 1893 then
+			if widgetInfo and (widgetInfo.widgetID == 3116 or widgetInfo.widgetID == 3117) then
 				local dataTbl = GetIconAndTextWidgetVisualizationInfo(widgetInfo.widgetID)
-				if not dataTbl or not dataTbl.leftBarMax then return end
+				if not dataTbl or not dataTbl.text then return end
 				if prevTime == 0 then
 					prevTime = GetTime()
-					prevAScore, prevHScore = dataTbl.leftBarValue, dataTbl.rightBarValue
+					local allianceTbl = GetIconAndTextWidgetVisualizationInfo(3116)
+					prevAScore = tonumber(string.match(allianceTbl.text, "(%d+)/%d+")) or 0
+					local hordeTbl = GetIconAndTextWidgetVisualizationInfo(3117)
+					prevHScore = tonumber(string.match(hordeTbl.text, "(%d+)/%d+")) or 0
 					return
 				end
 
@@ -424,9 +430,10 @@ do
 				prevTime = t
 				if elapsed > 0.5 then
 					-- If there's only 1 update, it could be either alliance or horde, so we update both stats in this one
-					maxscore = dataTbl.leftBarMax -- Total
-					ascore = dataTbl.leftBarValue -- Alliance Bar
-					hscore = dataTbl.rightBarValue -- Horde Bar
+					local allianceTbl = GetIconAndTextWidgetVisualizationInfo(3116)
+					ascore = tonumber(string.match(allianceTbl.text, "(%d+)/%d+")) or 0
+					local hordeTbl = GetIconAndTextWidgetVisualizationInfo(3117)
+					hscore = tonumber(string.match(hordeTbl.text, "(%d+)/%d+")) or 0
 					aIncrease = ascore - prevAScore
 					hIncrease = hscore - prevHScore
 					aRemain = maxscore - ascore
@@ -441,17 +448,73 @@ do
 					Timer(0.5, UpdatePredictor)
 				else
 					-- If elapsed < 0.5 then the event fired twice because both alliance and horde have bases.
-					-- 1st update = alliance, 2nd update = horde
+					-- 1st update = horde, 2nd update = alliance
 					-- If only one faction has bases, the event only fires once.
-					-- Unfortunately we need to wait for the 2nd event to fire (the horde update) to know the true horde stats.
-					-- In this one where we have 2 updates, we overwrite the horde stats from the 1st update.
-					hscore = dataTbl.rightBarValue -- Horde Bar
-					hIncrease = hscore - prevHScore
-					hRemain = maxscore - hscore
+					-- Unfortunately we need to wait for the 2nd event to fire (the alliance update) to know the true alliance stats.
+					-- In this one where we have 2 updates, we overwrite the alliance stats from the 1st update.
+					local allianceTbl = GetIconAndTextWidgetVisualizationInfo(3116)
+					ascore = tonumber(string.match(allianceTbl.text, "(%d+)/%d+")) or 0
+					aIncrease = ascore - prevAScore
+					aRemain = maxscore - ascore
 					-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
 					-- If ticks are 0 (no bases) then set to a random huge number (10,000)
-					hTicksToWin = ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
-					prevHScore = hscore
+					aTicksToWin = ceil(aIncrease == 0 and 10000 or aRemain / aIncrease)
+					prevAScore = ascore
+				end
+			end
+		end
+
+		local abTable = {0.8333, 1.1111, 1.6667, 3.3333, 30}
+		local function ScorePredictorAB(widgetInfo)
+			if widgetInfo and (widgetInfo.widgetID == 1893 or widgetInfo.widgetID == 1894) then
+				local dataTbl = GetIconAndTextWidgetVisualizationInfo(widgetInfo.widgetID)
+				if not dataTbl or not dataTbl.text then return end
+
+				local curTime = GetTime()
+
+				local allianceTbl = GetIconAndTextWidgetVisualizationInfo(1893)
+				local aBasesStr, ascoreStr = string.match(allianceTbl.text, "(%d)[^%d]+(%d+)/%d+")
+				aBases, ascore = tonumber(aBasesStr), tonumber(ascoreStr)
+				local hordeTbl = GetIconAndTextWidgetVisualizationInfo(1894)
+				local hBasesStr, hscoreStr = string.match(hordeTbl.text, "(%d)[^%d]+(%d+)/%d+")
+				hBases, hscore = tonumber(hBasesStr), tonumber(hscoreStr)
+
+				-- Hackjob backport of original code
+				local allowUpdate = false
+				if ascore and ascore ~= prevAScore then
+					prevAScore, aTime, allowUpdate = ascore, curTime, true
+				end
+				if hscore and hscore ~= prevHScore then
+					prevHScore, hTime, allowUpdate = hscore, curTime, true
+				end
+				if not allowUpdate then return end
+
+				local apps, hpps = abTable[aBases] or 0, abTable[hBases] or 0
+				local ATimeRemain = ((maxscore - ascore) / apps) - (curTime - aTime)
+				if ATimeRemain > 10000 then ATimeRemain = 10000 end
+				local HTimeRemain = ((maxscore - hscore) / hpps) - (curTime - hTime)
+				if HTimeRemain > 10000 then HTimeRemain = 10000 end
+
+				if HTimeRemain < ATimeRemain then -- Horde is winning
+					local finalAScore = 10 * math.floor((HTimeRemain * apps + ascore + 5) * 0.1)
+					finalAScore = (finalAScore < 0 and 0) or (finalAScore < maxscore and finalAScore) or (maxscore - 10)
+					local txt = format(L.finalScore, finalAScore, maxscore)
+					if txt ~= prevText and finalAScore ~= (prevfinalAScore+10) then
+						curMod:StopBar(prevText)
+						curMod:StartBar(txt, HTimeRemain, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+						prevText = txt
+						prevfinalAScore = finalAScore
+					end
+				else -- Alliance is winning
+					local finalHScore = 10 * math.floor((ATimeRemain * hpps + hscore + 5) * 0.1)
+					finalHScore = (finalHScore < 0 and 0) or (finalHScore < maxscore and finalHScore) or (maxscore - 10)
+					local txt = format(L.finalScore, maxscore, finalHScore)
+					if txt ~= prevText and finalHScore ~= (prevfinalHScore+10) then
+						curMod:StopBar(prevText)
+						curMod:StartBar(txt, ATimeRemain, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+						prevText = txt
+						prevfinalHScore = finalHScore
+					end
 				end
 			end
 		end
@@ -460,10 +523,22 @@ do
 			curMod = self
 			prevTime, prevAScore, prevHScore, prevAIncrease, prevHIncrease = 0, 0, 0, 0, 0
 			timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
-			maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
+			maxscore, ascore, hscore, aIncrease, hIncrease = 1600, 0, 0, 0, 0
 			aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
 
 			self:RegisterEvent("UPDATE_UI_WIDGET", ScorePredictor)
+		end
+		function API:StartScoreEstimatorAB()
+			prevText = ""
+			curMod = self
+			prevTime, prevAScore, prevHScore, prevAIncrease, prevHIncrease = 0, 0, 0, 0, 0
+			timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
+			maxscore, ascore, hscore, aIncrease, hIncrease = 1600, 0, 0, 0, 0
+			aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
+			aTime, hTime = 0, 0
+			prevfinalAScore, prevfinalHScore = 0, 0
+
+			self:RegisterEvent("UPDATE_UI_WIDGET", ScorePredictorAB)
 		end
 		function API:StopScoreEstimator()
 			self:UnregisterEvent("UPDATE_UI_WIDGET")
