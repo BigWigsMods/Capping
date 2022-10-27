@@ -247,7 +247,7 @@ do
 		self:RegisterEvent("CHAT_MSG_ADDON")
 		self:RegisterEvent("CHAT_MSG_MONSTER_YELL")
 		RequestBattlefieldScoreData()
-		self:Timer(1, RequestBattlefieldScoreData)
+		self:Timer(1, function() RequestBattlefieldScoreData() end)
 		self:Timer(2, IoCSyncRequest)
 	end
 end

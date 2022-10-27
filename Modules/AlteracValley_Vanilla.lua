@@ -182,7 +182,7 @@ do
 		self:RegisterEvent("QUEST_PROGRESS")
 		self:RegisterEvent("QUEST_COMPLETE")
 		RequestBattlefieldScoreData()
-		self:Timer(1, RequestBattlefieldScoreData)
+		self:Timer(1, function() RequestBattlefieldScoreData() end)
 		self:Timer(2, AVSyncRequest)
 	end
 end

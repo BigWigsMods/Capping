@@ -412,7 +412,7 @@ do
 			["307935"] = attackerTowerHealth, -- Flamewatch Tower (East)
 		}
 		RequestBattlefieldScoreData()
-		self:Timer(1, RequestBattlefieldScoreData)
+		self:Timer(1, function() RequestBattlefieldScoreData() end)
 		self:Timer(2, WGSyncRequest)
 		C_ChatInfo.RegisterAddonMessagePrefix("Capping")
 		self:RegisterEvent("CHAT_MSG_ADDON")
