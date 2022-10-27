@@ -556,7 +556,7 @@ do
 			[219] = "colorHorde",
 		}
 		local atlasColors = nil
-		local GetPOITextureCoords = GetPOITextureCoords
+		local GetPOITextureCoords = C_Minimap.GetPOITextureCoords
 		local capTime = 0
 		local curMapID = 0
 		local curMod = nil
