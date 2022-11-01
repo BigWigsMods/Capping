@@ -701,6 +701,27 @@ do
 		end
 	end
 
+	do
+		local GetOptions = C_GossipInfo.GetOptions
+		local SelectOption = C_GossipInfo.SelectOption
+		function API:GetGossipNumOptions()
+			local gossipOptions = GetOptions()
+			return #gossipOptions
+		end
+		function API:GetGossipID(id)
+			local gossipOptions = GetOptions()
+			for i = 1, #gossipOptions do
+				local gossipTable = gossipOptions[i]
+				if gossipTable.gossipOptionID == id then
+					return gossipTable
+				end
+			end
+		end
+		function API:SelectGossipID(id)
+			SelectOption(id)
+		end
+	end
+
 	function mod:NewMod()
 		local t = {}
 		for k,v in next, API do
