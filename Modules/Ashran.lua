@@ -32,6 +32,7 @@ end
 
 function mod:ExitZone()
 	self:UnregisterEvent("GOSSIP_SHOW")
+	self:StopHealthCheck()
 end
 
 mod:RegisterZone(1191)
