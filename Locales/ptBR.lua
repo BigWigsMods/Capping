@@ -25,8 +25,6 @@ L.front = "Frente"
 L.east = "Leste"
 L.hordeBoss = "Chefe da Horda"
 L.allianceBoss = "Chefe da Aliança"
-L.hordeGuardian = "Guardião da Horda"
-L.allianceGuardian = "Guardião da Aliança"
 L.galvangar = "Galvangar"
 L.balinda = "Balinda"
 L.ivus = "Ivus"
@@ -64,6 +62,12 @@ L.mainEntrance = "Entrada Principal"
 L.westTower = "Torre Oeste"
 L.southTower = "Torre Sul"
 L.eastTower = "Torre Leste"
+
+-- Ashran
+L.hordeGuardian = "Guardião da Horda"
+L.allianceGuardian = "Guardião da Aliança"
+L.kronus = "Kronus"
+L.fangraal = "Fangraal"
 
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

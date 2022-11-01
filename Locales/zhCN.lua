@@ -25,8 +25,6 @@ L.front = "工坊"
 L.east = "码头"
 L.hordeBoss = "部落将军"
 L.allianceBoss = "联盟将军"
-L.hordeGuardian = "部落守卫"
-L.allianceGuardian = "联盟守卫"
 L.galvangar = "加尔范上尉"
 L.balinda = "巴琳达"
 L.ivus = "伊弗斯"
@@ -64,6 +62,12 @@ L.mainEntrance = "堡垒塔楼之门（最后一面墙）"
 L.westTower = "影目塔楼（西塔）"
 L.southTower = "冬缘塔楼（南塔）"
 L.eastTower = "火光塔楼（东塔）"
+
+-- Ashran
+L.hordeGuardian = "部落守卫"
+L.allianceGuardian = "联盟守卫"
+L.kronus = "克鲁努斯"
+L.fangraal = "范加尔"
 
 -- Arena
 L.arenaStartTrigger = "竞技场战斗开始了！"

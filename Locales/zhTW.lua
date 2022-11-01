@@ -25,8 +25,6 @@ L.front = "工坊"
 L.east = "機場"
 L.hordeBoss = "部落將軍"
 L.allianceBoss = "聯盟將軍"
-L.hordeGuardian = "部落守衛"
-L.allianceGuardian = "聯盟守衛"
 L.galvangar = "加爾凡加"
 L.balinda = "巴琳達"
 L.ivus = "伊弗斯"
@@ -64,6 +62,12 @@ L.mainEntrance = "冬握堡壘大門"
 L.westTower = "西側焰望哨塔"
 L.southTower = "南側冬際哨塔"
 L.eastTower = "東側影景哨塔"
+
+-- Ashran
+L.hordeGuardian = "部落守衛"
+L.allianceGuardian = "聯盟守衛"
+--L.kronus = "Kronus"
+--L.fangraal = "Fangraal"
 
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

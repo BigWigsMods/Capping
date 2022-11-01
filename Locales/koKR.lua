@@ -25,8 +25,6 @@ L.upgradeToTrigger = "추가 전리품"
 --L.east = "East"
 --L.hordeBoss = "Horde Boss"
 --L.allianceBoss = "Alliance Boss"
---L.hordeGuardian = "Horde Guardian"
---L.allianceGuardian = "Alliance Guardian"
 --L.galvangar = "Galvangar"
 --L.balinda = "Balinda"
 --L.ivus = "Ivus"
@@ -64,6 +62,12 @@ L.anchorTooltip = "옵션에 접근하려면 |cffeda55f오른쪽 클릭|r하세�
 --L.westTower = "West Tower"
 --L.southTower = "South Tower"
 --L.eastTower = "East Tower"
+
+-- Ashran
+--L.hordeGuardian = "Horde Guardian"
+--L.allianceGuardian = "Alliance Guardian"
+L.kronus = "크로너스"
+L.fangraal = "팡그랄"
 
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

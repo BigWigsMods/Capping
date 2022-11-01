@@ -25,8 +25,6 @@ L.front = "Передовая" -- тут еще вопрос (!) провери�
 L.east = "Восток"
 L.hordeBoss = "Босс Орды"
 L.allianceBoss = "Босс Альянса"
---L.hordeGuardian = "Horde Guardian"
---L.allianceGuardian = "Alliance Guardian"
 L.galvangar = "Гальвангар" -- Капитан Гальвангар <Капитан клана Северного Волка>
 L.balinda = "Балинда" -- Капитан Балинда Каменный Очаг <Капитан клана Грозовой Вершины>
 L.ivus = "Ивус" -- Ивус Лесной Властелин
@@ -64,6 +62,12 @@ L.mainEntrance = "Главный вход"
 L.westTower = "Западная башня"
 L.southTower = "Южная башня"
 L.eastTower = "Восточная башня"
+
+-- Ashran
+--L.hordeGuardian = "Horde Guardian"
+--L.allianceGuardian = "Alliance Guardian"
+L.kronus = "Крон"
+L.fangraal = "Фанграал"
 
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

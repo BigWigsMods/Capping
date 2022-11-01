@@ -25,8 +25,6 @@ L.front = "Devant"
 L.east = "Est"
 L.hordeBoss = "Chef de la Horde"
 L.allianceBoss = "Chef de l'Alliance"
---L.hordeGuardian = "Horde Guardian"
---L.allianceGuardian = "Alliance Guardian"
 L.galvangar = "Galvangar" -- Capitaine Galvangar
 L.balinda = "Balinda" -- Capitaine Balinda Gîtepierre
 L.ivus = "Ivus" -- Ivus le Seigneur de la forêt
@@ -64,6 +62,12 @@ L.mainEntrance = "Entrée principale"
 L.westTower = "Tour Ouest"
 L.southTower = "Tour Sud"
 L.eastTower = "Tour Est"
+
+-- Ashran
+--L.hordeGuardian = "Horde Guardian"
+--L.allianceGuardian = "Alliance Guardian"
+L.kronus = "Kronus"
+L.fangraal = "Crograal"
 
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

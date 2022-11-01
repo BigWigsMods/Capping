@@ -25,8 +25,6 @@ L.front = "Vorne"
 L.east = "Ost"
 L.hordeBoss = "Hordenboss"
 L.allianceBoss = "Allianzboss"
-L.hordeGuardian = "Horde Wächter"
-L.allianceGuardian = "Allianz Wächter"
 L.galvangar = "Galvangar" -- Hauptmann Galvangar
 L.balinda = "Balinda" -- Hauptmann Balinda Steinbruch
 L.ivus = "Ivus" -- Ivus der Waldlord
@@ -64,6 +62,12 @@ L.mainEntrance = "Haupteingang"
 L.westTower = "Westlicher Turm"
 L.southTower = "Südlicher Turm"
 L.eastTower = "Östlicher Turm"
+
+-- Ashran
+L.hordeGuardian = "Horde Wächter"
+L.allianceGuardian = "Allianz Wächter"
+L.kronus = "Kronus"
+L.fangraal = "Fangraal"
 
 -- Arena
 L.arenaStartTrigger = "Der Arenakampf hat begonnen!"

@@ -25,8 +25,6 @@ local L = mod.L
 --L.east = "East"
 --L.hordeBoss = "Horde Boss"
 --L.allianceBoss = "Alliance Boss"
---L.hordeGuardian = "Horde Guardian"
---L.allianceGuardian = "Alliance Guardian"
 --L.galvangar = "Galvangar"
 --L.balinda = "Balinda"
 L.ivus = "Ivus" -- Ivus il Signore della Foresta
@@ -64,6 +62,12 @@ L.anchorTooltip = "|cffeda55fClic-Destro|r per aprire le Opzioni"
 --L.westTower = "West Tower"
 --L.southTower = "South Tower"
 --L.eastTower = "East Tower"
+
+-- Ashran
+--L.hordeGuardian = "Horde Guardian"
+--L.allianceGuardian = "Alliance Guardian"
+L.kronus = "Kronus"
+L.fangraal = "Fangraal"
 
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly
