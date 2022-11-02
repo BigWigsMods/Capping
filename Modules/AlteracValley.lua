@@ -5,10 +5,9 @@ do
 	mod, L = core:NewMod()
 end
 
-local hasPrinted = false
 do
 	local UnitGUID, strsplit, GetNumGossipActiveQuests, SelectGossipActiveQuest = UnitGUID, strsplit, C_GossipInfo.GetNumActiveQuests, C_GossipInfo.SelectActiveQuest
-	local tonumber, SelectGossipOption, GetGossipOptions, GetItemCount, SelectGossipAvailableQuest = tonumber, C_GossipInfo.SelectOption, C_GossipInfo.GetOptions, GetItemCount, C_GossipInfo.SelectAvailableQuest
+	local tonumber, GetGossipOptions, GetItemCount = tonumber, C_GossipInfo.GetOptions, GetItemCount
 	function mod:GOSSIP_SHOW()
 		local target = UnitGUID("npc")
 		if target then
@@ -16,41 +15,72 @@ do
 			local mobId = tonumber(id)
 			if mobId == 13176 or mobId == 13257 then -- Smith Regzar, Murgot Deepforge
 				-- Open Quest to Smith or Murgot
-				local tbl = GetGossipOptions()
-				if tbl[1] and tbl[1].name and strmatch(tbl[1].name, L.upgradeToTrigger) then
-					SelectGossipOption(1)
-				elseif GetItemCount(17422) >= 20 then -- Armor Scraps 17422
-					SelectGossipAvailableQuest(1)
+				local gossipOptions = GetGossipOptions()
+				if gossipOptions[1] then--and strmatch(tbl[1].name, L.upgradeToTrigger)
+					for i = 1, #gossipOptions do
+						local gossipTable = gossipOptions[i]
+						if gossipTable.gossipOptionID ~= 30907 and gossipTable.gossipOptionID ~= 35739 then -- alliance, horde
+							print("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS!", gossipTable.gossipOptionID, mobId, gossipTable.name)
+							geterrorhandler()("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS! ".. tostring(gossipTable.gossipOptionID) ..", ".. mobId ..", ".. tostring(gossipTable.name))
+							return
+						end
+					end
+					--self:SelectGossipID(1)
 				end
-			elseif mobId == 13236 then -- Primalist Thurloga
+				if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
+					if self:GetGossipAvailableQuestID(6781) then -- Alliance, More Armor Scraps
+						self:SelectGossipAvailableQuestID(6781)
+					elseif self:GetGossipAvailableQuestID(6741) then -- Horde, More Booty!
+						self:SelectGossipAvailableQuestID(6741)
+					end
+				end
+			elseif mobId == 13236 then -- Horde, Primalist Thurloga
 				local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
 				if num > 0 then
-					if GetNumGossipActiveQuests() == 1 then
+					if GetNumGossipActiveQuests() > 0 then
+						local tbl = C_GossipInfo.GetActiveQuests()
+						for i = 1, #tbl do
+							local questTable = tbl[i]
+							print("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS!", questTable.questID, mobId, questTable.title)
+							geterrorhandler()("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS! ".. tostring(questTable.questID) ..", ".. mobId ..", ".. tostring(questTable.title))
+						end
+						return
 						SelectGossipActiveQuest(1)
-					elseif num >= 5 then
-						SelectGossipAvailableQuest(2)
-					else
-						SelectGossipAvailableQuest(1)
+					elseif self:GetGossipAvailableQuestID(7385) and num >= 5 then -- A Gallon of Blood
+						self:SelectGossipAvailableQuestID(7385)
+					elseif self:GetGossipAvailableQuestID(6801) then -- Lokholar the Ice Lord
+						self:SelectGossipAvailableQuestID(6801)
 					end
 				end
-			elseif mobId == 13442 then -- Archdruid Renferal
+			elseif mobId == 13442 then -- Alliance, Archdruid Renferal
 				local num = GetItemCount(17423) -- Storm Crystal 17423
 				if num > 0 then
-					if GetNumGossipActiveQuests() == 1 then
+					if GetNumGossipActiveQuests() > 0 then
+						local tbl = C_GossipInfo.GetActiveQuests()
+						for i = 1, #tbl do
+							local questTable = tbl[i]
+							print("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS!", questTable.questID, mobId, questTable.title)
+							geterrorhandler()("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS! ".. tostring(questTable.questID) ..", ".. mobId ..", ".. tostring(questTable.title))
+						end
+						return
 						SelectGossipActiveQuest(1)
-					elseif num >= 5 then
-						SelectGossipAvailableQuest(2)
-					else
-						SelectGossipAvailableQuest(1)
+					elseif self:GetGossipAvailableQuestID(7386) and num >= 5 then -- Crystal Cluster
+						self:SelectGossipAvailableQuestID(7386)
+					elseif self:GetGossipAvailableQuestID(6881) then -- Ivus the Forest Lord
+						self:SelectGossipAvailableQuestID(6881)
 					end
 				end
-			elseif mobId == 13577 then -- Stormpike Ram Rider Commander
+			elseif mobId == 13577 then -- Alliance, Stormpike Ram Rider Commander
+				print("|cFF33FF99Capping|r: RAM RIDER, TELL THE DEVS!", self:GetGossipAvailableQuestID(7026)) -- Don't think this is needed anymore, adding a print to see, v10.0.0
+				geterrorhandler()("|cFF33FF99Capping|r: RAM RIDER, TELL THE DEVS! ".. tostring(self:GetGossipAvailableQuestID(7026)))
 				if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
-					SelectGossipAvailableQuest(1)
+					self:SelectGossipAvailableQuestID(7026)
 				end
-			elseif mobId == 13441 then -- Frostwolf Wolf Rider Commander
+			elseif mobId == 13441 then -- Horde, Frostwolf Wolf Rider Commander
+				print("|cFF33FF99Capping|r: WOLF RIDER, TELL THE DEVS!", self:GetGossipAvailableQuestID(7002)) -- Don't think this is needed anymore, adding a print to see, v10.0.0
+				geterrorhandler()("|cFF33FF99Capping|r: WOLF RIDER, TELL THE DEVS! ".. tostring(self:GetGossipAvailableQuestID(7002)))
 				if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
-					SelectGossipAvailableQuest(1)
+					self:SelectGossipAvailableQuestID(7002) -- Ram Hide Harnesses
 				end
 			end
 		end
@@ -58,13 +88,17 @@ do
 end
 
 do
+	local hasPrinted = false
+	local function allowPrints()
+		hasPrinted = false
+	end
 	local IsQuestCompletable, CompleteQuest = IsQuestCompletable, CompleteQuest
 	function mod:QUEST_PROGRESS()
-		self:GOSSIP_SHOW()
 		if IsQuestCompletable() then
 			CompleteQuest()
 			if not hasPrinted then
 				hasPrinted = true
+				C_Timer.After(10, allowPrints)
 				print(L.handIn)
 			end
 		end
@@ -164,13 +198,7 @@ end
 do
 	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 	function mod:EnterZone()
-		hasPrinted = false
-		local _, _, _, _, _, _, _, id = GetInstanceInfo()
-		if id == 1537 then
-			self:StartFlagCaptures(242, 1537) -- Korrak's Revenge (WoW 15th)
-		else
-			self:StartFlagCaptures(242, 91)
-		end
+		self:StartFlagCaptures(242, 91)
 		self:SetupHealthCheck("11946", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
 		self:SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
 		self:SetupHealthCheck("11947", L.galvangar, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
@@ -197,4 +225,3 @@ function mod:ExitZone()
 end
 
 mod:RegisterZone(30)
-mod:RegisterZone(2197) -- Korrak's Revenge (WoW 15th)

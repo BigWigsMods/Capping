@@ -33,6 +33,7 @@ globals = {
 	"GetBattlefieldStatus",
 	"GetBattlefieldTimeWaited",
 	"GetBattlegroundInfo",
+	"geterrorhandler",
 	"GetInstanceInfo",
 	"GetItemCount",
 	"GetLocale",

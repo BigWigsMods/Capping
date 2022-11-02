@@ -591,7 +591,7 @@ do
 							elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
 								-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
 								local _, _, _, id = UnitPosition("player")
-								if id == 30 or id == 628 or id == 2197 then -- Alterac Valley, IoC, Korrak's Revenge (WoW 15th)
+								if id == 30 or id == 628 then -- Alterac Valley, IoC
 									local bar = curMod:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
 									bar:Pause()
 									bar:SetTimeVisibility(false)
@@ -658,7 +658,7 @@ do
 					if icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
 						-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
 						local _, _, _, id = UnitPosition("player")
-						if id == 30 or id == 628 or id == 2197 then -- Alterac Valley, IoC, Korrak's Revenge (WoW 15th)
+						if id == 30 or id == 628 then -- Alterac Valley, IoC
 							local bar = self:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
 							bar:Pause()
 							bar:SetTimeVisibility(false)
@@ -713,12 +713,29 @@ do
 			for i = 1, #gossipOptions do
 				local gossipTable = gossipOptions[i]
 				if gossipTable.gossipOptionID == id then
-					return gossipTable
+					return true
 				end
 			end
 		end
 		function API:SelectGossipID(id)
 			SelectOption(id)
+		end
+	end
+
+	do
+		local GetAvailableQuests = C_GossipInfo.GetAvailableQuests
+		local SelectAvailableQuest = C_GossipInfo.SelectAvailableQuest
+		function API:GetGossipAvailableQuestID(id)
+			local gossipOptions = GetAvailableQuests()
+			for i = 1, #gossipOptions do
+				local gossipTable = gossipOptions[i]
+				if gossipTable.questID == id then
+					return true
+				end
+			end
+		end
+		function API:SelectGossipAvailableQuestID(id)
+			SelectAvailableQuest(id)
 		end
 	end
 
