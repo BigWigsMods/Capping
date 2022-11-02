@@ -1,13 +1,14 @@
 
-local mod, L
+local mod, L, cap
 do
 	local _, core = ...
-	mod, L = core:NewMod()
+	mod, L, cap = core:NewMod()
 end
 
 do
 	local GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 	function mod:GOSSIP_SHOW()
+		if not cap.db.profile.autoTurnIn then return end
 		local alliance = self:GetGossipID(43063)
 		local horde = self:GetGossipID(52320)
 		if alliance or horde then

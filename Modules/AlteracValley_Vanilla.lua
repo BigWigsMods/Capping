@@ -1,8 +1,8 @@
 
-local mod, L
+local mod, L, cap
 do
 	local _, core = ...
-	mod, L = core:NewMod()
+	mod, L, cap = core:NewMod()
 end
 
 local hasPrinted = false
@@ -10,6 +10,8 @@ do
 	local UnitGUID, strsplit, GetNumGossipActiveQuests, SelectGossipActiveQuest = UnitGUID, strsplit, GetNumGossipActiveQuests, SelectGossipActiveQuest
 	local tonumber, SelectGossipOption, GetGossipOptions, GetItemCount, SelectGossipAvailableQuest = tonumber, SelectGossipOption, GetGossipOptions, GetItemCount, SelectGossipAvailableQuest
 	function mod:GOSSIP_SHOW()
+		if not cap.db.profile.autoTurnIn then return end
+
 		local target = UnitGUID("npc")
 		if target then
 			local _, _, _, _, _, id = strsplit("-", target)
@@ -59,6 +61,7 @@ end
 do
 	local IsQuestCompletable, CompleteQuest = IsQuestCompletable, CompleteQuest
 	function mod:QUEST_PROGRESS()
+		if not cap.db.profile.autoTurnIn then return end
 		self:GOSSIP_SHOW()
 		if IsQuestCompletable() then
 			CompleteQuest()
@@ -73,6 +76,7 @@ end
 do
 	local GetQuestReward = GetQuestReward
 	function mod:QUEST_COMPLETE()
+		if not cap.db.profile.autoTurnIn then return end
 		GetQuestReward(0)
 	end
 end

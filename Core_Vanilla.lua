@@ -815,10 +815,11 @@ function core:ADDON_LOADED(addon)
 				barOnShift = "SAY",
 				barOnControl = "INSTANCE_CHAT",
 				barOnAlt = "NONE",
+				autoTurnIn = true,
 			},
 		}
 		db = LibStub("AceDB-3.0"):New("CappingSettings", defaults, true)
-		CappingFrame.db = db
+		frame.db = db
 		do
 			local rl = function() ReloadUI() end
 			db.RegisterCallback(self, "OnProfileChanged", rl)

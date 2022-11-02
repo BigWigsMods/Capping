@@ -470,6 +470,18 @@ local options = function()
 						values = barClickOptions,
 						set = barClickSetOptions,
 					},
+					autoTurnInHeader = {
+						type = "header",
+						name = "",
+						order = 7,
+					},
+					autoTurnIn = {
+						type = "toggle",
+						name = L.autoTurnIn,
+						desc = L.autoTurnInDesc,
+						order = 8,
+						width = "full",
+					},
 				},
 			},
 			profiles = adbo:GetOptionsTable(cap.db),
