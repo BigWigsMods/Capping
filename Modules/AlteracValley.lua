@@ -8,6 +8,11 @@ end
 do
 	local UnitGUID, strsplit, GetNumGossipActiveQuests, SelectGossipActiveQuest = UnitGUID, strsplit, C_GossipInfo.GetNumActiveQuests, C_GossipInfo.SelectActiveQuest
 	local tonumber, GetGossipOptions, GetItemCount = tonumber, C_GossipInfo.GetOptions, GetItemCount
+	local blockedIds = {
+		[30907] = true, -- alliance
+		[30909] = true, -- alliance
+		[35739] = true, -- horde
+	}
 	function mod:GOSSIP_SHOW()
 		if not cap.db.profile.autoTurnIn then return end
 
@@ -24,7 +29,7 @@ do
 					if gossipOptions[1] then
 						for i = 1, #gossipOptions do
 							local gossipTable = gossipOptions[i]
-							if gossipTable.gossipOptionID ~= 30907 and gossipTable.gossipOptionID ~= 35739 then -- alliance, horde
+							if not blockedIds[gossipTable.gossipOptionID] then
 								print("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS!", gossipTable.gossipOptionID, mobId, gossipTable.name)
 								geterrorhandler()("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS! ".. tostring(gossipTable.gossipOptionID) ..", ".. mobId ..", ".. tostring(gossipTable.name))
 								return
