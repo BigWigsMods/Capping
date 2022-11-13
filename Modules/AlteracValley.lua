@@ -17,18 +17,22 @@ do
 			local mobId = tonumber(id)
 			if mobId == 13176 or mobId == 13257 then -- Smith Regzar, Murgot Deepforge
 				-- Open Quest to Smith or Murgot
-				local gossipOptions = GetGossipOptions()
-				if gossipOptions[1] then--and strmatch(tbl[1].name, L.upgradeToTrigger)
-					for i = 1, #gossipOptions do
-						local gossipTable = gossipOptions[i]
-						if gossipTable.gossipOptionID ~= 30907 and gossipTable.gossipOptionID ~= 35739 then -- alliance, horde
-							print("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS!", gossipTable.gossipOptionID, mobId, gossipTable.name)
-							geterrorhandler()("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS! ".. tostring(gossipTable.gossipOptionID) ..", ".. mobId ..", ".. tostring(gossipTable.name))
-							return
+				if self:GetGossipID(30904) then -- Alliance
+					self:SelectGossipID(30904) -- Upgrade to seasoned units!
+				else
+					local gossipOptions = GetGossipOptions()
+					if gossipOptions[1] then
+						for i = 1, #gossipOptions do
+							local gossipTable = gossipOptions[i]
+							if gossipTable.gossipOptionID ~= 30907 and gossipTable.gossipOptionID ~= 35739 then -- alliance, horde
+								print("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS!", gossipTable.gossipOptionID, mobId, gossipTable.name)
+								geterrorhandler()("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS! ".. tostring(gossipTable.gossipOptionID) ..", ".. mobId ..", ".. tostring(gossipTable.name))
+								return
+							end
 						end
 					end
-					--self:SelectGossipID(1)
 				end
+
 				if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
 					if self:GetGossipAvailableQuestID(6781) then -- Alliance, More Armor Scraps
 						self:SelectGossipAvailableQuestID(6781)
