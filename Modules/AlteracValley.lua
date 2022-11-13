@@ -12,6 +12,8 @@ do
 		[30907] = true, -- alliance
 		[30909] = true, -- alliance
 		[35739] = true, -- horde
+		[35740] = true, -- horde
+		[35741] = true, -- horde
 	}
 	function mod:GOSSIP_SHOW()
 		if not cap.db.profile.autoTurnIn then return end
