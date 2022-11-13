@@ -74,10 +74,12 @@ do
 end
 
 do
-	local GetQuestReward = GetQuestReward
+	local GetNumQuestRewards, GetQuestReward = GetNumQuestRewards, GetQuestReward
 	function mod:QUEST_COMPLETE()
 		if not cap.db.profile.autoTurnIn then return end
-		GetQuestReward(0)
+		if GetNumQuestRewards() == 0 then
+			GetQuestReward(0)
+		end
 	end
 end
 

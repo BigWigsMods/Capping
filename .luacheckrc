@@ -38,6 +38,7 @@ globals = {
 	"GetItemCount",
 	"GetLocale",
 	"GetNumBattlegroundTypes",
+	"GetNumQuestRewards",
 	"GetPOITextureCoords",
 	"GetQuestReward",
 	"GetRealmName",
