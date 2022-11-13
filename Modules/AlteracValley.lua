@@ -34,6 +34,10 @@ do
 						self:SelectGossipAvailableQuestID(6781)
 					elseif self:GetGossipAvailableQuestID(6741) then -- Horde, More Booty!
 						self:SelectGossipAvailableQuestID(6741)
+					elseif self:GetGossipAvailableQuestID(57318) then -- Horde, More Booty! [Specific to Korrak's Revenge]
+						self:SelectGossipAvailableQuestID(57318)
+					elseif self:GetGossipAvailableQuestID(57306) then -- Alliance, More Armor Scraps [Specific to Korrak's Revenge]
+						self:SelectGossipAvailableQuestID(57306)
 					end
 				end
 			elseif mobId == 13236 then -- Horde, Primalist Thurloga
@@ -203,7 +207,7 @@ do
 	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 	function mod:EnterZone(id)
 		if id == 2197 then
-			self:StartFlagCaptures(242, 1537) -- Korrak's Revenge (WoW 15th)
+			self:StartFlagCaptures(241, 1537) -- Korrak's Revenge (WoW 15th)
 		else
 			self:StartFlagCaptures(242, 91)
 		end
