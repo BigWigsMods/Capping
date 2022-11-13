@@ -10,6 +10,7 @@ do
 	local tonumber, GetGossipOptions, GetItemCount = tonumber, C_GossipInfo.GetOptions, GetItemCount
 	local blockedIds = {
 		[30907] = true, -- alliance
+		[30908] = true, -- alliance
 		[30909] = true, -- alliance
 		[35739] = true, -- horde
 		[35740] = true, -- horde
