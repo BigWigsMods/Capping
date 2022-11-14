@@ -27,6 +27,8 @@ do
 				-- Open Quest to Smith or Murgot
 				if self:GetGossipID(30904) then -- Alliance
 					self:SelectGossipID(30904) -- Upgrade to seasoned units!
+				elseif self:GetGossipID(30905) then -- Alliance
+					self:SelectGossipID(30905) -- Upgrade to veteran units!
 				else
 					local gossipOptions = GetGossipOptions()
 					if gossipOptions[1] then
