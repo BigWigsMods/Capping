@@ -29,6 +29,14 @@ do
 					self:SelectGossipID(30904) -- Upgrade to seasoned units!
 				elseif self:GetGossipID(30905) then -- Alliance
 					self:SelectGossipID(30905) -- Upgrade to veteran units!
+				--elseif self:GetGossipID(30906) then -- Alliance
+				--	self:SelectGossipID(30906) -- XXX
+				--elseif self:GetGossipID(35736) then -- Horde
+				--	self:SelectGossipID(35736) -- XXX
+				--elseif self:GetGossipID(35737) then -- Horde
+				--	self:SelectGossipID(35737) -- XXX
+				--elseif self:GetGossipID(35738) then -- Horde
+				--	self:SelectGossipID(35738) -- XXX
 				else
 					local gossipOptions = GetGossipOptions()
 					if gossipOptions[1] then
