@@ -776,6 +776,44 @@ do
 		end
 	end
 
+	do
+		local GetOptions = C_GossipInfo.GetOptions
+		local SelectOption = C_GossipInfo.SelectOption
+		function API:GetGossipNumOptions()
+			local gossipOptions = GetOptions()
+			return #gossipOptions
+		end
+		function API:GetGossipID(id)
+			local gossipOptions = GetOptions()
+			for i = 1, #gossipOptions do
+				local gossipTable = gossipOptions[i]
+				if gossipTable.gossipOptionID == id then
+					return true
+				end
+			end
+		end
+		function API:SelectGossipID(id)
+			SelectOption(id)
+		end
+	end
+
+	do
+		local GetAvailableQuests = C_GossipInfo.GetAvailableQuests
+		local SelectAvailableQuest = C_GossipInfo.SelectAvailableQuest
+		function API:GetGossipAvailableQuestID(id)
+			local gossipOptions = GetAvailableQuests()
+			for i = 1, #gossipOptions do
+				local gossipTable = gossipOptions[i]
+				if gossipTable.questID == id then
+					return true
+				end
+			end
+		end
+		function API:SelectGossipAvailableQuestID(id)
+			SelectAvailableQuest(id)
+		end
+	end
+
 	function mod:NewMod()
 		local t = {}
 		for k,v in next, API do
