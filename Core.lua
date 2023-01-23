@@ -471,6 +471,7 @@ do
 	end
 
 	do
+		local GetPOITextureCoords = C_Minimap.GetPOITextureCoords
 		-- Easy world map icon checker
 		--local start = function(self) self:StartMoving() end
 		--local stop = function(self) self:StopMovingOrSizing() end
@@ -556,7 +557,6 @@ do
 			[219] = "colorHorde",
 		}
 		local atlasColors = nil
-		local GetPOITextureCoords = C_Minimap.GetPOITextureCoords
 		local capTime = 0
 		local curMapID = 0
 		local curMod = nil
