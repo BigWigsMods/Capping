@@ -248,6 +248,7 @@ do
 		local collection, reset, blocked, started = {}, {}, {}, false
 		local count1, count2, count3 = #unitTable1, #unitTable2, #unitTable3
 		local UnitGUID, strsplit = UnitGUID, strsplit
+		local UnitHealth, UnitHealthMax = UnitHealth, UnitHealthMax
 		local SendAddonMessage = C_ChatInfo.SendAddonMessage
 		local curMod = nil
 
@@ -259,9 +260,12 @@ do
 					if guid then
 						local _, _, _, _, _, strid = strsplit("-", guid)
 						if strid and collection[strid] and not blocked[strid] then
-							blocked[strid] = true
-							local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
-							SendAddonMessage("Capping", format("%s:%.1f", strid, hp), "INSTANCE_CHAT")
+							local maxHP = UnitHealthMax(unit)
+							if maxHP > 0 then
+								blocked[strid] = true
+								local hp = UnitHealth(unit) / maxHP * 100
+								SendAddonMessage("Capping", format("%s:%.1f", strid, hp), "INSTANCE_CHAT")
+							end
 						end
 					end
 				end
@@ -275,9 +279,12 @@ do
 					if guid then
 						local _, _, _, _, _, strid = strsplit("-", guid)
 						if strid and collection[strid] and not blocked[strid] then
-							blocked[strid] = true
-							local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
-							SendAddonMessage("Capping", format("%s:%.1f", strid, hp), "INSTANCE_CHAT")
+							local maxHP = UnitHealthMax(unit)
+							if maxHP > 0 then
+								blocked[strid] = true
+								local hp = UnitHealth(unit) / maxHP * 100
+								SendAddonMessage("Capping", format("%s:%.1f", strid, hp), "INSTANCE_CHAT")
+							end
 						end
 					end
 				end
@@ -308,9 +315,12 @@ do
 					if guid then
 						local _, _, _, _, _, strid = strsplit("-", guid)
 						if strid and collection[strid] and not blocked[strid] then
-							blocked[strid] = true
-							local hp = UnitHealth(unit) / UnitHealthMax(unit) * 100
-							SendAddonMessage("Capping", format("%s:%.1f", strid, hp), "INSTANCE_CHAT")
+							local maxHP = UnitHealthMax(unit)
+							if maxHP > 0 then
+								blocked[strid] = true
+								local hp = UnitHealth(unit) / maxHP * 100
+								SendAddonMessage("Capping", format("%s:%.1f", strid, hp), "INSTANCE_CHAT")
+							end
 						end
 					end
 				end
