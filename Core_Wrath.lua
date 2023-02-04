@@ -331,7 +331,7 @@ do
 			if prefix == "Capping" and channel == "INSTANCE_CHAT" then
 				local strid, strhp = strsplit(":", msg)
 				local hp = tonumber(strhp)
-				if strid and hp and collection[strid] and hp <= 100 and hp >= 0 then
+				if strid and hp and collection[strid] and hp <= 100 and hp >= 0 and (hp < 0) ~= (hp >= 0) then -- Check hp is 0-100 and isn't NaN
 					if collection[strid].candyBarBar then
 						if hp < 100 then
 							reset[strid] = 0
