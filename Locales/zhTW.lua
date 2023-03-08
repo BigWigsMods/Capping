@@ -71,7 +71,6 @@ L.allianceGuardian = "聯盟守衛"
 L.narduke = "納杜克"
 L.anenga = "安恩加"
 
-
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly
 --L.arenaStart60s = "One minute until the Arena battle begins!" -- Needs to match the in game text exactly
