@@ -29,6 +29,9 @@ function mod:EnterZone()
 	self:SetupHealthCheck("82876", L.allianceBoss, "Alliance Boss", 236447, "colorHorde") -- Interface/Icons/Achievement_character_human_female
 	self:SetupHealthCheck("82201", L.kronus, "Kronus", 1006111, "colorAlliance") -- Interface/Icons/achievement_boss_highmaul_earthenfury
 	self:SetupHealthCheck("81859", L.fangraal, "Fangraal", 874857, "colorHorde") -- Interface/Icons/inv_pet_ancientprotector
+	self:SetupHealthCheck("183198", L.narduke, "Narduke", 236454, "colorAlliance") -- Interface/Icons/achievement-character-tauren-male
+	
+	self:SetupHealthCheck("81870", L.anenga, "Anenga", 236450, "colorHorde") -- Interface/Icons/achievement-character-nightelf-male
 end
 
 function mod:ExitZone()

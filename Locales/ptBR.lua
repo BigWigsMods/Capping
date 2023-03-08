@@ -68,6 +68,8 @@ L.hordeGuardian = "Guardião da Horda"
 L.allianceGuardian = "Guardião da Aliança"
 L.kronus = "Kronus"
 L.fangraal = "Fangraal"
+L.narduke = "Narduke"
+L.anenga = "Anenga"
 
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

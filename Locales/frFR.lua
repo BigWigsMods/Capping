@@ -68,6 +68,8 @@ L.eastTower = "Tour Est"
 --L.allianceGuardian = "Alliance Guardian"
 L.kronus = "Kronus"
 L.fangraal = "Crograal"
+L.narduke = "Narduc"
+L.anenga = "Anenga"
 
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

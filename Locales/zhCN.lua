@@ -68,6 +68,8 @@ L.hordeGuardian = "部落守卫"
 L.allianceGuardian = "联盟守卫"
 L.kronus = "克鲁努斯"
 L.fangraal = "范加尔"
+L.narduke = "纳杜克"
+L.anenga = "安恩加"
 
 -- Arena
 L.arenaStartTrigger = "竞技场战斗开始了！"

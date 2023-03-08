@@ -68,6 +68,8 @@ L.anchorTooltip = "|cffeda55fClic-Destro|r per aprire le Opzioni"
 --L.allianceGuardian = "Alliance Guardian"
 L.kronus = "Kronus"
 L.fangraal = "Fangraal"
+L.narduke = "Narduke"
+L.anenga = "Anenga"
 
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

@@ -68,6 +68,8 @@ L.anchorTooltip = "옵션에 접근하려면 |cffeda55f오른쪽 클릭|r하세�
 --L.allianceGuardian = "Alliance Guardian"
 L.kronus = "크로너스"
 L.fangraal = "팡그랄"
+L.narduke = "나르두크"
+L.anenga = "아넹가"
 
 -- Arena
 --L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly

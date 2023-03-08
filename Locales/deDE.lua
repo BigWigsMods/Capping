@@ -68,6 +68,8 @@ L.hordeGuardian = "Horde Wächter"
 L.allianceGuardian = "Allianz Wächter"
 L.kronus = "Kronus"
 L.fangraal = "Fangraal"
+L.narduke = "Narduke"
+L.anenga = "Anenga"
 
 -- Arena
 L.arenaStartTrigger = "Der Arenakampf hat begonnen!"
