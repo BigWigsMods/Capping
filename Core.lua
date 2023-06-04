@@ -891,7 +891,6 @@ do
 	frame:SetMovable(true)
 	frame:EnableMouse(true)
 	frame:RegisterForDrag("LeftButton")
-	frame:SetClampedToScreen(true)
 	frame:Show()
 	local tooltip = CreateFrame("GameTooltip", "CappingTooltip", UIParent, "GameTooltipTemplate")
 	frame:SetScript("OnEnter", function(f)
