@@ -39,7 +39,6 @@ globals = {
 	"GetLocale",
 	"GetNumBattlegroundTypes",
 	"GetNumQuestRewards",
-	"GetPOITextureCoords",
 	"GetQuestReward",
 	"GetRealmName",
 	"GetSpellInfo",
@@ -77,9 +76,4 @@ globals = {
 
 	-- Classic WoW
 	"GetBattlefieldScore",
-	"GetGossipOptions",
-	"GetNumGossipActiveQuests",
-	"SelectGossipActiveQuest",
-	"SelectGossipAvailableQuest",
-	"SelectGossipOption",
 }

@@ -230,15 +230,14 @@ end
 
 do
 	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
-	function mod:EnterZone()
-		--local _, _, _, _, _, _, _, id = GetInstanceInfo()
-		--if id == 1537 then
-		--	self:StartFlagCaptures(242, 1537) -- Korrak's Revenge (WoW 15th)
-		--else
-		--	self:StartFlagCaptures(242, 91)
-		--end
-		currentWorldMapId = 1459
-		self:StartFlagCaptures(245, currentWorldMapId)
+	function mod:EnterZone(id)
+		if id == 2197 then
+			currentWorldMapId = 1537
+			self:StartFlagCaptures(241, currentWorldMapId) -- Korrak's Revenge (WoW 15th)
+		else
+			currentWorldMapId = 1459
+			self:StartFlagCaptures(245, currentWorldMapId)
+		end
 		self:SetupHealthCheck("11946", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
 		self:SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
 		self:SetupHealthCheck("11947", L.galvangar, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
@@ -265,4 +264,4 @@ function mod:ExitZone()
 end
 
 mod:RegisterZone(30)
---mod:RegisterZone(2197) -- Korrak's Revenge (WoW 15th)
+mod:RegisterZone(2197) -- Korrak's Revenge (WoW 15th)
