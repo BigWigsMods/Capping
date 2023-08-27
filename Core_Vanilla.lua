@@ -556,6 +556,7 @@ do
 	end
 
 	do
+		local GetPOITextureCoords = C_Minimap.GetPOITextureCoords
 		-- Easy world map icon checker
 		--local start = function(self) self:StartMoving() end
 		--local stop = function(self) self:StopMovingOrSizing() end
@@ -641,7 +642,6 @@ do
 			[219] = "colorHorde",
 		}
 		local atlasColors = nil
-		local GetPOITextureCoords = GetPOITextureCoords
 		local capTime = 0
 		local curMapID = 0
 		local curMod = nil
@@ -777,6 +777,44 @@ do
 					self:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon], nil, maxBarTime)
 				end
 			end
+		end
+	end
+
+	do
+		local GetOptions = C_GossipInfo.GetOptions
+		local SelectOption = C_GossipInfo.SelectOption
+		function API:GetGossipNumOptions()
+			local gossipOptions = GetOptions()
+			return #gossipOptions
+		end
+		function API:GetGossipID(id)
+			local gossipOptions = GetOptions()
+			for i = 1, #gossipOptions do
+				local gossipTable = gossipOptions[i]
+				if gossipTable.gossipOptionID == id then
+					return true
+				end
+			end
+		end
+		function API:SelectGossipID(id)
+			SelectOption(id)
+		end
+	end
+
+	do
+		local GetAvailableQuests = C_GossipInfo.GetAvailableQuests
+		local SelectAvailableQuest = C_GossipInfo.SelectAvailableQuest
+		function API:GetGossipAvailableQuestID(id)
+			local gossipOptions = GetAvailableQuests()
+			for i = 1, #gossipOptions do
+				local gossipTable = gossipOptions[i]
+				if gossipTable.questID == id then
+					return true
+				end
+			end
+		end
+		function API:SelectGossipAvailableQuestID(id)
+			SelectAvailableQuest(id)
 		end
 	end
 
