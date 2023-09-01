@@ -6,6 +6,7 @@ exclude_files = {
 }
 ignore = {
 	"111/SLASH_Capping1", -- slash handlers
+	"113/BasicMessageDialog", -- Alterac Valley popup
 	"212/self", -- (W212) unused argument self
 }
 globals = {

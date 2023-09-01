@@ -15,6 +15,7 @@ do
 		[35739] = true, -- horde
 		[35740] = true, -- horde
 		[35741] = true, -- horde
+		[97507] = true, -- horde (classic era)
 	}
 	function mod:GOSSIP_SHOW()
 		if not cap.db.profile.autoTurnIn then return end
@@ -37,6 +38,8 @@ do
 					self:SelectGossipID(35737) -- Upgrade to veteran units!
 				elseif self:GetGossipID(35738) then -- Horde
 					self:SelectGossipID(35738) -- Upgrade to champion units!
+				elseif self:GetGossipID(90270) then -- Alliance (WotLK classic)
+					self:SelectGossipID(90270) -- Upgrade to seasoned units!
 				else
 					local gossipOptions = GetGossipOptions()
 					if gossipOptions[1] then
@@ -45,6 +48,8 @@ do
 							if not blockedIds[gossipTable.gossipOptionID] then
 								print("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS!", gossipTable.gossipOptionID, mobId, gossipTable.name)
 								geterrorhandler()("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS! ".. tostring(gossipTable.gossipOptionID) ..", ".. mobId ..", ".. tostring(gossipTable.name))
+								BasicMessageDialog.Text:SetText("Capping error, see chat for details")
+								BasicMessageDialog:Show()
 								return
 							end
 						end
