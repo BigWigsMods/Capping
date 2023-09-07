@@ -13,6 +13,7 @@ do
 		[30908] = true, -- alliance
 		[30909] = true, -- alliance
 		[97829] = true, -- alliance (classic era)
+		[97830] = true, -- alliance (classic era)
 		[35739] = true, -- horde
 		[35740] = true, -- horde
 		[35741] = true, -- horde
