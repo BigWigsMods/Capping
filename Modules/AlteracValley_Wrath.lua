@@ -41,6 +41,9 @@ do
 					self:SelectGossipID(35737) -- Upgrade to veteran units!
 				elseif self:GetGossipID(35738) then -- Horde
 					self:SelectGossipID(35738) -- Upgrade to champion units!
+				-- Classic
+				elseif self:GetGossipID(97833) then -- Alliance (classic era)
+					self:SelectGossipID(97833) -- Upgrade to seasoned units!
 				elseif self:GetGossipID(90270) then -- Alliance (WotLK classic)
 					self:SelectGossipID(90270) -- Upgrade to seasoned units!
 				else
