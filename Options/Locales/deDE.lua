@@ -3,11 +3,11 @@ local _, mod = ...
 local L = mod.L
 
 --- Options
---L.introduction = "The options below can always be accessed by typing the following command in chat: /capping"
+L.introduction = "Auf die folgenden Optionen kannst du immer zugreifen, indem du im Chat den folgenden Befehl eingibst: /capping"
 L.general = "Generell"
 L.test = "Test"
 L.lock = "Fenster fixieren"
---L.lockDesc = "Enable the lock to hide the bar moving anchor, preventing the bars from being moved."
+L.lockDesc = "Aktiviere die Sperre, um den Anker zum Verschieben der Stäbe auszublenden und zu verhindern, dass die Stäbe verschoben werden."
 L.barIcon = "Leistensymbol"
 L.showTime = "Zeit anzeigen"
 L.fillBar = "Leiste füllen"
@@ -48,5 +48,5 @@ L.raidChat = "Gruppenchat"
 L.clickableBars = "Klickbare Leisten"
 L.loudQueue = "Laute Warteschlange"
 L.loudQueueDesc = "Wenn die Warteschlange bereit ist, wird eine akustische Benachrichtigung, über den 'Haupt'-Tonkanal abgespielt."
---L.autoTurnIn = "Auto Turn-In"
---L.autoTurnInDesc = "Automatically turn in quest items in zones like Alterac Valley and Ashran."
+L.autoTurnIn = "Automatisches Abgeben"
+L.autoTurnInDesc = "Gib in Zonen wie dem Alteractal und Ashran automatisch Questgegenstände ab."
