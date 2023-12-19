@@ -15,7 +15,7 @@ L.capturedTheTrigger = "errungen!"
 --- Alterac Valley
 --- This is the trigger option when talking to the NPC to auto hand in the quest items
 --- This chat interaction only appears when the NPC is ready to start an upgrade, and you need to confirm it
---L.upgradeToTrigger = "Upgrade to" -- todo: muss Schmied Regzar bzw. Murgot Tiefenschmied Gossip-Option sein! -- Needs to match the in game text exactly
+L.upgradeToTrigger = "Aufwerten auf" -- todo: muss Schmied Regzar bzw. Murgot Tiefenschmied Gossip-Option sein! -- Needs to match the in game text exactly
 
 L.hordeGate = "Hordentor"
 L.allianceGate = "Allianztor"
@@ -31,7 +31,7 @@ L.ivus = "Ivus" -- Ivus der Waldlord
 L.lokholar = "Lokholar" -- Lokholar der Eislord
 L.handIn = "|cFF33FF99Capping|r: Gebe Quest-Gegenstände automatisch ab."
 L.anchorTooltip = "|cffeda55fRechtsklick|r, um auf die Optionen zuzugreifen"
---L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."
+L.anchorTooltipNote = "Öffne die Optionen und sperre die Balken, um diesen beweglichen Anker auszublenden."
 
 --- Alliance IoC Workshop yells:
 -- Gnomenmechaniker: Ich hab's gleich! Haltet die Horde von hier fern. Kämpfen stand in der Ingenieursschule nicht auf dem
