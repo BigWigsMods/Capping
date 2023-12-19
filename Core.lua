@@ -837,7 +837,7 @@ core:RegisterEvent("ADDON_LOADED")
 do
 	local loc = GetLocale()
 	local needsLocale = {
-		deDE = "German",
+		--deDE = "German",
 		esES = "Spanish",
 		esMX = "Spanish MX",
 		itIT = "Italian",
