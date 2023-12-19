@@ -12,11 +12,6 @@ L.hasTakenTheTrigger = "점령했습니다"
 L.droppedTrigger = "([^ ]*)|1이;가; ([^!]*) 깃발을 떨어뜨렸습니다!"
 L.capturedTheTrigger = "([^ ]*)|1이;가; ([^!]*) 깃발 쟁탈에 성공했습니다!"
 
---- Alterac Valley
---- This is the trigger option when talking to the NPC to auto hand in the quest items
---- This chat interaction only appears when the NPC is ready to start an upgrade, and you need to confirm it
-L.upgradeToTrigger = "추가 전리품"
-
 --L.hordeGate = "Horde Gate"
 --L.allianceGate = "Alliance Gate"
 --L.gatePosition = "%s (%s)"

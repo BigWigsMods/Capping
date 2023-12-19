@@ -12,11 +12,6 @@ L.hasTakenTheTrigger = "eingenommen!"
 L.droppedTrigger = "fallen lassen!"
 L.capturedTheTrigger = "errungen!"
 
---- Alterac Valley
---- This is the trigger option when talking to the NPC to auto hand in the quest items
---- This chat interaction only appears when the NPC is ready to start an upgrade, and you need to confirm it
-L.upgradeToTrigger = "Aufwerten auf" -- todo: muss Schmied Regzar bzw. Murgot Tiefenschmied Gossip-Option sein! -- Needs to match the in game text exactly
-
 L.hordeGate = "Hordentor"
 L.allianceGate = "Allianztor"
 L.gatePosition = "%s (%s)"

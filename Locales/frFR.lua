@@ -12,11 +12,6 @@ L.hasTakenTheTrigger = "s'est emparée"
 L.droppedTrigger = "a été lâché"
 L.capturedTheTrigger = "a pris le drapeau de"
 
---- Alterac Valley
---- This is the trigger option when talking to the NPC to auto hand in the quest items
---- This chat interaction only appears when the NPC is ready to start an upgrade, and you need to confirm it
-L.upgradeToTrigger = "Passé à"
-
 L.hordeGate = "Porte de la Horde"
 L.allianceGate = "Porte de l'Alliance"
 L.gatePosition = "%s (%s)"
