@@ -1,4 +1,4 @@
-## Interface: 100200
+## Interface: 100205
 ## Title: Capping_Options
 ## Author: Funkydude
 ## Notes: Capping Configuration Options.
