@@ -20,6 +20,7 @@ globals = {
 	"C_CurrencyInfo",
 	"C_CVar",
 	"C_GossipInfo",
+	"C_Item",
 	"C_Minimap",
 	"C_PvP",
 	"C_Texture",

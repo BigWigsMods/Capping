@@ -7,7 +7,8 @@ end
 
 do
 	local UnitGUID, strsplit, GetNumGossipActiveQuests, SelectGossipActiveQuest = UnitGUID, strsplit, C_GossipInfo.GetNumActiveQuests, C_GossipInfo.SelectActiveQuest
-	local tonumber, GetGossipOptions, GetItemCount = tonumber, C_GossipInfo.GetOptions, GetItemCount
+	local tonumber, GetGossipOptions = tonumber, C_GossipInfo.GetOptions
+	local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount -- XXX 10.2.6
 	local blockedIds = {
 		[30907] = true, -- alliance
 		[30908] = true, -- alliance
