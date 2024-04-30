@@ -1,4 +1,4 @@
-## Interface: 11502
+## Interface: 40400
 ## Version: @project-version@
 ## Title: Capping
 ## Author: Funkydude
@@ -28,10 +28,13 @@
 embeds.xml
 locales.xml
 
-Core_Vanilla.lua
-Modules\AlteracValley_Vanilla.lua
-Modules\ArathiBasin_Classic.lua
-Modules\QueueTimers_Vanilla.lua
-Modules\WarsongGulch_Vanilla.lua
+Core_Wrath.lua
+Modules\AlteracValley_Wrath.lua
+Modules\ArathiBasin_Wrath.lua
+Modules\Arena_Classic.lua
+Modules\EyeOfTheStorm_Wrath.lua
+Modules\IsleOfConquest_Wrath.lua
+Modules\QueueTimers_Wrath.lua
+Modules\WarsongGulch_Wrath.lua
 
 modules.xml

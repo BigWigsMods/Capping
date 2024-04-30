@@ -1,4 +1,4 @@
-## Interface: 11502
+## Interface: 40400
 ## Title: Capping_Options
 ## Author: Funkydude
 ## Notes: Capping Configuration Options.
