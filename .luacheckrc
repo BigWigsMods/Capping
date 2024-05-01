@@ -11,6 +11,7 @@ ignore = {
 }
 globals = {
 	-- Addon
+	"CappingAPI",
 	"CappingFrame",
 	"LibStub",
 

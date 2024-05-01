@@ -18,6 +18,7 @@ local media = LibStub("LibSharedMedia-3.0")
 -- API
 do
 	local API = {}
+	local public = {}
 	do
 		local BarOnClick
 		do
@@ -145,6 +146,7 @@ do
 			RearrangeBars()
 			return bar
 		end
+		public.StartBar = API.StartBar
 
 		function API:StopBar(text)
 			local dirty = nil
@@ -156,6 +158,8 @@ do
 			end
 			if dirty then RearrangeBars() end
 		end
+		public.StopBar = API.StopBar
+		CappingAPI = public
 
 		candy.RegisterCallback(API, "LibCandyBar_Stop", function(_, bar)
 			if activeBars[bar] then
