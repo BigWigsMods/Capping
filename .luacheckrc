@@ -16,6 +16,7 @@ globals = {
 	"LibStub",
 
 	-- WoW (general API)
+	"C_AddOns",
 	"C_AreaPoiInfo",
 	"C_ChatInfo",
 	"C_CurrencyInfo",
@@ -30,7 +31,6 @@ globals = {
 	"CombatLogGetCurrentEventInfo",
 	"CompleteQuest",
 	"CreateFrame",
-	"EnableAddOn",
 	"GetBattlefieldEstimatedWaitTime",
 	"GetBattlefieldPortExpiration",
 	"GetBattlefieldStatus",
@@ -51,7 +51,6 @@ globals = {
 	"IsInGroup",
 	"IsQuestCompletable",
 	"IsShiftKeyDown",
-	"LoadAddOn",
 	"PlaySound",
 	"RaidNotice_AddMessage",
 	"RaidWarningFrame_OnEvent",
