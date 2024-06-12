@@ -1,9 +1,9 @@
-if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then return end
+if GetLocale() ~= "esES" then return end
 local _, mod = ...
 local L = mod.L
 
 --- Options
-L.introduction = "Puedes acceder a los opciones de abajo escribiendo el siguiente comando en el chat: /capping"
+L.introduction = "Puedes acceder a las opciones de abajo escribiendo el siguiente comando en el chat: /capping"
 L.general = "General"
 L.test = "Prueba"
 L.lock = "Bloqueo"
