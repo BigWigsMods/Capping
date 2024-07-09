@@ -1,4 +1,4 @@
-## Interface: 11502
+## Interface: 11502, 11503
 ## Version: @project-version@
 ## Title: Capping
 ## Author: Funkydude
