@@ -48,6 +48,8 @@ do
 					self:SelectGossipID(97833) -- Upgrade to seasoned units!
 				elseif self:GetGossipID(90270) then -- Alliance (WotLK classic)
 					self:SelectGossipID(90270) -- Upgrade to seasoned units!
+				elseif self:GetGossipID(97512) then -- Horde (classic era)
+					self:SelectGossipID(97512) -- Upgrade to seasoned units!
 				else
 					local gossipOptions = GetGossipOptions()
 					if gossipOptions[1] then
