@@ -65,7 +65,7 @@ L.kronus = "Kronus"
 L.fangraal = "Crograal"
 
 -- Arena
---L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly
---L.arenaStart60s = "One minute until the Arena battle begins!" -- Needs to match the in game text exactly
---L.arenaStart30s = "Thirty seconds until the Arena battle begins!" -- Needs to match the in game text exactly
---L.arenaStart15s = "Fifteen seconds until the Arena battle begins!" -- Needs to match the in game text exactly
+L.arenaStartTrigger = "Le combat commence !" -- Needs to match the in game text exactly
+L.arenaStart60s = "Le combat d'arène commence dans une minute !" -- Needs to match the in game text exactly
+L.arenaStart30s = "Le combat d'arène commence dans trente secondes !" -- Needs to match the in game text exactly
+L.arenaStart15s = "Le combat d'arène commence dans quinze secondes !" -- Needs to match the in game text exactly
