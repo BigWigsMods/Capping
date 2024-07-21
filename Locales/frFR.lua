@@ -26,7 +26,7 @@ L.ivus = "Ivus" -- Ivus le Seigneur de la forêt
 L.lokholar = "Lokholar" -- Lokholar le Seigneur des glaces
 L.handIn = "|cFF33FF99Capping|r: Remise automatique des objets de quête."
 L.anchorTooltip = "|cffeda55fClic droit|r pour accéder aux options."
---L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."
+L.anchorTooltipNote = "Ouvre les options et verrouille les barres afin de cacher l'ancre à déplacer."
 
 --- Alliance IoC Workshop yells:
 -- Mécano gnome crie : J'en suis à la moitié ! Tenez la Horde à distance. On n'apprend pas à se battre dans les écoles d'ingénieurs !
@@ -59,13 +59,13 @@ L.southTower = "Tour Sud"
 L.eastTower = "Tour Est"
 
 -- Ashran
---L.hordeGuardian = "Horde Guardian"
---L.allianceGuardian = "Alliance Guardian"
+L.hordeGuardian = "Gardien de la Horde"
+L.allianceGuardian = "Gardien de l'Alliance"
 L.kronus = "Kronus"
 L.fangraal = "Crograal"
 
 -- Arena
---L.arenaStartTrigger = "The Arena battle has begun!" -- Needs to match the in game text exactly
---L.arenaStart60s = "One minute until the Arena battle begins!" -- Needs to match the in game text exactly
---L.arenaStart30s = "Thirty seconds until the Arena battle begins!" -- Needs to match the in game text exactly
---L.arenaStart15s = "Fifteen seconds until the Arena battle begins!" -- Needs to match the in game text exactly
+L.arenaStartTrigger = "Le combat commence !" -- Needs to match the in game text exactly
+L.arenaStart60s = "Le combat d'arène commence dans une minute !" -- Needs to match the in game text exactly
+L.arenaStart30s = "Le combat d'arène commence dans trente secondes !" -- Needs to match the in game text exactly
+L.arenaStart15s = "Le combat d'arène commence dans quinze secondes !" -- Needs to match the in game text exactly
