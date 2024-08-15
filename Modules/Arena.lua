@@ -7,7 +7,9 @@ end
 
 do
 	local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
-	local tonumber, gsub, match, GetSpellInfo = tonumber, string.gsub, string.match, GetSpellInfo
+	local tonumber, gsub, match = tonumber, string.gsub, string.match
+	local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
+	local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
 	function mod:UPDATE_UI_WIDGET(tbl)
 		if tbl.widgetSetID == 1 and tbl.widgetType == 0 then
 			local id = tbl.widgetID
@@ -20,7 +22,8 @@ do
 					local remaining = seconds + (minutes*60) + 1
 					if remaining > 4 then
 						self:UnregisterEvent("UPDATE_UI_WIDGET")
-						local spell, _, icon = GetSpellInfo(34709)
+						local spell = GetSpellName(34709)
+						local icon = GetSpellTexture(34709)
 						self:StartBar(spell, 93, icon, "colorOther")
 						local text = gsub(TIME_REMAINING, ":", "")
 						self:StartBar(text, remaining, nil, "colorOther")

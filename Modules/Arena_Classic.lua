@@ -6,11 +6,13 @@ do
 end
 
 do
-	local GetSpellInfo = GetSpellInfo
+	local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
+	local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
 	function mod:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
 		if msg == L.arenaStartTrigger then
 			self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
-			local spell, _, icon = GetSpellInfo(34709)
+			local spell = GetSpellName(34709)
+			local icon = GetSpellTexture(34709)
 			self:StartBar(spell, 95, icon, "colorOther")
 		end
 	end

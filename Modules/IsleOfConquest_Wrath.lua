@@ -144,6 +144,7 @@ do
 	local me = UnitName("player").. "-" ..GetRealmName()
 	local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 	local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
+	local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
 	function mod:CHAT_MSG_ADDON(prefix, msg, channel, sender)
 		if prefix == "Capping" and channel == "INSTANCE_CHAT" then
 			if msg == "gr" and sender ~= me then -- gate request
@@ -160,7 +161,7 @@ do
 					local tbl = GetAreaPOIInfo(169, pois[i])
 					local icon = tbl.textureIndex
 					if icon == 136 or icon == 138 then -- Workshop in IoC
-						local text = GetSpellInfo(56661) -- Build Siege Engine
+						local text = GetSpellName(56661) -- Build Siege Engine
 						local bar = self:GetBar(text)
 						if not bar then
 							self:StartBar(text, msg == "rb" and 181 or 90.5, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- 252187 = ability_vehicle_siegeengineram

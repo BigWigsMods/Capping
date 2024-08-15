@@ -22,6 +22,8 @@ do
 	local extraMsg = nil
 	local color = {r=0,g=1,b=0}
 	local NewTicker = C_Timer.NewTicker
+	local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
+	local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
 	local function PrintExtraMessage()
 		local _, _, _, _, _, _, _, id = GetInstanceInfo()
 		if extraMsg and id == 566 then -- Check the game isn't over
@@ -31,7 +33,8 @@ do
 	local function StartNextGravTimer()
 		local _, _, _, _, _, _, _, id = GetInstanceInfo()
 		if id == 566 then -- Check the game isn't over
-			local name, _, icon = GetSpellInfo(44224) -- Gravity Lapse
+			local name = GetSpellName(44224) -- Gravity Lapse
+			local icon = GetSpellTexture(44224) -- Gravity Lapse
 			mod:StartBar(name, 55, icon, "colorOther")
 			ticker1 = NewTicker(55, StartNextGravTimer, 1) -- Compensate for being dead (you don't get the message)
 			ticker2 = NewTicker(50, PrintExtraMessage, 1)
@@ -42,7 +45,8 @@ do
 			if not extraMsg then
 				extraMsg = msg:gsub("1", "")
 			end
-			local name, _, icon = GetSpellInfo(44224) -- Gravity Lapse
+			local name = GetSpellName(44224) -- Gravity Lapse
+			local icon = GetSpellTexture(44224) -- Gravity Lapse
 			self:StartBar(name, 15, icon, "colorOther")
 			self:Timer(15, StartNextGravTimer)
 			self:Timer(10, PrintExtraMessage)

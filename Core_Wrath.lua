@@ -658,6 +658,7 @@ do
 		local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 		local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 		local GetAtlasInfo = C_Texture.GetAtlasInfo
+		local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
 
 		local function UpdatePOI()
 			local pois = GetAreaPOIForMap(curMapID)
@@ -671,12 +672,12 @@ do
 							local bar = curMod:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
 							bar:Set("capping:poiid", areaPoiID)
 							if icon == 137 or icon == 139 then -- Workshop in IoC
-								curMod:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
+								curMod:StopBar((GetSpellName(56661))) -- Build Siege Engine
 							end
 						else
 							curMod:StopBar(name)
 							if icon == 136 or icon == 138 then -- Workshop in IoC
-								curMod:StartBar(GetSpellInfo(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+								curMod:StartBar(GetSpellName(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
 							elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
 								-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
 								local _, _, _, id = UnitPosition("player")
@@ -709,12 +710,12 @@ do
 							)
 							bar:Set("capping:poiid", areaPoiID)
 							--if atlasName == WORKSHOPHORDE or atlasName == WORKSHOPALLIANCE then -- Workshop in IoC
-							--	curMod:StopBar((GetSpellInfo(56661))) -- Build Siege Engine
+							--	curMod:StopBar((GetSpellName(56661))) -- Build Siege Engine
 							--end
 						else
 							curMod:StopBar(name)
 							--if icon == 136 or icon == 138 then -- Workshop in IoC
-							--	curMod:StartBar(GetSpellInfo(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+							--	curMod:StartBar(GetSpellName(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
 							--elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
 							--	-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
 							--	local _, _, _, id = UnitPosition("player")
