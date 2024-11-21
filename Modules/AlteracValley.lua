@@ -100,14 +100,12 @@ do
 					end
 				end
 			elseif mobId == 13577 then -- Alliance, Stormpike Ram Rider Commander
-				print("|cFF33FF99Capping|r: RAM RIDER, TELL THE DEVS!", self:GetGossipAvailableQuestID(7026)) -- Don't think this is needed anymore, adding a print to see, v10.0.0
-				geterrorhandler()("|cFF33FF99Capping|r: RAM RIDER, TELL THE DEVS! ".. tostring(self:GetGossipAvailableQuestID(7026)))
+				-- Only in Korrak's Revenge on retail
 				if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
 					self:SelectGossipAvailableQuestID(7026)
 				end
 			elseif mobId == 13441 then -- Horde, Frostwolf Wolf Rider Commander
-				print("|cFF33FF99Capping|r: WOLF RIDER, TELL THE DEVS!", self:GetGossipAvailableQuestID(7002)) -- Don't think this is needed anymore, adding a print to see, v10.0.0
-				geterrorhandler()("|cFF33FF99Capping|r: WOLF RIDER, TELL THE DEVS! ".. tostring(self:GetGossipAvailableQuestID(7002)))
+				-- Only in Korrak's Revenge on retail
 				if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
 					self:SelectGossipAvailableQuestID(7002) -- Ram Hide Harnesses
 				end
