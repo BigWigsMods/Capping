@@ -842,7 +842,6 @@ core:RegisterEvent("ADDON_LOADED")
 do
 	local loc = GetLocale()
 	local needsLocale = {
-		esMX = "Spanish MX",
 		itIT = "Italian",
 		koKR = "Korean",
 		zhTW = "zhTW",
