@@ -29,13 +29,13 @@ L.anchorTooltip = "옵션에 접근하려면 |cffeda55f오른쪽 클릭|r하세�
 L.anchorTooltipNote = "옵션을 열고 바를 잠그면 이 이동 앵커가 숨겨집니다."
 
 --- Alliance IoC Workshop yells:
--- Gnomish Mechanic yells: I'm halfway there! Keep the Horde away from here.  They don't teach fighting in engineering school!
--- Gnomish Mechanic yells: It's broken already?! No worries. It's nothing I can't fix.
+-- 노움 정비사의 외침: 반쯤 됐다고! 호드가 절 못 때리게 해주세요. 기계 공학 학교에서는 싸움은 안 가르친다구요!
+-- 노움 정비사의 외침: 벌써 부서졌어요?! 괜찮아요. 제가 못 고칠 정도는 아니에요.
 --- Horde IoC Workshop yells:
--- Goblin Mechanic yells: I'm about halfway done! Keep the Alliance away - fighting's not in my contract!
--- Goblin Mechanic yells: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
---L.halfway = "halfway" -- Needs to match the in game text exactly
---L.broken = "broken" -- Needs to match the in game text exactly
+-- 고블린 정비사의 외침: 반쯤 됐다고! 얼라이언스 놈들이 가까이 못 오게 해줘. 계약서에 전투 얘긴 없었다고!
+-- 고블린 정비사의 외침: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
+L.halfway = "반쯤" -- Needs to match the in game text exactly
+L.broken = "부서졌" -- Needs to match the in game text exactly
 
 -- Wintergrasp
 L.damaged = "|cFF33FF99Capping|r: %s 손상됨"
