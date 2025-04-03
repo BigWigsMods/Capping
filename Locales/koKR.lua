@@ -35,7 +35,7 @@ L.anchorTooltipNote = "옵션을 열고 바를 잠그면 이 이동 앵커가 �
 -- 고블린 정비사의 외침: 반쯤 됐다고! 얼라이언스 놈들이 가까이 못 오게 해줘. 계약서에 전투 얘긴 없었다고!
 -- 고블린 정비사의 외침: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
 L.halfway = "반쯤" -- Needs to match the in game text exactly
-L.broken = "부서졌" -- Needs to match the in game text exactly
+L.broken = "부서" -- Needs to match the in game text exactly
 
 -- Wintergrasp
 L.damaged = "|cFF33FF99Capping|r: %s 손상됨"
