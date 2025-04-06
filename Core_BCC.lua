@@ -915,27 +915,6 @@ end
 core:RegisterEvent("ADDON_LOADED")
 
 do
-	local loc = GetLocale()
-	local needsLocale = {
-		--esMX = "Spanish MX",
-		--itIT = "Italian",
-		--koKR = "Korean",
-		--zhTW = "zhTW",
-	}
-	if needsLocale[loc] then
-		function core:LOADING_SCREEN_DISABLED()
-			self:UnregisterEvent("LOADING_SCREEN_DISABLED")
-			self:Timer(0, function() -- Timers aren't fully functional until 1 frame after loading is done
-				self:Timer(15, function()
-					print("|cFF33FF99Capping|r is missing locale for", needsLocale[loc], "and needs your help! Please visit the project page on GitHub for more info.")
-				end)
-			end)
-		end
-		core:RegisterEvent("LOADING_SCREEN_DISABLED")
-	end
-end
-
-do
 	local prevZone = 0
 	local GetInstanceInfo = GetInstanceInfo
 	function core:PLAYER_ENTERING_WORLD()
