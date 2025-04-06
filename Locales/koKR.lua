@@ -33,7 +33,7 @@ L.anchorTooltipNote = "옵션을 열고 바를 잠그면 이 이동 앵커가 �
 -- 노움 정비사의 외침: 벌써 부서졌어요?! 괜찮아요. 제가 못 고칠 정도는 아니에요.
 --- Horde IoC Workshop yells:
 -- 고블린 정비사의 외침: 반쯤 됐다고! 얼라이언스 놈들이 가까이 못 오게 해줘. 계약서에 전투 얘긴 없었다고!
--- 고블린 정비사의 외침: It's broken again?! I'll fix it... just don't expect the warranty to cover this.
+-- 고블린 정비사의 외침: 또 부서졌어요?! 제가 고쳐드릴게요... 다만 보증이 적용될 거라고 기대하지 마세요.
 L.halfway = "반쯤" -- Needs to match the in game text exactly
 L.broken = "부서" -- Needs to match the in game text exactly
 
