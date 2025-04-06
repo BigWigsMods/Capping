@@ -24,7 +24,7 @@ L.galvangar = "갈반가르"
 L.balinda = "발린다"
 L.ivus = "이부스"
 L.lokholar = "로크홀라"
-L.handIn = "|cFF33FF99Capping|r: 퀘스트 아이템 자동 제출 중."
+L.handIn = "|cFF33FF99Capping|r: 퀘스트 아이템 자동 반납 중."
 L.anchorTooltip = "옵션에 접근하려면 |cffeda55f오른쪽 클릭|r하세요"
 L.anchorTooltipNote = "옵션을 열고 바를 잠그면 이 이동 앵커가 숨겨집니다."
 
