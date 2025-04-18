@@ -49,6 +49,8 @@ do
 					self:SelectGossipID(97833) -- Upgrade to seasoned units!
 				elseif self:GetGossipID(90270) then -- Alliance (WotLK classic)
 					self:SelectGossipID(90270) -- Upgrade to seasoned units!
+				elseif self:GetGossipID(97511) then -- Horde (classic era)
+					self:SelectGossipID(97511) -- Upgrade to veteran units!
 				elseif self:GetGossipID(97512) then -- Horde (classic era)
 					self:SelectGossipID(97512) -- Upgrade to seasoned units!
 				else
@@ -115,16 +117,22 @@ do
 					end
 				end
 			elseif mobId == 13577 then -- Alliance, Stormpike Ram Rider Commander
-				print("|cFF33FF99Capping|r: RAM RIDER, TELL THE DEVS!", self:GetGossipAvailableQuestID(7026)) -- Don't think this is needed anymore, adding a print to see, v10.0.0
-				geterrorhandler()("|cFF33FF99Capping|r: RAM RIDER, TELL THE DEVS! ".. tostring(self:GetGossipAvailableQuestID(7026)))
 				if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
-					self:SelectGossipAvailableQuestID(7026)
+					if self:GetGossipAvailableQuestID(7026) then
+						self:SelectGossipAvailableQuestID(7026)
+					else
+						print("|cFF33FF99Capping|r: RAM RIDER, TELL THE DEVS! 7026 was not found!")
+						geterrorhandler()("|cFF33FF99Capping|r: RAM RIDER, TELL THE DEVS! 7026 was not found!")
+					end
 				end
 			elseif mobId == 13441 then -- Horde, Frostwolf Wolf Rider Commander
-				print("|cFF33FF99Capping|r: WOLF RIDER, TELL THE DEVS!", self:GetGossipAvailableQuestID(7002)) -- Don't think this is needed anymore, adding a print to see, v10.0.0
-				geterrorhandler()("|cFF33FF99Capping|r: WOLF RIDER, TELL THE DEVS! ".. tostring(self:GetGossipAvailableQuestID(7002)))
 				if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
-					self:SelectGossipAvailableQuestID(7002) -- Ram Hide Harnesses
+					if self:GetGossipAvailableQuestID(7002) then
+						self:SelectGossipAvailableQuestID(7002) -- Ram Hide Harnesses
+					else
+						print("|cFF33FF99Capping|r: WOLF RIDER, TELL THE DEVS! 7002 was not found!")
+						geterrorhandler()("|cFF33FF99Capping|r: WOLF RIDER, TELL THE DEVS! 7002 was not found!")
+					end
 				end
 			end
 		end
