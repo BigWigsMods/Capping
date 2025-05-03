@@ -5,24 +5,25 @@ do
 	mod, L, cap = core:NewMod()
 end
 
-function mod:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
-	local timeSeconds
-	local num = msg:match("(%d+)")
-	if num then num = tonumber(num) end
+--[[
+Enum.StartTimerType.PvPBeginTimer = 0
+Enum.StartTimerType.ChallengeModeCountdown = 1
+Enum.StartTimerType.PlayerCountdown = 2
+Enum.StartTimerType.PlunderstormCountdown = 3
+]]
+function mod:START_TIMER(timerType, timeSeconds)
+	if timerType ~= 0 then return end
 
-	if num == 30 then
-		timeSeconds = 30
-	elseif num == 2 then
-		timeSeconds = 120
-	elseif num == 1 then
-		timeSeconds = 60
-	else
-		return
+	for i = 1, #TimerTracker.timerList do
+		TimerTracker.timerList[i].bar:Hide() -- Hide the Blizz start timer
 	end
 
-	self:StartBar(L.battleBegins, timeSeconds, 136106, "colorOther", nil, timeSeconds == 120 and timeSeconds or 60) -- 136106 = Interface/Icons/Spell_nature_timestop
+	local bar = self:GetBar(L.battleBegins)
+	if not bar or timeSeconds > bar.remaining+1 or timeSeconds < bar.remaining-1 then -- Don't restart bars for subtle changes +/- 1s
+		self:StartBar(L.battleBegins, timeSeconds, 618859, "colorOther") -- 618859 = Interface/Icons/achievement_challengemode_platinum
+	end
 end
-mod:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
+mod:RegisterEvent("START_TIMER")
 
 do -- estimated wait timer and port timer
 	local GetBattlefieldStatus = GetBattlefieldStatus
@@ -37,7 +38,7 @@ do -- estimated wait timer and port timer
 	end
 
 	function mod:UPDATE_BATTLEFIELD_STATUS(queueId)
-		local status, mapName, _, _, _, queueType, gameType = GetBattlefieldStatus(queueId)
+		local status, mapName, _, _, _, _, _, _, _, queueType = GetBattlefieldStatus(queueId)
 
 		if queueType == "ARENASKIRMISH" then
 			mapName = string.format("%s (%d)", ARENA, queueId) -- No size or name distinction given for casual arena 2v2/3v3, separate them manually. Messy :(
@@ -60,13 +61,13 @@ do -- estimated wait timer and port timer
 				end
 			end
 		elseif status == "queued" and cap.db.profile.queueBars then -- Waiting for BG to pop
-			if not mapName then -- Brawl queue after a ReloadUI() is nil cuz lul
-				if gameType then
-					mapName = gameType
-				else
-					return
-				end
-			end
+			--if not mapName then -- Brawl queue after a ReloadUI() is nil cuz lul
+			--	if gameType then
+			--		mapName = gameType
+			--	else
+			--		return
+			--	end
+			--end
 
 			local esttime = GetBattlefieldEstimatedWaitTime(queueId) / 1000 -- 0 when queue is paused
 			local waited = GetBattlefieldTimeWaited(queueId) / 1000
@@ -79,13 +80,17 @@ do -- estimated wait timer and port timer
 			if estremain > 1 then -- Not a paused queue (0) and not a negative queue (in queue longer than estimated time).
 				if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 or bar:GetLabel() ~= mapName then -- Don't restart bars for subtle changes +/- 10s
 					local icon
-					for i = 1, GetNumBattlegroundTypes() do
-						local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(i)
-						if name == mapName then
-							icon = bgIcon
-							break
-						end
+					local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo()
+					if name == mapName then
+						icon = bgIcon
 					end
+					--for i = 1, GetNumBattlegroundTypes() do
+					--	local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(i)
+					--	if name == mapName then
+					--		icon = bgIcon
+					--		break
+					--	end
+					--end
 					if bar then
 						bar:Stop()
 					end
@@ -96,13 +101,17 @@ do -- estimated wait timer and port timer
 			else -- Negative queue (in queue longer than estimated time) or 0 queue (paused)
 				if not bar or bar.remaining ~= 1 then
 					local icon
-					for i = 1, GetNumBattlegroundTypes() do
-						local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(i)
-						if name == mapName then
-							icon = bgIcon
-							break
-						end
+					local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo()
+					if name == mapName then
+						icon = bgIcon
 					end
+					--for i = 1, GetNumBattlegroundTypes() do
+					--	local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(i)
+					--	if name == mapName then
+					--		icon = bgIcon
+					--		break
+					--	end
+					--end
 					if bar then
 						bar:Stop()
 					end
@@ -132,4 +141,4 @@ do -- estimated wait timer and port timer
 		end
 	end
 end
---mod:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
+mod:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
