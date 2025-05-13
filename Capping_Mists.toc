@@ -32,6 +32,7 @@ Core_Wrath.lua
 Modules\AlteracValley_Wrath.lua
 Modules\ArathiBasin_Wrath.lua
 Modules\Arena_Classic.lua
+Modules\DeepwindGorge.lua
 Modules\EyeOfTheStorm_Wrath.lua
 Modules\Gilneas.lua
 Modules\IsleOfConquest_Wrath.lua
