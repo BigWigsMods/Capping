@@ -6,7 +6,7 @@ do
 end
 
 function mod:EnterZone()
-	self:StartFlagCaptures(60)
+	self:StartFlagCaptures(C_PvP.IsSoloRBG() and 30 or 60) -- 30 sec when solo RBG, 60 otherwise
 	self:StartScoreEstimator()
 end
 
