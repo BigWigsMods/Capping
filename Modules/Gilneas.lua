@@ -6,7 +6,7 @@ do
 end
 
 function mod:EnterZone()
-	self:StartFlagCaptures(60, 275) -- Base cap time, uiMapID
+	self:StartFlagCaptures(C_PvP.IsSoloRBG() and 30 or 60) -- 30 sec when solo, 60 otherwise
 	self:StartScoreEstimator()
 end
 
