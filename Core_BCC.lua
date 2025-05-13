@@ -658,7 +658,7 @@ do
 		local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 		local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 		local GetAtlasInfo = C_Texture.GetAtlasInfo
-		local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
+		local GetSpellName = C_Spell.GetSpellName
 
 		local function UpdatePOI()
 			local pois = GetAreaPOIForMap(curMapID)
@@ -735,7 +735,7 @@ do
 		function API:StartFlagCaptures(bgcaptime, uiMapID, colors)
 			atlasColors = colors
 			capTime = bgcaptime -- cap time
-			curMapID = uiMapID -- current map
+			curMapID = C_Map.GetBestMapForUnit("player") or uiMapID -- current map
 			landmarkCache = {}
 			curMod = self
 			local pois = GetAreaPOIForMap(uiMapID)
