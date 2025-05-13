@@ -732,15 +732,16 @@ do
 			end
 		end
 
-		function API:StartFlagCaptures(bgcaptime, uiMapID, colors)
+		local GetBestMapForUnit = C_Map.GetBestMapForUnit
+		function API:StartFlagCaptures(bgcaptime, _, colors)
 			atlasColors = colors
 			capTime = bgcaptime -- cap time
-			curMapID = C_Map.GetBestMapForUnit("player") or uiMapID -- current map
+			curMapID = GetBestMapForUnit("player") -- current map
 			landmarkCache = {}
 			curMod = self
-			local pois = GetAreaPOIForMap(uiMapID)
+			local pois = GetAreaPOIForMap(curMapID)
 			for i = 1, #pois do
-				local tbl = GetAreaPOIInfo(uiMapID, pois[i])
+				local tbl = GetAreaPOIInfo(curMapID, pois[i])
 				local icon = tbl.textureIndex
 				local atlasName = tbl.atlasName
 				if icon then
