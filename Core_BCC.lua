@@ -916,20 +916,25 @@ end
 core:RegisterEvent("ADDON_LOADED")
 
 do
-	local prevZone = 0
+	local prevZone = nil
 	local GetInstanceInfo = GetInstanceInfo
 	function core:PLAYER_ENTERING_WORLD()
-		local _, _, _, _, _, _, _, id = GetInstanceInfo()
+		local _, instanceType, _, _, _, _, _, id = GetInstanceInfo()
 		if zoneIds[id] then
 			prevZone = id
 			self:RegisterEvent("PLAYER_LEAVING_WORLD")
 			self:Timer(0, function() zoneIds[id]:EnterZone(id) end)
+		elseif instanceType == "arena" then
+			prevZone = instanceType
+			self:RegisterEvent("PLAYER_LEAVING_WORLD")
+			self:Timer(0, function() zoneIds[instanceType]:EnterZone(id) end)
 		end
 	end
 	function core:PLAYER_LEAVING_WORLD()
 		self:UnregisterEvent("PLAYER_LEAVING_WORLD")
 		self:StopAllBars()
 		zoneIds[prevZone]:ExitZone()
+		prevZone = nil
 	end
 end
 

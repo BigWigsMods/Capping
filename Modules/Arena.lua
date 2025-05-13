@@ -8,8 +8,8 @@ end
 do
 	local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
 	local tonumber, gsub, match = tonumber, string.gsub, string.match
-	local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
-	local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
+	local GetSpellName = C_Spell.GetSpellName
+	local GetSpellTexture = C_Spell.GetSpellTexture
 	function mod:UPDATE_UI_WIDGET(tbl)
 		if tbl.widgetSetID == 1 and tbl.widgetType == 0 then
 			local id = tbl.widgetID
@@ -48,15 +48,4 @@ function mod:ExitZone()
 	self:UnregisterEvent("UPDATE_UI_WIDGET")
 end
 
-mod:RegisterZone(572) -- Ruins of Lordaeron
-mod:RegisterZone(617) -- Dalaran Sewers
-mod:RegisterZone(980) -- Tol'Viron Arena
-mod:RegisterZone(1134) -- The Tiger's Peak
-mod:RegisterZone(1504) -- Black Rook Hold Arena
-mod:RegisterZone(1505) -- Nagrand Arena
-mod:RegisterZone(1552) -- Ashamane's Fall
-mod:RegisterZone(1672) -- Blade's Edge Arena
-mod:RegisterZone(1825) -- Hook Point
-mod:RegisterZone(1911) -- Mugambala
-mod:RegisterZone(2167) -- The Robodrome
-mod:RegisterZone(2373) -- Empyrean Domain
+mod:RegisterZone("arena")
