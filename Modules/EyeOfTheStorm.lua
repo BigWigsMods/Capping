@@ -22,8 +22,8 @@ do
 	local extraMsg = nil
 	local color = {r=0,g=1,b=0}
 	local NewTicker = C_Timer.NewTicker
-	local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
-	local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
+	local GetSpellName = C_Spell.GetSpellName
+	local GetSpellTexture = C_Spell.GetSpellTexture
 	local function PrintExtraMessage()
 		local _, _, _, _, _, _, _, id = GetInstanceInfo()
 		if extraMsg and id == 566 then -- Check the game isn't over
@@ -77,7 +77,7 @@ do
 		if id == 566 then -- Normal/Brawl
 			self:RegisterEvent("RAID_BOSS_WHISPER")
 		else -- Rated
-			self:StartFlagCaptures(60, 397, colors)
+			self:StartFlagCaptures(60, nil, colors)
 		end
 	end
 end
