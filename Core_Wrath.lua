@@ -394,8 +394,8 @@ do
 
 		local function UpdatePredictor()
 			if aIncrease ~= prevAIncrease or hIncrease ~= prevHIncrease or timeBetweenEachTick ~= prevTick then
-				if aIncrease > 60 or hIncrease > 60 --[[or aIncrease < 0 or hIncrease < 0]] then -- Scores can reduce in DG
-					curMod:StopBar(prevText) -- >60 increase means captured a flag/cart in EotS/DG
+				if aIncrease > 65 or hIncrease > 65 --[[or aIncrease < 0 or hIncrease < 0]] then -- Scores can reduce in DG
+					curMod:StopBar(prevText) -- >65 increase means captured a flag/cart in EotS/DG
 					prevAIncrease, prevHIncrease = -1, -1
 					return
 				end
