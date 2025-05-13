@@ -923,7 +923,7 @@ do
 		if zoneIds[id] then
 			prevZone = id
 			self:RegisterEvent("PLAYER_LEAVING_WORLD")
-			zoneIds[id]:EnterZone(id)
+			self:Timer(0, function() zoneIds[id]:EnterZone(id) end)
 		end
 	end
 	function core:PLAYER_LEAVING_WORLD()
