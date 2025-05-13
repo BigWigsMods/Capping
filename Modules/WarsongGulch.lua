@@ -19,9 +19,9 @@ do
 	local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
 	local tonumber, gsub = tonumber, string.gsub
 	local function GetTimeRemaining(self)
-		local tbl = GetIconAndTextWidgetVisualizationInfo(6)
+		local tbl = GetIconAndTextWidgetVisualizationInfo(6) or GetIconAndTextWidgetVisualizationInfo(630) -- 6: WSG & TP, 630: TP old versions (changed at some point prior to 11.1.5)
 		if tbl and tbl.state == 1 then
-			local minutes, seconds = strmatch(tbl.text, "(%d+):(%d+)")
+			local minutes, seconds = strmatch(tbl.text, "(%d%d)[^%d]+(%d%d)")
 			minutes = tonumber(minutes)
 			seconds = tonumber(seconds)
 			if minutes and seconds then
@@ -53,4 +53,5 @@ function mod:ExitZone()
 	self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE")
 end
 
-mod:RegisterZone(2106)
+mod:RegisterZone(2106) -- Warsong Gultch
+mod:RegisterZone(726) -- Twin Peaks
