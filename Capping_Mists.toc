@@ -37,6 +37,6 @@ Modules\EyeOfTheStorm_Wrath.lua
 Modules\Gilneas.lua
 Modules\IsleOfConquest_Wrath.lua
 Modules\QueueTimers_Wrath.lua
-Modules\WarsongGulch_Wrath.lua
+Modules\WarsongGulchTwinPeaks.lua
 
 modules.xml

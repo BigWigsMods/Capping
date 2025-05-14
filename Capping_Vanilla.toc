@@ -32,6 +32,6 @@ Core_Vanilla.lua
 Modules\AlteracValley_Vanilla.lua
 Modules\ArathiBasin_Classic.lua
 Modules\QueueTimers_Vanilla.lua
-Modules\WarsongGulch_Vanilla.lua
+Modules\WarsongGulchTwinPeaks.lua
 
 modules.xml

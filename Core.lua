@@ -3,6 +3,7 @@
 local addonName, mod = ...
 local frame = CreateFrame("Frame", "CappingFrame", UIParent)
 local L = mod.L
+mod.isRetail = true
 
 local format, type = string.format, type
 local db, core
