@@ -647,7 +647,6 @@ do
 		}
 		local atlasColors = nil
 		local capTime = 0
-		local curMapID = 0
 		local curMod = nil
 		local path = {136441}
 		local GetIconData = function(icon)
@@ -659,8 +658,10 @@ do
 		local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 		local GetAtlasInfo = C_Texture.GetAtlasInfo
 		local GetSpellName = C_Spell.GetSpellName
+		local GetBestMapForUnit = C_Map.GetBestMapForUnit
 
 		local function UpdatePOI()
+			local curMapID = GetBestMapForUnit("player")
 			local pois = GetAreaPOIForMap(curMapID)
 			for i = 1, #pois do
 				local tbl = GetAreaPOIInfo(curMapID, pois[i])
@@ -732,46 +733,11 @@ do
 			end
 		end
 
-		local GetBestMapForUnit = C_Map.GetBestMapForUnit
 		function API:StartFlagCaptures(bgcaptime, _, colors)
 			atlasColors = colors
 			capTime = bgcaptime -- cap time
-			curMapID = GetBestMapForUnit("player") -- current map
 			landmarkCache = {}
 			curMod = self
-			local pois = GetAreaPOIForMap(curMapID)
-			for i = 1, #pois do
-				local tbl = GetAreaPOIInfo(curMapID, pois[i])
-				local icon = tbl.textureIndex
-				local atlasName = tbl.atlasName
-				if icon then
-					landmarkCache[tbl.name] = icon
-					if icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
-						-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
-						local _, _, _, id = UnitPosition("player")
-						if id == 30 or id == 628 or id == 2197 then -- Alterac Valley, IoC, Korrak's Revenge (WoW 15th)
-							local bar = self:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
-							bar:Pause()
-							bar:SetTimeVisibility(false)
-							bar:Set("capping:customchat", function() end)
-						end
-					end
-				elseif atlasName then
-					--local atlasTbl = GetAtlasInfo(atlasName)
-					landmarkCache[tbl.name] = atlasName
-					-- This can stay commented out until the day IoC/AV is converted to atlasNames
-					--if atlasName == 2 or atlasName == 3 or atlasName == 151 or atlasName == 153 or atlasName == 18 or atlasName == 20 then
-					--	-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
-					--	local _, _, _, id = UnitPosition("player")
-					--	if id == 30 or id == 628 then -- Alterac Valley, IoC
-					--		local bar = self:StartBar(tbl.name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
-					--		bar:Pause()
-					--		bar:SetTimeVisibility(false)
-					--		bar:Set("capping:customchat", function() end)
-					--	end
-					--end
-				end
-			end
 			self:RegisterEvent("AREA_POIS_UPDATED", UpdatePOI)
 		end
 
@@ -923,11 +889,11 @@ do
 		if zoneIds[id] then
 			prevZone = id
 			self:RegisterEvent("PLAYER_LEAVING_WORLD")
-			self:Timer(0, function() zoneIds[id]:EnterZone(id) end)
-		elseif instanceType == "arena" then
+			zoneIds[id]:EnterZone(id)
+		elseif zoneIds[instanceType] then
 			prevZone = instanceType
 			self:RegisterEvent("PLAYER_LEAVING_WORLD")
-			self:Timer(0, function() zoneIds[instanceType]:EnterZone(id) end)
+			zoneIds[instanceType]:EnterZone(id)
 		end
 	end
 	function core:PLAYER_LEAVING_WORLD()
