@@ -733,7 +733,7 @@ do
 			end
 		end
 
-		function API:StartFlagCaptures(bgcaptime, _, colors)
+		function API:StartFlagCaptures(bgcaptime, colors)
 			atlasColors = colors
 			capTime = bgcaptime -- cap time
 			landmarkCache = {}
@@ -745,7 +745,8 @@ do
 			self:UnregisterEvent("AREA_POIS_UPDATED")
 		end
 
-		function API:RestoreFlagCaptures(uiMapID, inProgressDataTbl, maxBarTime)
+		function API:RestoreFlagCaptures(inProgressDataTbl, maxBarTime)
+			local uiMapID = GetBestMapForUnit("player")
 			local pois = GetAreaPOIForMap(uiMapID)
 			for i = 1, #pois do
 				local tbl = GetAreaPOIInfo(uiMapID, pois[i])

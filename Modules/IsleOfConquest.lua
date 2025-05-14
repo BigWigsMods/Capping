@@ -241,7 +241,7 @@ do
 			["195699"] = baseGateHealth,
 			["195700"] = baseGateHealth,
 		}
-		self:StartFlagCaptures(61, 169)
+		self:StartFlagCaptures(61)
 		self:SetupHealthCheck("34922", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
 		self:SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
 		C_ChatInfo.RegisterAddonMessagePrefix("Capping")

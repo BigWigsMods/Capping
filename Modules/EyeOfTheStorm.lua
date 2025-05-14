@@ -77,7 +77,7 @@ do
 		if id == 566 then -- Normal/Brawl
 			self:RegisterEvent("RAID_BOSS_WHISPER")
 		else -- Rated
-			self:StartFlagCaptures(C_PvP.IsSoloRBG() and 30 or 60, nil, colors) -- 30 sec when solo RBG, 60 otherwise
+			self:StartFlagCaptures(C_PvP.IsSoloRBG() and 30 or 60, colors) -- 30 sec when solo RBG, 60 otherwise
 		end
 	end
 end

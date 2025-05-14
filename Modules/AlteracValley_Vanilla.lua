@@ -192,7 +192,6 @@ local function AVSyncRequest()
 	hasData = true
 end
 
-local currentWorldMapId = 1459
 do
 	local timer = nil
 	local function SendAVTimers()
@@ -227,7 +226,7 @@ do
 			end
 
 			if next(inProgressDataTbl) then
-				self:RestoreFlagCaptures(currentWorldMapId, inProgressDataTbl, 242)
+				self:RestoreFlagCaptures(inProgressDataTbl, 242)
 			end
 		end
 
@@ -256,11 +255,9 @@ do
 	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 	function mod:EnterZone(id)
 		if id == 2197 then
-			currentWorldMapId = 1537
-			self:StartFlagCaptures(241, currentWorldMapId) -- Korrak's Revenge (WoW 15th)
+			self:StartFlagCaptures(241) -- Korrak's Revenge (WoW 15th)
 		else
-			currentWorldMapId = 1459
-			self:StartFlagCaptures(300, currentWorldMapId)
+			self:StartFlagCaptures(300)
 		end
 		self:SetupHealthCheck("11946", L.hordeBoss, "Horde Boss", 134170, "colorAlliance") -- Interface/Icons/Inv_misc_head_orc_01
 		self:SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 134159, "colorHorde") -- Interface/Icons/inv_misc_head_dwarf_01
