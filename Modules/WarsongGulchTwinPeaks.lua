@@ -17,7 +17,7 @@ end
 
 do
 	local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
-	local tonumber, gsub = tonumber, string.gsub
+	local tonumber = tonumber
 	local function GetTimeRemaining(self)
 		-- 6: WSG & TP, 630: TP old versions (changed at some point prior to 11.1.5)
 		local tbl = GetIconAndTextWidgetVisualizationInfo(6) or GetIconAndTextWidgetVisualizationInfo(630)
@@ -27,10 +27,9 @@ do
 			seconds = tonumber(seconds)
 			if minutes and seconds then
 				local remaining = seconds + (minutes*60) + 1
-				local text = gsub(TIME_REMAINING, ":", "")
-				local bar = self:GetBar(text)
+				local bar = self:GetBar(L.timeRemaining)
 				if remaining > 3 and (not bar or bar.remaining > remaining+5 or bar.remaining < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
-					self:StartBar(text, remaining, 134420, "colorOther") -- Interface/Icons/INV_Misc_Rune_07
+					self:StartBar(L.timeRemaining, remaining, 134420, "colorOther") -- Interface/Icons/INV_Misc_Rune_07
 				end
 			end
 		end
@@ -44,8 +43,7 @@ do
 				minutes = tonumber(minutes)
 				if minutes and minutes < 16 then -- Starts at 25min, wait until 15min is left
 					local remaining = minutes * 60
-					local text = gsub(TIME_REMAINING, ":", "")
-					self:StartBar(text, remaining, 134420, "colorOther", nil, minutes > 5 and 900 or 300) -- Interface/Icons/INV_Misc_Rune_07
+					self:StartBar(L.timeRemaining, remaining, 134420, "colorOther", nil, minutes > 5 and 900 or 300) -- Interface/Icons/INV_Misc_Rune_07
 				end
 			end
 		end

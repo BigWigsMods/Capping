@@ -6,8 +6,8 @@ do
 end
 
 do
-	local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
-	local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
+	local GetSpellName = C_Spell.GetSpellName
+	local GetSpellTexture = C_Spell.GetSpellTexture
 	function mod:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
 		if msg == L.arenaStartTrigger then
 			self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")

@@ -77,7 +77,6 @@ globals = {
 
 	-- WoW (global strings)
 	"ARENA",
-	"TIME_REMAINING",
 
 	-- Classic WoW
 	"GetBattlefieldScore",

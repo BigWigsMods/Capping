@@ -1,13 +1,13 @@
 
-local mod
+local mod, L
 do
 	local _, core = ...
-	mod = core:NewMod()
+	mod, L = core:NewMod()
 end
 
 do
 	local GetIconAndTextWidgetVisualizationInfo = C_UIWidgetManager.GetIconAndTextWidgetVisualizationInfo
-	local tonumber, gsub, match = tonumber, string.gsub, string.match
+	local tonumber, strmatch = tonumber, string.match
 	local GetSpellName = C_Spell.GetSpellName
 	local GetSpellTexture = C_Spell.GetSpellTexture
 	function mod:UPDATE_UI_WIDGET(tbl)
@@ -15,7 +15,7 @@ do
 			local id = tbl.widgetID
 			local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
 			if dataTbl and dataTbl.text and dataTbl.state == 1 then
-				local minutes, seconds = match(dataTbl.text, "(%d+):(%d+)")
+				local minutes, seconds = strmatch(dataTbl.text, "(%d+):(%d+)")
 				minutes = tonumber(minutes)
 				seconds = tonumber(seconds)
 				if minutes and seconds then
@@ -25,8 +25,7 @@ do
 						local spell = GetSpellName(34709)
 						local icon = GetSpellTexture(34709)
 						self:StartBar(spell, 93, icon, "colorOther")
-						local text = gsub(TIME_REMAINING, ":", "")
-						self:StartBar(text, remaining, nil, "colorOther")
+						self:StartBar(L.timeRemaining, remaining, nil, "colorOther")
 					end
 				end
 			end

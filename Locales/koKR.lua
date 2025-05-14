@@ -6,6 +6,7 @@ local L = mod.L
 L.battleBegins = "전투 개시"
 L.finalScore = "종료: %d - %d"
 L.flagRespawns = "깃발 생성"
+L.timeRemaining = "남은 시간"
 
 L.takenTheFlagTrigger = "^(.+)|1이;가; 깃발을 차지했습니다!"
 L.hasTakenTheTrigger = "점령했습니다"

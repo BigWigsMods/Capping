@@ -5,6 +5,7 @@ local L = mod.L
 L.battleBegins = "La batalla ha comenzado"
 L.finalScore = "Final: %d - %d"
 L.flagRespawns = "La bandera se ha restablecido"
+L.timeRemaining = "Tiempo"
 
 L.takenTheFlagTrigger = "^(.+) ha cogido la bandera!"
 L.hasTakenTheTrigger = "ha cogido"

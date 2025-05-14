@@ -6,6 +6,7 @@ local L = mod.L
 L.battleBegins = "战斗即将开始"
 L.finalScore = "最终：%d - %d"
 L.flagRespawns = "旗帜即将刷新"
+L.timeRemaining = "剩余时间"
 
 L.takenTheFlagTrigger = "^(.+)夺走了旗帜！"
 L.hasTakenTheTrigger = "夺取了"
