@@ -424,7 +424,8 @@ do
 		local GetDoubleStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetDoubleStatusBarWidgetVisualizationInfo
 		local ceil, floor = math.ceil, math.floor
 		local function ScorePredictor(widgetInfo)
-			if widgetInfo and (widgetInfo.widgetID == 1671 or widgetInfo.widgetID == 2074) then -- The 1671 widget is used for all BGs with score predictors, but DG uses 2074
+			 -- The 1671 widget is used for most BGs with score predictors, but DG uses 2074, and DR uses 5153
+			if widgetInfo and (widgetInfo.widgetID == 1671 or widgetInfo.widgetID == 2074 or widgetInfo.widgetID == 5153) then
 				local dataTbl = GetDoubleStatusBarWidgetVisualizationInfo(widgetInfo.widgetID)
 				if not dataTbl or not dataTbl.leftBarMax then return end
 				if prevTime == 0 then

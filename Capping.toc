@@ -33,6 +33,7 @@ Modules\AlteracValley.lua
 Modules\ArathiBasin.lua
 Modules\Arena.lua
 Modules\Ashran.lua
+Modules\DeephaulRavine.lua
 Modules\DeepwindGorge.lua
 Modules\EyeOfTheStorm.lua
 Modules\Gilneas.lua
