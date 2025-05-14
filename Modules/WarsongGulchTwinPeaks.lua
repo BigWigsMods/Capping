@@ -1,8 +1,9 @@
 
-local mod, L
+local mod, L, isRetail
 do
 	local _, core = ...
 	mod, L = core:NewMod()
+	isRetail = core.isRetail
 end
 
 local strmatch = string.match
@@ -10,7 +11,7 @@ do
 	local icon = {136441, C_Minimap.GetPOITextureCoords(45)}
 	function mod:CHAT_MSG(msg)
 		if strmatch(msg, L.capturedTheTrigger) then -- flag was captured
-			self:StartBar(L.flagRespawns, 12, self.isRetail and icon or 134420, "colorOther") -- White flag, or inv_misc_rune_07 (WSG rune)
+			self:StartBar(L.flagRespawns, 12, isRetail and icon or 134420, "colorOther") -- White flag, or inv_misc_rune_07 (WSG rune)
 		end
 	end
 end
@@ -52,15 +53,15 @@ do
 	function mod:EnterZone()
 		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "CHAT_MSG")
 		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "CHAT_MSG")
-		if not self.isRetail then
-			self:RegisterEvent("UPDATE_UI_WIDGET", "WSGTimeLeft")
-		else
+		if isRetail then
 			local func = function() GetTimeRemaining(self) end
 			self:Timer(5, func)
 			self:Timer(30, func)
 			self:Timer(60, func)
 			self:Timer(130, func)
 			self:Timer(240, func)
+		else
+			self:RegisterEvent("UPDATE_UI_WIDGET", "WSGTimeLeft")
 		end
 	end
 end
