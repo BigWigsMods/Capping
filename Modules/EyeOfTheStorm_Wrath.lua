@@ -77,7 +77,7 @@ do
 		--if id == 566 then -- Normal/Brawl
 		--	self:RegisterEvent("RAID_BOSS_WHISPER")
 		--else -- Rated
-		--	self:StartFlagCaptures(C_PvP.IsSoloRBG() and 30 or 60, colors)
+		--	self:StartFlagCaptures(60, colors)
 		--end
 	end
 end

@@ -584,6 +584,7 @@ do
 		local GetAtlasInfo = C_Texture.GetAtlasInfo
 		local GetSpellName = C_Spell.GetSpellName
 		local GetBestMapForUnit = C_Map.GetBestMapForUnit
+		local IsRatedSoloRBG = C_PvP.IsRatedSoloRBG or function() return false end
 
 		local function UpdatePOI()
 			local curMapID = GetBestMapForUnit("player")
@@ -595,7 +596,7 @@ do
 					if landmarkCache[name] ~= icon then
 						landmarkCache[name] = icon
 						if iconDataConflict[icon] then
-							local bar = curMod:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
+							local bar = curMod:StartBar(name, IsRatedSoloRBG() and 30 or capTime, GetIconData(icon), iconDataConflict[icon])
 							bar:Set("capping:poiid", areaPoiID)
 							if icon == 137 or icon == 139 then -- Workshop in IoC
 								curMod:StopBar((GetSpellName(56661))) -- Build Siege Engine
@@ -624,7 +625,7 @@ do
 						if atlasColors[atlasName] then
 							local bar = curMod:StartBar(
 								name,
-								capTime,
+								IsRatedSoloRBG() and 30 or capTime,
 								{ -- Begin Icon Texture
 									atlasTbl.file,
 									atlasTbl.leftTexCoord,
