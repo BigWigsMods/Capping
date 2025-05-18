@@ -1,4 +1,3 @@
-
 -- LOCALS
 local addonName, mod = ...
 local frame = CreateFrame("Frame", "CappingFrame", UIParent)
@@ -11,6 +10,21 @@ local zoneIds = {}
 
 local activeBars = { }
 frame.bars = activeBars
+
+local function UpdateBarMouseState()
+    if not db then return end
+    local enabled = (IsShiftKeyDown() and db.profile.barOnShift ~= "NONE")
+                 or (IsControlKeyDown() and db.profile.barOnControl ~= "NONE")
+                 or (IsAltKeyDown() and db.profile.barOnAlt ~= "NONE")
+    for bar in next, activeBars do
+        bar:EnableMouse(enabled)
+    end
+end
+
+local function IsInPvPZone()
+    local _, instanceType = GetInstanceInfo()
+    return instanceType == "pvp" or instanceType == "arena"
+end
 
 -- LIBRARIES
 local candy = LibStub("LibCandyBar-3.0")
@@ -172,6 +186,17 @@ do
 		for bar in next, activeBars do
 			bar:Stop()
 		end
+		-- Clean up test mode timer
+		if core and core.testModeTimer then
+			core.testModeTimer:Cancel()
+			core.testModeTimer = nil
+		end
+		-- Clean up any remaining events outside of PvP zones
+		if core and core:IsEventRegistered("MODIFIER_STATE_CHANGED") then
+			if not IsInPvPZone() then
+				core:UnregisterEvent("MODIFIER_STATE_CHANGED")
+			end
+		end
 	end
 
 	function API:GetBar(text)
@@ -185,11 +210,13 @@ do
 	do
 		local eventMap = {}
 		frame:SetScript("OnEvent", function(_, event, ...)
-			for k,v in next, eventMap[event] do
-				if type(v) == "function" then
-					v(...)
-				else
-					k[v](k, ...)
+			if eventMap[event] then
+				for k,v in next, eventMap[event] do
+					if type(v) == "function" then
+						v(...)
+					else
+						k[v](k, ...)
+					end
 				end
 			end
 		end)
@@ -207,16 +234,10 @@ do
 				eventMap[event] = nil
 			end
 		end
-	end
-	API:RegisterEvent("MODIFIER_STATE_CHANGED", function()
-		local enabled = (IsShiftKeyDown() and db.profile.barOnShift ~= "NONE")
-		             or (IsControlKeyDown() and db.profile.barOnControl ~= "NONE")
-		             or (IsAltKeyDown() and db.profile.barOnAlt ~= "NONE")
-		for bar in next, activeBars do
-			bar:EnableMouse(enabled)
+		function API:IsEventRegistered(event)
+			return eventMap[event] and eventMap[event][self] and true or false
 		end
-	end)
-
+	end
 	function API:RegisterZone(id)
 		zoneIds[id] = self
 	end
@@ -840,21 +861,26 @@ do
 	local GetInstanceInfo = GetInstanceInfo
 	function core:PLAYER_ENTERING_WORLD()
 		local _, instanceType, _, _, _, _, _, id = GetInstanceInfo()
-		if zoneIds[id] then
-			prevZone = id
-			self:RegisterEvent("PLAYER_LEAVING_WORLD")
-			zoneIds[id]:EnterZone(id)
-		elseif zoneIds[instanceType] then
-			prevZone = instanceType
-			self:RegisterEvent("PLAYER_LEAVING_WORLD")
-			zoneIds[instanceType]:EnterZone(id)
-		end
+           if zoneIds[id] then
+               prevZone = id
+               self:RegisterEvent("PLAYER_LEAVING_WORLD")
+               zoneIds[id]:EnterZone(id)
+               self:RegisterEvent("MODIFIER_STATE_CHANGED", UpdateBarMouseState)
+               UpdateBarMouseState()
+           elseif zoneIds[instanceType] then
+               prevZone = instanceType
+               self:RegisterEvent("PLAYER_LEAVING_WORLD")
+               zoneIds[instanceType]:EnterZone(id)
+               self:RegisterEvent("MODIFIER_STATE_CHANGED", UpdateBarMouseState)
+               UpdateBarMouseState()
+           end
 	end
 	function core:PLAYER_LEAVING_WORLD()
-		self:UnregisterEvent("PLAYER_LEAVING_WORLD")
-		self:StopAllBars()
-		zoneIds[prevZone]:ExitZone()
-		prevZone = nil
+           self:UnregisterEvent("PLAYER_LEAVING_WORLD")
+           self:UnregisterEvent("MODIFIER_STATE_CHANGED")
+           self:StopAllBars()
+           zoneIds[prevZone]:ExitZone()
+           prevZone = nil
 	end
 end
 
@@ -863,6 +889,15 @@ function core:Test(locale)
 	core:StartBar(locale.otherBars, 75, 1582141, "colorOther") -- Interface/Icons/Achievement_PVP_Legion03
 	core:StartBar(locale.allianceBars, 45, 132486, "colorAlliance") -- Interface/Icons/INV_BannerPVP_02
 	core:StartBar(locale.hordeBars, 25, 132485, "colorHorde") -- Interface/Icons/INV_BannerPVP_01
+	
+	-- Use polling only outside of PvP zones where MODIFIER_STATE_CHANGED doesn't work
+	if not IsInPvPZone() then
+		self.testModeTimer = C_Timer.NewTicker(0.2, function()
+			UpdateBarMouseState()
+		end)
+	end
+	
+	UpdateBarMouseState()
 end
 frame.Test = core.Test
 
