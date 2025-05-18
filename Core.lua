@@ -138,11 +138,9 @@ do
 			bar.candyBarLabel:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 			bar.candyBarDuration:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 			bar:SetScript("OnMouseUp", BarOnClick)
-			if db.profile.barOnShift ~= "NONE" or db.profile.barOnControl ~= "NONE" or db.profile.barOnAlt ~= "NONE" then
-				bar:EnableMouse(true)
-			else
-				bar:EnableMouse(false)
-			end
+			bar:EnableMouse((IsShiftKeyDown() and db.profile.barOnShift ~= "NONE")
+			             or (IsControlKeyDown() and db.profile.barOnControl ~= "NONE")
+			             or (IsAltKeyDown() and db.profile.barOnAlt ~= "NONE"))
 			bar:Start(maxBarTime)
 			RearrangeBars()
 			return bar
@@ -210,6 +208,14 @@ do
 			end
 		end
 	end
+	API:RegisterEvent("MODIFIER_STATE_CHANGED", function()
+		local enabled = (IsShiftKeyDown() and db.profile.barOnShift ~= "NONE")
+		             or (IsControlKeyDown() and db.profile.barOnControl ~= "NONE")
+		             or (IsAltKeyDown() and db.profile.barOnAlt ~= "NONE")
+		for bar in next, activeBars do
+			bar:EnableMouse(enabled)
+		end
+	end)
 
 	function API:RegisterZone(id)
 		zoneIds[id] = self
