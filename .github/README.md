@@ -16,4 +16,5 @@ Configure by right-clicking the anchor or by typing /capping
 * Deepwind Gorge - Node timers and final score estimation
 
 ## Download
-<https://www.curseforge.com/wow/addons/capping-bg-timers>
+* <https://www.curseforge.com/wow/addons/capping-bg-timers>
+* <https://addons.wago.io/addons/capping>
