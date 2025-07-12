@@ -1,7 +1,7 @@
 ## Interface: 50500
 ## Version: @project-version@
 ## Title: Capping
-## Author: Funkydude
+## Author: Funkeh
 ## Notes: Battleground timers and other PvP features.
 ## Notes-deDE: Battleground timers and other PvP features.
 ## Notes-ruRU: Battleground timers and other PvP features.
