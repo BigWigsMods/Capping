@@ -662,6 +662,7 @@ do
 
 		local function UpdatePOI()
 			local curMapID = GetBestMapForUnit("player")
+			if not curMapID then return end
 			local pois = GetAreaPOIForMap(curMapID)
 			for i = 1, #pois do
 				local tbl = GetAreaPOIInfo(curMapID, pois[i])
