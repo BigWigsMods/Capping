@@ -11,6 +11,21 @@ local zoneIds = {}
 local activeBars = { }
 frame.bars = activeBars
 
+local function UpdateBarMouseState()
+    if not db then return end
+    local enabled = (IsShiftKeyDown() and db.profile.barOnShift ~= "NONE")
+                 or (IsControlKeyDown() and db.profile.barOnControl ~= "NONE")
+                 or (IsAltKeyDown() and db.profile.barOnAlt ~= "NONE")
+    for bar in next, activeBars do
+        bar:EnableMouse(enabled)
+    end
+end
+
+local function IsInPvPZone()
+    local _, instanceType = GetInstanceInfo()
+    return instanceType == "pvp" or instanceType == "arena"
+end
+
 -- LIBRARIES
 local candy = LibStub("LibCandyBar-3.0")
 local media = LibStub("LibSharedMedia-3.0")
@@ -137,11 +152,9 @@ do
 			bar.candyBarLabel:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 			bar.candyBarDuration:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 			bar:SetScript("OnMouseUp", BarOnClick)
-			if db.profile.barOnShift ~= "NONE" or db.profile.barOnControl ~= "NONE" or db.profile.barOnAlt ~= "NONE" then
-				bar:EnableMouse(true)
-			else
-				bar:EnableMouse(false)
-			end
+			bar:EnableMouse((IsShiftKeyDown() and db.profile.barOnShift ~= "NONE")
+			             or (IsControlKeyDown() and db.profile.barOnControl ~= "NONE")
+			             or (IsAltKeyDown() and db.profile.barOnAlt ~= "NONE"))
 			bar:Start(maxBarTime)
 			RearrangeBars()
 			return bar
@@ -172,6 +185,17 @@ do
 	function API:StopAllBars()
 		for bar in next, activeBars do
 			bar:Stop()
+		end
+		-- Clean up test mode timer
+		if self.testModeTimer then
+			self.testModeTimer:Cancel()
+			self.testModeTimer = nil
+		end
+		-- Clean up any remaining events outside of PvP zones
+		if self:IsEventRegistered("MODIFIER_STATE_CHANGED") then
+			if not IsInPvPZone() then
+				self:UnregisterEvent("MODIFIER_STATE_CHANGED")
+			end
 		end
 	end
 
@@ -209,7 +233,6 @@ do
 			end
 		end
 	end
-
 	function API:RegisterZone(id)
 		zoneIds[id] = self
 	end
@@ -797,6 +820,11 @@ do
 			SelectAvailableQuest(id)
 		end
 	end
+	
+	function API:IsEventRegistered(event)
+		if not frame.events then return false end
+		return frame.events[event] and true or false
+	end
 
 	function mod:NewMod()
 		local t = {}
@@ -888,21 +916,26 @@ do
 	local GetInstanceInfo = GetInstanceInfo
 	function core:PLAYER_ENTERING_WORLD()
 		local _, instanceType, _, _, _, _, _, id = GetInstanceInfo()
-		if zoneIds[id] then
-			prevZone = id
-			self:RegisterEvent("PLAYER_LEAVING_WORLD")
-			zoneIds[id]:EnterZone(id)
-		elseif zoneIds[instanceType] then
-			prevZone = instanceType
-			self:RegisterEvent("PLAYER_LEAVING_WORLD")
-			zoneIds[instanceType]:EnterZone(id)
-		end
+       if zoneIds[id] then
+           prevZone = id
+           self:RegisterEvent("PLAYER_LEAVING_WORLD")
+           zoneIds[id]:EnterZone(id)
+           self:RegisterEvent("MODIFIER_STATE_CHANGED", UpdateBarMouseState)
+           UpdateBarMouseState()
+       elseif zoneIds[instanceType] then
+           prevZone = instanceType
+           self:RegisterEvent("PLAYER_LEAVING_WORLD")
+           zoneIds[instanceType]:EnterZone(id)
+           self:RegisterEvent("MODIFIER_STATE_CHANGED", UpdateBarMouseState)
+           UpdateBarMouseState()
+       end
 	end
 	function core:PLAYER_LEAVING_WORLD()
-		self:UnregisterEvent("PLAYER_LEAVING_WORLD")
-		self:StopAllBars()
-		zoneIds[prevZone]:ExitZone()
-		prevZone = nil
+       self:UnregisterEvent("PLAYER_LEAVING_WORLD")
+       self:UnregisterEvent("MODIFIER_STATE_CHANGED")
+       self:StopAllBars()
+       zoneIds[prevZone]:ExitZone()
+       prevZone = nil
 	end
 end
 
@@ -911,6 +944,13 @@ function core:Test(locale)
 	core:StartBar(locale.otherBars, 75, 132333, "colorOther") -- Interface/Icons/Ability_warrior_battleshout
 	core:StartBar(locale.allianceBars, 45, 132486, "colorAlliance") -- Interface/Icons/INV_BannerPVP_02
 	core:StartBar(locale.hordeBars, 25, 132485, "colorHorde") -- Interface/Icons/INV_BannerPVP_01
+	
+	if not IsInPvPZone() then
+		if self.testModeTimer then self.testModeTimer:Cancel() end
+		self.testModeTimer = C_Timer.NewTicker(0.2, function()
+			UpdateBarMouseState()
+		end)
+	end
 end
 frame.Test = core.Test
 
