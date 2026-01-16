@@ -1,4 +1,4 @@
-## Interface: 11506, 11507, 20504, 30405, 40402, 40401, 50500, 110105, 110107, 110200
+## Interface: 11508, 11507, 20505, 30405, 38000, 40402, 50503, 50502, 120001, 110207, 120000
 ## Title: Capping_Options
 ## Author: Funkeh
 ## Notes: Capping Configuration Options.

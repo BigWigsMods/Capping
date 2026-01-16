@@ -1,4 +1,4 @@
-## Interface: 110105, 110107, 110200
+## Interface: 120001, 110207, 120000
 ## Version: @project-version@
 ## Title: Capping
 ## Author: Funkeh
