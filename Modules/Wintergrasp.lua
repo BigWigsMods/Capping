@@ -192,7 +192,7 @@ do
 	end
 end
 
-local WGSyncRequest
+--local WGSyncRequest
 do
 	local towerNamesEnglish = {
 		["308062"] = "West Tower", -- Shadowsight Tower (West)
@@ -224,27 +224,27 @@ do
 	local NewTicker = C_Timer.NewTicker
 	local hereFromTheStart, hasData = true, true
 	local stopTimer = nil
-	local function allow() hereFromTheStart = false end
+	--local function allow() hereFromTheStart = false end
 	local function stop() hereFromTheStart = true stopTimer = nil end
-	local GetScoreInfo = C_PvP.GetScoreInfo
+	--local GetScoreInfo = C_PvP.GetScoreInfo
 	local SendAddonMessage = C_ChatInfo.SendAddonMessage
-	function WGSyncRequest()
-		for i = 1, 80 do
-			local scoreTbl = GetScoreInfo(i)
-			if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
-				hereFromTheStart = true
-				hasData = false
-				mod:Timer(0.5, allow)
-				stopTimer = NewTicker(3, stop, 1)
-				SendAddonMessage("Capping", "twr", "INSTANCE_CHAT")
-				return
-			end
-		end
+	--function WGSyncRequest()
+	--	for i = 1, 80 do
+	--		local scoreTbl = GetScoreInfo(i)
+	--		if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
+	--			hereFromTheStart = true
+	--			hasData = false
+	--			mod:Timer(0.5, allow)
+	--			stopTimer = NewTicker(3, stop, 1)
+	--			SendAddonMessage("Capping", "twr", "INSTANCE_CHAT")
+	--			return
+	--		end
+	--	end
 
-		hereFromTheStart = true
-		hasData = true
-		initTowerBars()
-	end
+	--	hereFromTheStart = true
+	--	hasData = true
+	--	initTowerBars()
+	--end
 
 	local timer = nil
 	local function SendWGTowers()
@@ -412,18 +412,18 @@ do
 			["307935"] = attackerTowerHealth, -- Flamewatch Tower (East)
 		}
 		RequestBattlefieldScoreData()
-		self:Timer(1, function() RequestBattlefieldScoreData() end)
-		self:Timer(2, WGSyncRequest)
-		C_ChatInfo.RegisterAddonMessagePrefix("Capping")
-		self:RegisterEvent("CHAT_MSG_ADDON")
+		--self:Timer(1, function() RequestBattlefieldScoreData() end)
+		--self:Timer(2, WGSyncRequest)
+		--C_ChatInfo.RegisterAddonMessagePrefix("Capping")
+		--self:RegisterEvent("CHAT_MSG_ADDON")
 		self:RegisterEvent("AREA_POIS_UPDATED")
 	end
 end
 
 function mod:ExitZone()
 	self:UnregisterEvent("AREA_POIS_UPDATED")
-	self:UnregisterEvent("CHAT_MSG_ADDON")
-	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	--self:UnregisterEvent("CHAT_MSG_ADDON")
+	--self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 end
 
 mod:RegisterZone(2118)

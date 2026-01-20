@@ -102,7 +102,7 @@ local function initGateBars()
 	allianceGateBar, hordeGateBar = aBar, hBar
 end
 
-local IoCSyncRequest
+--local IoCSyncRequest
 do
 	local timer = nil
 	local NewTicker = C_Timer.NewTicker
@@ -120,26 +120,26 @@ do
 
 	local hereFromTheStart, hasData = true, true
 	local stopTimer = nil
-	local function allow() hereFromTheStart = false end
+	--local function allow() hereFromTheStart = false end
 	local function stop() hereFromTheStart = true stopTimer = nil end
-	local GetScoreInfo = C_PvP.GetScoreInfo
-	function IoCSyncRequest()
-		for i = 1, 80 do
-			local scoreTbl = GetScoreInfo(i)
-			if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
-				hereFromTheStart = true
-				hasData = false
-				mod:Timer(0.5, allow)
-				stopTimer = NewTicker(3, stop, 1)
-				SendAddonMessage("Capping", "gr", "INSTANCE_CHAT")
-				return
-			end
-		end
+	--local GetScoreInfo = C_PvP.GetScoreInfo
+	--function IoCSyncRequest()
+	--	for i = 1, 80 do
+	--		local scoreTbl = GetScoreInfo(i)
+	--		if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
+	--			hereFromTheStart = true
+	--			hasData = false
+	--			mod:Timer(0.5, allow)
+	--			stopTimer = NewTicker(3, stop, 1)
+	--			SendAddonMessage("Capping", "gr", "INSTANCE_CHAT")
+	--			return
+	--		end
+	--	end
 
-		hereFromTheStart = true
-		hasData = true
-		initGateBars()
-	end
+	--	hereFromTheStart = true
+	--	hasData = true
+	--	initGateBars()
+	--end
 
 	local me = UnitName("player").. "-" ..GetRealmName()
 	local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
@@ -242,21 +242,21 @@ do
 			["195700"] = baseGateHealth,
 		}
 		self:StartFlagCaptures(61)
-		self:SetupHealthCheck("34922", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
-		self:SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
-		C_ChatInfo.RegisterAddonMessagePrefix("Capping")
-		self:RegisterEvent("CHAT_MSG_ADDON")
-		self:RegisterEvent("CHAT_MSG_MONSTER_YELL")
+		--self:SetupHealthCheck("34922", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Overlord Agmar -- Interface/Icons/Achievement_Character_Orc_Male
+		--self:SetupHealthCheck("34924", L.allianceBoss, "Alliance Boss", 236448, "colorHorde") -- Halford Wyrmbane -- Interface/Icons/Achievement_Character_Human_Male
+		--C_ChatInfo.RegisterAddonMessagePrefix("Capping")
+		--self:RegisterEvent("CHAT_MSG_ADDON")
+		--self:RegisterEvent("CHAT_MSG_MONSTER_YELL")
 		RequestBattlefieldScoreData()
-		self:Timer(1, function() RequestBattlefieldScoreData() end)
-		self:Timer(2, IoCSyncRequest)
+		--self:Timer(1, function() RequestBattlefieldScoreData() end)
+		--self:Timer(2, IoCSyncRequest)
 	end
 end
 
 function mod:ExitZone()
-	self:UnregisterEvent("CHAT_MSG_ADDON")
-	self:UnregisterEvent("CHAT_MSG_MONSTER_YELL")
-	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	--self:UnregisterEvent("CHAT_MSG_ADDON")
+	--self:UnregisterEvent("CHAT_MSG_MONSTER_YELL")
+	--self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:StopFlagCaptures()
 end
 

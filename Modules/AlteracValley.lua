@@ -158,26 +158,26 @@ end
 local NewTicker = C_Timer.NewTicker
 local hereFromTheStart, hasData = true, true
 local stopTimer = nil
-local function allow() hereFromTheStart = false end
+--local function allow() hereFromTheStart = false end
 local function stop() hereFromTheStart = true hasData = true stopTimer = nil end
-local GetScoreInfo = C_PvP.GetScoreInfo
+--local GetScoreInfo = C_PvP.GetScoreInfo
 local SendAddonMessage = C_ChatInfo.SendAddonMessage
-local function AVSyncRequest()
-	for i = 1, 80 do
-		local scoreTbl = GetScoreInfo(i)
-		if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
-			hereFromTheStart = true
-			hasData = false
-			mod:Timer(0.5, allow)
-			stopTimer = NewTicker(3, stop, 1)
-			SendAddonMessage("Capping", "tr", "INSTANCE_CHAT")
-			return
-		end
-	end
-
-	hereFromTheStart = true
-	hasData = true
-end
+--local function AVSyncRequest()
+--	for i = 1, 80 do
+--		local scoreTbl = GetScoreInfo(i)
+--		if scoreTbl and scoreTbl.damageDone and scoreTbl.damageDone ~= 0 then
+--			hereFromTheStart = true
+--			hasData = false
+--			mod:Timer(0.5, allow)
+--			stopTimer = NewTicker(3, stop, 1)
+--			SendAddonMessage("Capping", "tr", "INSTANCE_CHAT")
+--			return
+--		end
+--	end
+--
+--	hereFromTheStart = true
+--	hasData = true
+--end
 
 do
 	local timer = nil
@@ -246,19 +246,19 @@ do
 		else
 			self:StartFlagCaptures(242)
 		end
-		self:SetupHealthCheck("11946", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
-		self:SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
-		self:SetupHealthCheck("11947", L.galvangar, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
-		self:SetupHealthCheck("11949", L.balinda, "Balinda", 236447, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Female
-		self:SetupHealthCheck("13419", L.ivus, "Ivus", 874581, "colorAlliance") -- Interface/Icons/inv_pet_ancientprotector_winter
-		self:SetupHealthCheck("13256", L.lokholar, "Lokholar", 1373132, "colorHorde") -- Interface/Icons/Inv_infernalmounice.blp
-		self:RegisterEvent("CHAT_MSG_ADDON")
+		--self:SetupHealthCheck("11946", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
+		--self:SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
+		--self:SetupHealthCheck("11947", L.galvangar, "Galvangar", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
+		--self:SetupHealthCheck("11949", L.balinda, "Balinda", 236447, "colorHorde") -- Interface/Icons/Achievement_Character_Human_Female
+		--self:SetupHealthCheck("13419", L.ivus, "Ivus", 874581, "colorAlliance") -- Interface/Icons/inv_pet_ancientprotector_winter
+		--self:SetupHealthCheck("13256", L.lokholar, "Lokholar", 1373132, "colorHorde") -- Interface/Icons/Inv_infernalmounice.blp
+		--self:RegisterEvent("CHAT_MSG_ADDON")
 		self:RegisterEvent("GOSSIP_SHOW")
 		self:RegisterEvent("QUEST_PROGRESS")
 		self:RegisterEvent("QUEST_COMPLETE")
 		RequestBattlefieldScoreData()
-		self:Timer(1, function() RequestBattlefieldScoreData() end)
-		self:Timer(2, AVSyncRequest)
+		--self:Timer(1, function() RequestBattlefieldScoreData() end)
+		--self:Timer(2, AVSyncRequest)
 	end
 end
 
@@ -266,9 +266,9 @@ function mod:ExitZone()
 	self:UnregisterEvent("GOSSIP_SHOW")
 	self:UnregisterEvent("QUEST_PROGRESS")
 	self:UnregisterEvent("QUEST_COMPLETE")
-	self:UnregisterEvent("CHAT_MSG_ADDON")
+	--self:UnregisterEvent("CHAT_MSG_ADDON")
 	self:StopFlagCaptures()
-	self:StopHealthCheck()
+	--self:StopHealthCheck()
 end
 
 mod:RegisterZone(30)

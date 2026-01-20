@@ -23,17 +23,17 @@ end
 
 function mod:EnterZone()
 	self:RegisterEvent("GOSSIP_SHOW")
-	self:SetupHealthCheck("88178", L.hordeGuardian, "Horde Guardian", 236440, "colorAlliance") -- Jeron Emberfall -- Interface/Icons/achievement_character_bloodelf_male
-	self:SetupHealthCheck("88224", L.allianceGuardian, "Alliance Guardian", 236447, "colorHorde") -- Rylai Crestfall -- Interface/Icons/Achievement_character_human_female
-	self:SetupHealthCheck("82877", L.hordeBoss, "Horde Boss", 236456, "colorAlliance") -- Interface/Icons/Achievement_character_troll_male
-	self:SetupHealthCheck("82876", L.allianceBoss, "Alliance Boss", 236447, "colorHorde") -- Interface/Icons/Achievement_character_human_female
-	self:SetupHealthCheck("82201", L.kronus, "Kronus", 1006111, "colorAlliance") -- Interface/Icons/achievement_boss_highmaul_earthenfury
-	self:SetupHealthCheck("81859", L.fangraal, "Fangraal", 874857, "colorHorde") -- Interface/Icons/inv_pet_ancientprotector
+	--self:SetupHealthCheck("88178", L.hordeGuardian, "Horde Guardian", 236440, "colorAlliance") -- Jeron Emberfall -- Interface/Icons/achievement_character_bloodelf_male
+	--self:SetupHealthCheck("88224", L.allianceGuardian, "Alliance Guardian", 236447, "colorHorde") -- Rylai Crestfall -- Interface/Icons/Achievement_character_human_female
+	--self:SetupHealthCheck("82877", L.hordeBoss, "Horde Boss", 236456, "colorAlliance") -- Interface/Icons/Achievement_character_troll_male
+	--self:SetupHealthCheck("82876", L.allianceBoss, "Alliance Boss", 236447, "colorHorde") -- Interface/Icons/Achievement_character_human_female
+	--self:SetupHealthCheck("82201", L.kronus, "Kronus", 1006111, "colorAlliance") -- Interface/Icons/achievement_boss_highmaul_earthenfury
+	--self:SetupHealthCheck("81859", L.fangraal, "Fangraal", 874857, "colorHorde") -- Interface/Icons/inv_pet_ancientprotector
 end
 
 function mod:ExitZone()
 	self:UnregisterEvent("GOSSIP_SHOW")
-	self:StopHealthCheck()
+	--self:StopHealthCheck()
 end
 
 mod:RegisterZone(1191)
