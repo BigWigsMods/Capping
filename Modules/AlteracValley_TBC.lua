@@ -13,9 +13,16 @@ do
 		[30907] = true, -- alliance
 		[30908] = true, -- alliance
 		[30909] = true, -- alliance
+		[97828] = true, -- alliance (classic era)
+		[97829] = true, -- alliance (classic era)
+		[97830] = true, -- alliance (classic era)
 		[35739] = true, -- horde
 		[35740] = true, -- horde
 		[35741] = true, -- horde
+		[97507] = true, -- horde (classic era)
+		[97508] = true, -- horde (classic era)
+		[97509] = true, -- horde (classic era)
+		[116628] = true, -- horde (TBC)
 	}
 	function mod:GOSSIP_SHOW()
 		if not cap.db.profile.autoTurnIn then return end
@@ -38,6 +45,15 @@ do
 					self:SelectGossipID(35737) -- Upgrade to veteran units!
 				elseif self:GetGossipID(35738) then -- Horde
 					self:SelectGossipID(35738) -- Upgrade to champion units!
+				-- Classic
+				elseif self:GetGossipID(97833) then -- Alliance (classic era)
+					self:SelectGossipID(97833) -- Upgrade to seasoned units!
+				elseif self:GetGossipID(90270) then -- Alliance (WotLK classic)
+					self:SelectGossipID(90270) -- Upgrade to seasoned units!
+				elseif self:GetGossipID(97511) then -- Horde (classic era)
+					self:SelectGossipID(97511) -- Upgrade to veteran units!
+				elseif self:GetGossipID(97512) then -- Horde (classic era)
+					self:SelectGossipID(97512) -- Upgrade to seasoned units!
 				else
 					local gossipOptions = GetGossipOptions()
 					if gossipOptions[1] then
