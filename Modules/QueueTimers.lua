@@ -81,9 +81,9 @@ do -- estimated wait timer and port timer
 				if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 or bar:GetLabel() ~= mapName then -- Don't restart bars for subtle changes +/- 10s
 					local icon
 					for i = 1, GetNumBattlegroundTypes() do
-						local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(i)
-						if name == mapName then
-							icon = bgIcon
+						local battlegroundInfoTable = C_PvP.GetBattlegroundInfo(i)
+						if battlegroundInfoTable.name == mapName then
+							icon = battlegroundInfoTable.icon
 							break
 						end
 					end
@@ -98,9 +98,9 @@ do -- estimated wait timer and port timer
 				if not bar or bar.remaining ~= 1 then
 					local icon
 					for i = 1, GetNumBattlegroundTypes() do
-						local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(i)
-						if name == mapName then
-							icon = bgIcon
+						local battlegroundInfoTable = C_PvP.GetBattlegroundInfo(i)
+						if battlegroundInfoTable.name == mapName then
+							icon = battlegroundInfoTable.icon
 							break
 						end
 					end
