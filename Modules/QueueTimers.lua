@@ -30,6 +30,7 @@ do -- estimated wait timer and port timer
 	local GetBattlefieldPortExpiration = GetBattlefieldPortExpiration
 	local GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited = GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited
 	local ARENA = ARENA
+	local GetBattlegroundInfo = C_PvP.GetBattlegroundInfo
 	local queueBars = {}
 
 	function mod:PLAYER_ENTERING_WORLD()
@@ -81,8 +82,8 @@ do -- estimated wait timer and port timer
 				if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 or bar:GetLabel() ~= mapName then -- Don't restart bars for subtle changes +/- 10s
 					local icon
 					for i = 1, GetNumBattlegroundTypes() do
-						local battlegroundInfoTable = C_PvP.GetBattlegroundInfo(i)
-						if battlegroundInfoTable.name == mapName then
+						local battlegroundInfoTable = GetBattlegroundInfo(i)
+						if battlegroundInfoTable and battlegroundInfoTable.name == mapName then
 							icon = battlegroundInfoTable.icon
 							break
 						end
@@ -98,8 +99,8 @@ do -- estimated wait timer and port timer
 				if not bar or bar.remaining ~= 1 then
 					local icon
 					for i = 1, GetNumBattlegroundTypes() do
-						local battlegroundInfoTable = C_PvP.GetBattlegroundInfo(i)
-						if battlegroundInfoTable.name == mapName then
+						local battlegroundInfoTable = GetBattlegroundInfo(i)
+						if battlegroundInfoTable and battlegroundInfoTable.name == mapName then
 							icon = battlegroundInfoTable.icon
 							break
 						end
