@@ -5,26 +5,25 @@ do
 	mod, L, cap = core:NewMod()
 end
 
-function mod:CHAT_MSG_BG_SYSTEM_NEUTRAL(msg)
-	local timeSeconds
-	local num = msg:match("(%d+)")
-	if num then num = tonumber(num) end
+--[[
+Enum.StartTimerType.PvPBeginTimer = 0
+Enum.StartTimerType.ChallengeModeCountdown = 1
+Enum.StartTimerType.PlayerCountdown = 2
+Enum.StartTimerType.PlunderstormCountdown = 3
+]]
+function mod:START_TIMER(timerType, timeSeconds)
+	if timerType ~= 0 then return end
 
-	if num == 30 or msg == L.arenaStart30s then
-		timeSeconds = 30
-	elseif num == 2 then
-		timeSeconds = 120
-	elseif num == 1 or msg == L.arenaStart60s then
-		timeSeconds = 60
-	elseif msg == L.arenaStart15s then
-		timeSeconds = 15
-	else
-		return
+	for i = 1, #TimerTracker.timerList do
+		TimerTracker.timerList[i].bar:Hide() -- Hide the Blizz start timer
 	end
 
-	self:StartBar(L.battleBegins, timeSeconds, 136106, "colorOther", nil, timeSeconds == 120 and timeSeconds or 60) -- 136106 = Interface/Icons/Spell_nature_timestop
+	local bar = self:GetBar(L.battleBegins)
+	if not bar or timeSeconds > bar.remaining+1 or timeSeconds < bar.remaining-1 then -- Don't restart bars for subtle changes +/- 1s
+		self:StartBar(L.battleBegins, timeSeconds, 136106, "colorOther") -- 136106 = Interface/Icons/Spell_nature_timestop
+	end
 end
-mod:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
+mod:RegisterEvent("START_TIMER")
 
 do -- estimated wait timer and port timer
 	local GetBattlefieldStatus = GetBattlefieldStatus
