@@ -23,6 +23,7 @@ do
 		[97508] = true, -- horde (classic era)
 		[97509] = true, -- horde (classic era)
 		[116628] = true, -- horde (TBC)
+		[116948] = true, -- alliance (TBC)
 		[116949] = true, -- alliance (TBC)
 	}
 	function mod:GOSSIP_SHOW()
