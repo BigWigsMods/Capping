@@ -28,7 +28,7 @@
 embeds.xml
 locales.xml
 
-Core_BCC.lua
+Core_Vanilla.lua
 Modules\AlteracValley_TBC.lua
 Modules\ArathiBasin_Classic.lua
 Modules\Arena_Classic.lua

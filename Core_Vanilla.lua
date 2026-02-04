@@ -901,8 +901,8 @@ do
 end
 
 function core:Test(locale)
-	core:StartBar(locale.queueBars, 100, 132147, "colorQueue") -- Interface/Icons/Ability_dualwield
-	core:StartBar(locale.otherBars, 75, 132089, "colorOther") -- Interface/Icons/Ability_ambush
+	core:StartBar(locale.queueBars, 100, 136106, "colorQueue") -- Interface/Icons/Spell_nature_timestop
+	core:StartBar(locale.otherBars, 75, 132333, "colorOther") -- Interface/Icons/Ability_warrior_battleshout
 	core:StartBar(locale.allianceBars, 45, 132486, "colorAlliance") -- Interface/Icons/INV_BannerPVP_02
 	core:StartBar(locale.hordeBars, 25, 132485, "colorHorde") -- Interface/Icons/INV_BannerPVP_01
 end
