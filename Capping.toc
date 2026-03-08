@@ -41,5 +41,6 @@ Modules\IsleOfConquest.lua
 Modules\QueueTimers.lua
 Modules\WarsongGulchTwinPeaks.lua
 Modules\Wintergrasp.lua
+Modules\SlayersRise.lua
 
 modules.xml
