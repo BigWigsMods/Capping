@@ -16,3 +16,4 @@ function mod:ExitZone()
 end
 
 mod:RegisterZone(2245)
+mod:RegisterZone(1105) -- Brawl: Deepwind Dunk
