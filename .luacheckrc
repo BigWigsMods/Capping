@@ -59,7 +59,6 @@ globals = {
 	"RaidWarningFrame_OnEvent",
 	"ReloadUI",
 	"RequestBattlefieldScoreData",
-	"SendChatMessage",
 	"StopSound",
 	"strmatch",
 	"strsplit",
