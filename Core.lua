@@ -32,11 +32,11 @@ do
 		--			local faction = colorid == "colorHorde" and _G.FACTION_HORDE or colorid == "colorAlliance" and _G.FACTION_ALLIANCE or ""
 		--			local timeLeft = bar.candyBarDuration:GetText()
 		--			if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
-		--			SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
+		--			C_ChatInfo.SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
 		--		else
 		--			local msg = custom(bar)
 		--			if msg then
-		--				SendChatMessage(format("Capping: %s", msg), channel)
+		--				C_ChatInfo.SendChatMessage(format("Capping: %s", msg), channel)
 		--			end
 		--		end
 		--	end
