@@ -6,20 +6,20 @@ do
 end
 
 --[[
-Timer.lua line 2
-TIMER_TYPE_PVP = 1;
-TIMER_TYPE_CHALLENGE_MODE = 2;
-TIMER_TYPE_PLAYER_COUNTDOWN = 3;
+Enum.StartTimerType.PvPBeginTimer = 0
+Enum.StartTimerType.ChallengeModeCountdown = 1
+Enum.StartTimerType.PlayerCountdown = 2
+Enum.StartTimerType.PlunderstormCountdown = 3
 ]]
 function mod:START_TIMER(timerType, timeSeconds)
-	if timerType == 3 then return end
+	if timerType ~= 0 then return end
 
 	for i = 1, #TimerTracker.timerList do
 		TimerTracker.timerList[i].bar:Hide() -- Hide the Blizz start timer
 	end
 
 	local bar = self:GetBar(L.battleBegins)
-	if not bar or timeSeconds > bar.remaining+1 or timeSeconds < bar.remaining-1 then -- Don't restart bars for subtle changes +/- 1s
+	if not bar or timeSeconds >= 45 or timeSeconds > bar.remaining+1 or timeSeconds < bar.remaining-1 then -- Don't restart bars for subtle changes +/- 1s
 		self:StartBar(L.battleBegins, timeSeconds, 618859, "colorOther") -- 618859 = Interface/Icons/achievement_challengemode_platinum
 	end
 end

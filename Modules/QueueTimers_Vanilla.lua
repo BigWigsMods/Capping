@@ -19,7 +19,7 @@ function mod:START_TIMER(timerType, timeSeconds)
 	end
 
 	local bar = self:GetBar(L.battleBegins)
-	if not bar or timeSeconds > bar.remaining+1 or timeSeconds < bar.remaining-1 then -- Don't restart bars for subtle changes +/- 1s
+	if not bar or timeSeconds >= 45 or timeSeconds > bar.remaining+1 or timeSeconds < bar.remaining-1 then -- Don't restart bars for subtle changes +/- 1s
 		self:StartBar(L.battleBegins, timeSeconds, 136106, "colorOther") -- 136106 = Interface/Icons/Spell_nature_timestop
 	end
 end
