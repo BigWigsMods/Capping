@@ -591,6 +591,13 @@ do
 		local function UpdatePOI()
 			local curMapID = GetBestMapForUnit("player")
 			if not curMapID then return end
+			if type(capTime) == "table" then
+				if IsRatedSoloRBG() then
+					capTime = capTime[1]
+				else
+					capTime = capTime[2]
+				end
+			end
 			local pois = GetAreaPOIForMap(curMapID)
 			for i = 1, #pois do
 				local tbl = GetAreaPOIInfo(curMapID, pois[i])
@@ -599,7 +606,7 @@ do
 					if landmarkCache[name] ~= icon then
 						landmarkCache[name] = icon
 						if iconDataConflict[icon] then
-							local bar = curMod:StartBar(name, IsRatedSoloRBG() and 30 or capTime, GetIconData(icon), iconDataConflict[icon])
+							local bar = curMod:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
 							bar:Set("capping:poiid", areaPoiID)
 							if icon == 137 or icon == 139 then -- Workshop in IoC
 								curMod:StopBar((GetSpellName(56661))) -- Build Siege Engine
@@ -628,7 +635,7 @@ do
 						if atlasColors[atlasName] then
 							local bar = curMod:StartBar(
 								name,
-								IsRatedSoloRBG() and 30 or capTime,
+								capTime,
 								{ -- Begin Icon Texture
 									atlasTbl.file,
 									atlasTbl.leftTexCoord,
