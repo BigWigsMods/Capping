@@ -1,4 +1,4 @@
-## Interface: 20505
+## Interface: 20505, 20506
 ## Version: @project-version@
 ## Title: Capping
 ## Author: Funkeh
