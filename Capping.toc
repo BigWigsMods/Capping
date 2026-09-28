@@ -32,7 +32,6 @@ Core_Vanilla.lua [AllowLoadGameType vanilla, tbc]
 Modules\AlteracValley_Vanilla.lua [AllowLoadGameType vanilla]
 Modules\ArathiBasin_Classic.lua [AllowLoadGameType vanilla, tbc]
 Modules\QueueTimers_Vanilla.lua [AllowLoadGameType vanilla]
-Modules\WarsongGulchTwinPeaks.lua
 
 Modules\AlteracValley_TBC.lua [AllowLoadGameType tbc]
 Modules\Arena_Classic.lua [AllowLoadGameType tbc, wrath, cata, mists]
@@ -61,5 +60,6 @@ Modules\QueueTimers.lua [AllowLoadGameType mainline]
 Modules\Wintergrasp.lua [AllowLoadGameType standard]
 Modules\SlayersRise.lua [AllowLoadGameType standard]
 Modules\TempleOfKotmogu.lua [AllowLoadGameType standard]
+Modules\WarsongGulchTwinPeaks.lua
 
 modules.xml
