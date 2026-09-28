@@ -1,4 +1,4 @@
-## Interface: 120100, 120105, 120007
+## Interface: 11508, 11509, 16001, 20505, 20506, 30405, 38002, 40402, 50503, 50504, 120100, 120105, 120007
 ## Version: @project-version@
 ## Title: Capping
 ## Author: Funkeh
@@ -28,20 +28,38 @@
 embeds.xml
 locales.xml
 
-Core.lua
-Modules\AlteracValley.lua
-Modules\ArathiBasin.lua
-Modules\Arena.lua
-Modules\Ashran.lua
-Modules\DeephaulRavine.lua
-Modules\DeepwindGorge.lua
-Modules\EyeOfTheStorm.lua
-Modules\Gilneas.lua
-Modules\IsleOfConquest.lua
-Modules\QueueTimers.lua
+Core_Vanilla.lua [AllowLoadGameType vanilla, tbc]
+Modules\AlteracValley_Vanilla.lua [AllowLoadGameType vanilla]
+Modules\ArathiBasin_Classic.lua [AllowLoadGameType vanilla, tbc]
+Modules\QueueTimers_Vanilla.lua [AllowLoadGameType vanilla]
 Modules\WarsongGulchTwinPeaks.lua
-Modules\Wintergrasp.lua
-Modules\SlayersRise.lua
-Modules\TempleOfKotmogu.lua
+
+Modules\AlteracValley_TBC.lua [AllowLoadGameType tbc]
+Modules\Arena_Classic.lua [AllowLoadGameType tbc, wrath, cata, mists]
+Modules\EyeOfTheStorm_TBC.lua [AllowLoadGameType tbc]
+Modules\QueueTimers_TBC.lua [AllowLoadGameType tbc]
+
+Core_Wrath.lua [AllowLoadGameType wrath, cata, mists]
+Modules\AlteracValley_Wrath.lua [AllowLoadGameType wrath, cata, mists]
+Modules\ArathiBasin_Wrath.lua [AllowLoadGameType wrath, cata, mists]
+Modules\EyeOfTheStorm_Wrath.lua [AllowLoadGameType wrath, cata, mists]
+Modules\IsleOfConquest_Wrath.lua [AllowLoadGameType wrath, cata, mists]
+Modules\QueueTimers_Wrath.lua [AllowLoadGameType wrath, cata, mists]
+Modules\Gilneas.lua [AllowLoadGameType cata, mists]
+
+Core.lua [AllowLoadGameType mainline]
+Modules\AlteracValley.lua [AllowLoadGameType mainline]
+Modules\ArathiBasin.lua [AllowLoadGameType mainline]
+Modules\Arena.lua [AllowLoadGameType standard]
+Modules\Ashran.lua [AllowLoadGameType standard]
+Modules\DeephaulRavine.lua [AllowLoadGameType standard]
+Modules\DeepwindGorge.lua [AllowLoadGameType standard, mists]
+Modules\EyeOfTheStorm.lua [AllowLoadGameType standard]
+
+Modules\IsleOfConquest.lua [AllowLoadGameType standard]
+Modules\QueueTimers.lua [AllowLoadGameType mainline]
+Modules\Wintergrasp.lua [AllowLoadGameType standard]
+Modules\SlayersRise.lua [AllowLoadGameType standard]
+Modules\TempleOfKotmogu.lua [AllowLoadGameType standard]
 
 modules.xml
