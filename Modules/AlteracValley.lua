@@ -6,121 +6,127 @@ do
 end
 
 do
-	local UnitGUID, strsplit, GetNumGossipActiveQuests, SelectGossipActiveQuest = UnitGUID, strsplit, C_GossipInfo.GetNumActiveQuests, C_GossipInfo.SelectActiveQuest
-	local tonumber, GetGossipOptions = tonumber, C_GossipInfo.GetOptions
-	local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount -- XXX 10.2.6
-	local blockedIds = {
+	local GetNumGossipActiveQuests = C_GossipInfo.GetNumActiveQuests
+	local GetGossipOptions = C_GossipInfo.GetOptions
+	local GetItemCount = C_Item.GetItemCount
+
+	local knownBadGossipIDs = {
+		-- Open Quest to Smith or Murgot
 		[30907] = true, -- alliance
 		[30908] = true, -- alliance
 		[30909] = true, -- alliance
 		[35739] = true, -- horde
 		[35740] = true, -- horde
 		[35741] = true, -- horde
+
+		[29176] = true, -- How many more supplies are needed to send ground assaults? [Stormpike Quartermaster (12096) - Alliance]
+		[29178] = true, -- I want to browse your goods. [Stormpike Quartermaster (12096) - Alliance]
+		[31070] = true, -- Where is the Stormpike Quartermaster? [Corporal Noreg Stormpike (13447) - Alliance]
+		[31071] = true, -- Where is the Stormpike Quartermaster? [Corporal Noreg Stormpike (13447) - Alliance]
+	}
+	local knownGoodGossipIDs = {
+		-- Open Quest to Smith or Murgot
+		[30904] = true, -- alliance
+		[30905] = true, -- alliance
+		[30906] = true, -- alliance
+		[35736] = true, -- horde
+		[35737] = true, -- horde
+		[35738] = true, -- horde
+	}
+
+	local knownBadQuestIDs = {
+	}
+	local knownGoodQuestIDs = {
+		[6781] = true, -- More Armor Scraps [Alliance]
+		[6741] = true, -- More Booty! [Horde]
+		[57318] = true, -- More Booty! [Horde, specific to Korrak's Revenge]
+		[57306] = true, -- More Armor Scraps [Alliance, specific to Korrak's Revenge]
+		[7385] = true, -- A Gallon of Blood [Horde]
+		[6801] = true, -- Lokholar the Ice Lord [Horde]
+		[7386] = true, -- Crystal Cluster [Alliance]
+		[6881] = true, -- Ivus the Forest Lord [Alliance]
+		[7026] = true, -- Stormpike Ram Rider Commander [Alliance, specific to Korrak's Revenge]
+		[7002] = true, -- Frostwolf Wolf Rider Commander [Horde, specific to Korrak's Revenge]
 	}
 	function mod:GOSSIP_SHOW()
 		if not cap.db.profile.autoTurnIn then return end
 
-		local target = UnitGUID("npc")
-		if target then
-			local _, _, _, _, _, id = strsplit("-", target)
-			local mobId = tonumber(id)
-			if mobId == 13176 or mobId == 13257 then -- Smith Regzar, Murgot Deepforge
-				-- Open Quest to Smith or Murgot
-				if self:GetGossipID(30904) then -- Alliance
-					self:SelectGossipID(30904) -- Upgrade to seasoned units!
-				elseif self:GetGossipID(30905) then -- Alliance
-					self:SelectGossipID(30905) -- Upgrade to veteran units!
-				elseif self:GetGossipID(30906) then -- Alliance
-					self:SelectGossipID(30906) -- Upgrade to champion units!
-				elseif self:GetGossipID(35736) then -- Horde
-					self:SelectGossipID(35736) -- Upgrade to seasoned units!
-				elseif self:GetGossipID(35737) then -- Horde
-					self:SelectGossipID(35737) -- Upgrade to veteran units!
-				elseif self:GetGossipID(35738) then -- Horde
-					self:SelectGossipID(35738) -- Upgrade to champion units!
-				else
-					local gossipOptions = GetGossipOptions()
-					if gossipOptions[1] then
-						for i = 1, #gossipOptions do
-							local gossipTable = gossipOptions[i]
-							if not blockedIds[gossipTable.gossipOptionID] then
-								print("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS!", gossipTable.gossipOptionID, mobId, gossipTable.name)
-								geterrorhandler()("|cFF33FF99Capping|r: NEW ID FOUND, TELL THE DEVS! ".. tostring(gossipTable.gossipOptionID) ..", ".. mobId ..", ".. tostring(gossipTable.name))
-								BasicMessageDialog.Text:SetText("Capping error, see chat for details")
-								BasicMessageDialog:Show()
-								return
-							end
-						end
-					end
+		if GetNumGossipActiveQuests() > 0 then
+			local tbl = C_GossipInfo.GetActiveQuests()
+			for i = 1, #tbl do
+				local questTable = tbl[i]
+				if not knownBadQuestIDs[questTable.questID] and not knownGoodQuestIDs[questTable.questID] then
+					print("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS!", questTable.questID, questTable.title)
+					geterrorhandler()("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS! ".. tostring(questTable.questID) ..", ".. tostring(questTable.title))
 				end
+			end
+		end
 
-				if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
-					if self:GetGossipAvailableQuestID(6781) then -- Alliance, More Armor Scraps
-						self:SelectGossipAvailableQuestID(6781)
-					elseif self:GetGossipAvailableQuestID(6741) then -- Horde, More Booty!
-						self:SelectGossipAvailableQuestID(6741)
-					elseif self:GetGossipAvailableQuestID(57318) then -- Horde, More Booty! [Specific to Korrak's Revenge]
-						self:SelectGossipAvailableQuestID(57318)
-					elseif self:GetGossipAvailableQuestID(57306) then -- Alliance, More Armor Scraps [Specific to Korrak's Revenge]
-						self:SelectGossipAvailableQuestID(57306)
-					end
+		local gossipOptions = GetGossipOptions()
+		if gossipOptions[1] then
+			for i = 1, #gossipOptions do
+				local gossipTable = gossipOptions[i]
+				if not knownBadGossipIDs[gossipTable.gossipOptionID] and not knownGoodGossipIDs[gossipTable.gossipOptionID] then
+					print("|cFF33FF99Capping|r: NEW GOSSIP ID FOUND, TELL THE DEVS!", gossipTable.gossipOptionID, gossipTable.name)
+					geterrorhandler()("|cFF33FF99Capping|r: NEW GOSSIP ID FOUND, TELL THE DEVS! ".. tostring(gossipTable.gossipOptionID) ..", ".. tostring(gossipTable.name))
+					--BasicMessageDialog.Text:SetText("Capping error, see chat for details")
+					--BasicMessageDialog:Show()
 				end
-			elseif mobId == 13236 then -- Horde, Primalist Thurloga
-				local num = GetItemCount(17306) -- Stormpike Soldier's Blood 17306
-				if num > 0 then
-					if GetNumGossipActiveQuests() > 0 then
-						local tbl = C_GossipInfo.GetActiveQuests()
-						for i = 1, #tbl do
-							local questTable = tbl[i]
-							print("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS!", questTable.questID, mobId, questTable.title)
-							geterrorhandler()("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS! ".. tostring(questTable.questID) ..", ".. mobId ..", ".. tostring(questTable.title))
-						end
-						return
-						SelectGossipActiveQuest(1)
-					elseif self:GetGossipAvailableQuestID(7385) and num >= 5 then -- A Gallon of Blood
-						self:SelectGossipAvailableQuestID(7385)
-					elseif self:GetGossipAvailableQuestID(6801) then -- Lokholar the Ice Lord
-						self:SelectGossipAvailableQuestID(6801)
-					end
-				end
-			elseif mobId == 13442 then -- Alliance, Archdruid Renferal
-				local num = GetItemCount(17423) -- Storm Crystal 17423
-				if num > 0 then
-					if GetNumGossipActiveQuests() > 0 then
-						local tbl = C_GossipInfo.GetActiveQuests()
-						for i = 1, #tbl do
-							local questTable = tbl[i]
-							print("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS!", questTable.questID, mobId, questTable.title)
-							geterrorhandler()("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS! ".. tostring(questTable.questID) ..", ".. mobId ..", ".. tostring(questTable.title))
-						end
-						return
-						SelectGossipActiveQuest(1)
-					elseif self:GetGossipAvailableQuestID(7386) and num >= 5 then -- Crystal Cluster
-						self:SelectGossipAvailableQuestID(7386)
-					elseif self:GetGossipAvailableQuestID(6881) then -- Ivus the Forest Lord
-						self:SelectGossipAvailableQuestID(6881)
-					end
-				end
-			elseif mobId == 13577 then -- Alliance, Stormpike Ram Rider Commander
-				-- Only in Korrak's Revenge on retail
-				if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
-					if self:GetGossipAvailableQuestID(7026) then
-						self:SelectGossipAvailableQuestID(7026)
-					else
-						print("|cFF33FF99Capping|r: RAM RIDER, TELL THE DEVS! 7026 was not found!")
-						geterrorhandler()("|cFF33FF99Capping|r: RAM RIDER, TELL THE DEVS! 7026 was not found!")
-					end
-				end
-			elseif mobId == 13441 then -- Horde, Frostwolf Wolf Rider Commander
-				-- Only in Korrak's Revenge on retail
-				if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
-					if self:GetGossipAvailableQuestID(7002) then
-						self:SelectGossipAvailableQuestID(7002) -- Ram Hide Harnesses
-					else
-						print("|cFF33FF99Capping|r: WOLF RIDER, TELL THE DEVS! 7002 was not found!")
-						geterrorhandler()("|cFF33FF99Capping|r: WOLF RIDER, TELL THE DEVS! 7002 was not found!")
-					end
-				end
+			end
+		end
+
+		-- Open Quest to Smith or Murgot
+		if self:GetGossipID(30904) then -- Alliance
+			self:SelectGossipID(30904) -- Upgrade to seasoned units!
+		elseif self:GetGossipID(30905) then -- Alliance
+			self:SelectGossipID(30905) -- Upgrade to veteran units!
+		elseif self:GetGossipID(30906) then -- Alliance
+			self:SelectGossipID(30906) -- Upgrade to champion units!
+		elseif self:GetGossipID(35736) then -- Horde
+			self:SelectGossipID(35736) -- Upgrade to seasoned units!
+		elseif self:GetGossipID(35737) then -- Horde
+			self:SelectGossipID(35737) -- Upgrade to veteran units!
+		elseif self:GetGossipID(35738) then -- Horde
+			self:SelectGossipID(35738) -- Upgrade to champion units!
+		elseif self:GetGossipAvailableQuestID(6781) then -- Alliance, More Armor Scraps
+			if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
+				self:SelectGossipAvailableQuestID(6781)
+			end
+		elseif self:GetGossipAvailableQuestID(6741) then -- Horde, More Booty!
+			if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
+				self:SelectGossipAvailableQuestID(6741)
+			end
+		elseif self:GetGossipAvailableQuestID(57318) then -- Horde, More Booty! [Specific to Korrak's Revenge]
+			if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
+				self:SelectGossipAvailableQuestID(57318)
+			end
+		elseif self:GetGossipAvailableQuestID(57306) then -- Alliance, More Armor Scraps [Specific to Korrak's Revenge]
+			if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
+				self:SelectGossipAvailableQuestID(57306)
+			end
+		-- Horde, Primalist Thurloga
+		elseif self:GetGossipAvailableQuestID(7385) and GetItemCount(17306) >= 5 then -- A Gallon of Blood
+			self:SelectGossipAvailableQuestID(7385)
+		elseif self:GetGossipAvailableQuestID(6801) then -- Lokholar the Ice Lord
+			if GetItemCount(17306) > 0 then -- Stormpike Soldier's Blood 17306
+				self:SelectGossipAvailableQuestID(6801)
+			end
+		-- Alliance, Archdruid Renferal
+		elseif self:GetGossipAvailableQuestID(7386) and GetItemCount(17423) >= 5 then -- Crystal Cluster
+			self:SelectGossipAvailableQuestID(7386)
+		elseif self:GetGossipAvailableQuestID(6881) then -- Ivus the Forest Lord
+			if GetItemCount(17423) > 0 then -- Storm Crystal 17423
+				self:SelectGossipAvailableQuestID(6881)
+			end
+		-- Alliance, Stormpike Ram Rider Commander
+		elseif self:GetGossipAvailableQuestID(7026) then -- Only in Korrak's Revenge on retail
+			if GetItemCount(17643) > 0 then -- Frost Wolf Hide 17643
+				self:SelectGossipAvailableQuestID(7026)
+			end
+		-- Horde, Frostwolf Wolf Rider Commander
+		elseif self:GetGossipAvailableQuestID(7002) then -- Only in Korrak's Revenge on retail
+			if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
+				self:SelectGossipAvailableQuestID(7002) -- Ram Hide Harnesses
 			end
 		end
 	end
