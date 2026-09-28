@@ -98,12 +98,7 @@ local options = function()
 						set = function(_, value)
 							cap.db.profile.icon = value
 							for bar in next, cap.bars do
-								if value then
-									bar:SetIcon(bar:Get("capping:iconoptionrestore") or 236396) -- Interface/Icons/Achievement_BG_winWSG
-								else
-									bar:Set("capping:iconoptionrestore", bar:GetIcon())
-									bar:SetIcon(nil)
-								end
+								bar:SetIconVisibility(value)
 							end
 						end,
 					},

@@ -117,14 +117,13 @@ do
 			bar:SetColor(unpack(db.profile[colorid]))
 			bar.candyBarBackground:SetVertexColor(unpack(db.profile.colorBarBackground))
 			bar:SetTextColor(unpack(db.profile.colorText))
-			if db.profile.icon then
-				if type(icon) == "table" then
-					bar:SetIcon(icon[1], icon[2], icon[3], icon[4], icon[5])
-				else
-					bar:SetIcon(icon)
-				end
-				bar:SetIconPosition(db.profile.alignIcon)
+			bar:SetIconVisibility(db.profile.icon)
+			if type(icon) == "table" then
+				bar:SetIcon(icon[1], icon[2], icon[3], icon[4], icon[5])
+			else
+				bar:SetIcon(icon)
 			end
+			bar:SetIconPosition(db.profile.alignIcon)
 			bar:SetTimeVisibility(db.profile.timeText)
 			bar:SetFill(db.profile.fill)
 			local flags = nil
