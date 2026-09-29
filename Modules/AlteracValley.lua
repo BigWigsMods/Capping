@@ -7,6 +7,7 @@ end
 
 do
 	local GetNumGossipActiveQuests = C_GossipInfo.GetNumActiveQuests
+	local GetGossipActiveQuests = C_GossipInfo.GetActiveQuests()
 	local GetGossipOptions = C_GossipInfo.GetOptions
 	local GetItemCount = C_Item.GetItemCount
 
@@ -52,7 +53,7 @@ do
 		if not cap.db.profile.autoTurnIn then return end
 
 		if GetNumGossipActiveQuests() > 0 then
-			local tbl = C_GossipInfo.GetActiveQuests()
+			local tbl = GetGossipActiveQuests()
 			for i = 1, #tbl do
 				local questTable = tbl[i]
 				if not knownBadQuestIDs[questTable.questID] and not knownGoodQuestIDs[questTable.questID] then
