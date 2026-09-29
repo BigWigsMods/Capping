@@ -160,6 +160,28 @@ do
 		public.StopBar = API.StopBar
 		CappingAPI = public
 
+		function API:StopBarByData(data, value)
+			local dirty = nil
+			for bar in next, activeBars do
+				if bar:Get(data) == value then
+					bar:Stop()
+					dirty = true
+				end
+			end
+			if dirty then RearrangeBars() end
+		end
+
+		function API:StopBarContainingData(data)
+			local dirty = nil
+			for bar in next, activeBars do
+				if bar:Get(data) then
+					bar:Stop()
+					dirty = true
+				end
+			end
+			if dirty then RearrangeBars() end
+		end
+
 		candy.RegisterCallback(API, "LibCandyBar_Stop", function(_, bar)
 			if activeBars[bar] then
 				activeBars[bar] = nil
@@ -177,6 +199,14 @@ do
 	function API:GetBar(text)
 		for bar in next, activeBars do
 			if bar:GetLabel() == text then
+				return bar
+			end
+		end
+	end
+
+	function API:GetBarByData(data, value)
+		for bar in next, activeBars do
+			if bar:Get(data) == value then
 				return bar
 			end
 		end

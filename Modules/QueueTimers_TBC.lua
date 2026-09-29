@@ -30,7 +30,6 @@ do -- estimated wait timer and port timer
 	local GetBattlefieldPortExpiration = GetBattlefieldPortExpiration
 	local GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited = GetBattlefieldEstimatedWaitTime, GetBattlefieldTimeWaited
 	local ARENA = ARENA
-	local queueBars = {}
 
 	function mod:PLAYER_ENTERING_WORLD()
 		self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
@@ -45,14 +44,9 @@ do -- estimated wait timer and port timer
 		end
 
 		if status == "confirm" then -- BG has popped, time until cancelled
-			local bar = queueBars[queueId]
-			if bar and bar:Get("capping:queueid") then
-				bar:Stop()
-			end
-
-			bar = self:StartBar(mapName, GetBattlefieldPortExpiration(queueId), 132327, "colorOther", true) -- 132327 = Interface/Icons/Ability_TownWatch
+			self:StopBarByData("capping:queueid", queueId)
+			local bar = self:StartBar(mapName, GetBattlefieldPortExpiration(queueId), 132327, "colorOther", true) -- 132327 = Interface/Icons/Ability_TownWatch
 			bar:Set("capping:queueid", queueId)
-			queueBars[queueId] = bar
 
 			if cap.db.profile.useMasterForQueue then
 				local _, id = PlaySound(8459, "Master", false) -- SOUNDKIT.PVP_THROUGH_QUEUE
@@ -72,48 +66,30 @@ do -- estimated wait timer and port timer
 			local esttime = GetBattlefieldEstimatedWaitTime(queueId) / 1000 -- 0 when queue is paused
 			local waited = GetBattlefieldTimeWaited(queueId) / 1000
 			local estremain = esttime - waited
-			local bar = queueBars[queueId]
-			if bar and not bar:Get("capping:queueid") then
-				bar = nil
-			end
+			local bar = self:GetBarByData("capping:queueid", queueId)
 
 			if estremain > 1 then -- Not a paused queue (0) and not a negative queue (in queue longer than estimated time).
 				if not bar or estremain > bar.remaining+10 or estremain < bar.remaining-10 or bar:GetLabel() ~= mapName then -- Don't restart bars for subtle changes +/- 10s
-					if bar then
-						bar:Stop()
-					end
-					bar = self:StartBar(mapName, estremain, 134400, "colorQueue", true) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
-					bar:Set("capping:queueid", queueId)
-					queueBars[queueId] = bar
+					self:StopBarByData("capping:queueid", queueId)
+					local newBar = self:StartBar(mapName, estremain, 134400, "colorQueue", true) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
+					newBar:Set("capping:queueid", queueId)
 				end
 			else -- Negative queue (in queue longer than estimated time) or 0 queue (paused)
 				if not bar or bar.remaining ~= 1 then
-					if bar then
-						bar:Stop()
-					end
-					bar = self:StartBar(mapName, 1, 134400, "colorQueue", true) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
-					bar:Pause()
-					bar.remaining = 1
-					bar:SetTimeVisibility(false)
-					bar:Set("capping:queueid", queueId)
-					queueBars[queueId] = bar
+					self:StopBarByData("capping:queueid", queueId)
+					local newBar = self:StartBar(mapName, 1, 134400, "colorQueue", true) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
+					newBar:Pause()
+					newBar.remaining = 1
+					newBar:SetTimeVisibility(false)
+					newBar:Set("capping:queueid", queueId)
 				end
 			end
 		elseif status == "none" then -- Leaving queue
-			local bar = queueBars[queueId]
-			if bar and bar:Get("capping:queueid") then
-				bar:Stop()
-			end
-			queueBars[queueId] = nil
+			self:StopBarByData("capping:queueid", queueId)
 		elseif status == "active" then -- Entered Zone, stop all queue bars
 			self:UnregisterEvent("UPDATE_BATTLEFIELD_STATUS")
 			self:RegisterEvent("PLAYER_ENTERING_WORLD")
-			for id, bar in next, queueBars do
-				if bar:Get("capping:queueid") then
-					bar:Stop()
-				end
-				queueBars[id] = nil
-			end
+			self:StopBarContainingData("capping:queueid")
 		end
 	end
 end
