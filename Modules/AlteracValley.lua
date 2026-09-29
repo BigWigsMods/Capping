@@ -73,6 +73,8 @@ do
 				if not knownBadQuestIDs[questTable.questID] and not knownGoodQuestIDs[questTable.questID] then
 					print("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS!", questTable.questID, questTable.title)
 					geterrorhandler()("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS! ".. tostring(questTable.questID) ..", ".. tostring(questTable.title))
+					BasicMessageDialog.Text:SetText("Capping error, see chat for details")
+					BasicMessageDialog:Show()
 				end
 			end
 		end
@@ -84,8 +86,8 @@ do
 				if not knownBadGossipIDs[gossipTable.gossipOptionID] and not knownGoodGossipIDs[gossipTable.gossipOptionID] then
 					print("|cFF33FF99Capping|r: NEW GOSSIP ID FOUND, TELL THE DEVS!", gossipTable.gossipOptionID, gossipTable.name)
 					geterrorhandler()("|cFF33FF99Capping|r: NEW GOSSIP ID FOUND, TELL THE DEVS! ".. tostring(gossipTable.gossipOptionID) ..", ".. tostring(gossipTable.name))
-					--BasicMessageDialog.Text:SetText("Capping error, see chat for details")
-					--BasicMessageDialog:Show()
+					BasicMessageDialog.Text:SetText("Capping error, see chat for details")
+					BasicMessageDialog:Show()
 				end
 			end
 		end
