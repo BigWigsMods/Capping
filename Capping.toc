@@ -34,7 +34,6 @@ Modules\ArathiBasin_Classic.lua [AllowLoadGameType vanilla, tbc]
 Modules\QueueTimers_Vanilla.lua [AllowLoadGameType vanilla]
 
 Modules\AlteracValley_TBC.lua [AllowLoadGameType tbc]
-Modules\Arena_Classic.lua [AllowLoadGameType tbc, wrath, cata, mists]
 Modules\EyeOfTheStorm_TBC.lua [AllowLoadGameType tbc]
 Modules\QueueTimers_TBC.lua [AllowLoadGameType tbc]
 
@@ -45,6 +44,7 @@ Modules\EyeOfTheStorm_Wrath.lua [AllowLoadGameType wrath, cata, mists]
 Modules\IsleOfConquest_Wrath.lua [AllowLoadGameType wrath, cata, mists]
 Modules\QueueTimers_Wrath.lua [AllowLoadGameType wrath, cata, mists]
 Modules\Gilneas.lua [AllowLoadGameType cata, mists]
+Modules\Arena_Classic.lua [AllowLoadGameType tbc, wrath, cata, mists]
 
 Core.lua [AllowLoadGameType mainline]
 Modules\AlteracValley.lua [AllowLoadGameType mainline]
