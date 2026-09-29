@@ -22,8 +22,22 @@ do
 
 		[29176] = true, -- How many more supplies are needed to send ground assaults? [Stormpike Quartermaster (12096) - Alliance]
 		[29178] = true, -- I want to browse your goods. [Stormpike Quartermaster (12096) - Alliance]
+		[32488] = true, -- How many more supplies are needed to send a ground assault? [Frostwolf Quartermaster (12097) - Horde]
+		[32490] = true, -- I want to browse your goods. [Frostwolf Quartermaster (12097) - Horde]
+
 		[31070] = true, -- Where is the Stormpike Quartermaster? [Corporal Noreg Stormpike (13447) - Alliance]
 		[31071] = true, -- Where is the Stormpike Quartermaster? [Corporal Noreg Stormpike (13447) - Alliance]
+		[34597] = true, -- Where is the Frostwolf Quartermaster? [Sergeant Yazra Bloodsnarl (13448) - Horde]
+		[34598] = true, -- Where is the Frostwolf Quartermaster? [Sergeant Yazra Bloodsnarl (13448) - Horde]
+
+		[33622] = true, -- Tell me about Alterac Valley. [Stormpike Herald (11997) - Alliance]
+		[33623] = true, -- Tell me about graveyards. [Stormpike Herald (11997) - Alliance]
+		[33624] = true, -- Tell me about mines. [Stormpike Herald (11997) - Alliance]
+		[33625] = true, -- Tell me about towers. [Stormpike Herald (11997) - Alliance]
+		[29172] = true, -- Tell me about Alterac Valley. [Frostwolf Herald (11998) - Horde]
+		[29173] = true, -- Tell me about graveyards. [Frostwolf Herald (11998) - Horde]
+		[29174] = true, -- Tell me about mines. [Frostwolf Herald (11998) - Horde]
+		[29175] = true, -- Tell me about towers. [Frostwolf Herald (11998) - Horde]
 	}
 	local knownGoodGossipIDs = {
 		-- Open Quest to Smith or Murgot
