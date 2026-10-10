@@ -7,7 +7,9 @@ end
 
 do
 	local GetNumGossipActiveQuests = C_GossipInfo.GetNumActiveQuests
-	local GetGossipActiveQuests = C_GossipInfo.GetActiveQuests()
+	local GetGossipActiveQuests = C_GossipInfo.GetActiveQuests
+	local GetNumGossipAvailableQuests = C_GossipInfo.GetNumAvailableQuests
+	local GetGossipAvailableQuests = C_GossipInfo.GetAvailableQuests
 	local GetGossipOptions = C_GossipInfo.GetOptions
 	local GetItemCount = C_Item.GetItemCount
 
@@ -50,6 +52,10 @@ do
 	}
 
 	local knownBadQuestIDs = {
+		[5892] = true, -- Irondeep Supplies [Stormpike Quartermaster (12096) - Alliance]
+		[6982] = true, -- Coldtooth Supplies [Stormpike Quartermaster (12096) - Alliance]
+		[6985] = true, -- Irondeep Supplies [Frostwolf Quartermaster (12097) - Horde]
+		[5893] = true, -- Coldtooth Supplies [Frostwolf Quartermaster (12097) - Horde]
 	}
 	local knownGoodQuestIDs = {
 		[6781] = true, -- More Armor Scraps [Alliance]
@@ -73,6 +79,19 @@ do
 				if not knownBadQuestIDs[questTable.questID] and not knownGoodQuestIDs[questTable.questID] then
 					print("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS!", questTable.questID, questTable.title)
 					geterrorhandler()("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS! ".. tostring(questTable.questID) ..", ".. tostring(questTable.title))
+					BasicMessageDialog.Text:SetText("Capping error, see chat for details")
+					BasicMessageDialog:Show()
+				end
+			end
+		end
+
+		if GetNumGossipAvailableQuests() > 0 then
+			local tbl = GetGossipAvailableQuests()
+			for i = 1, #tbl do
+				local questTable = tbl[i]
+				if not knownBadQuestIDs[questTable.questID] and not knownGoodQuestIDs[questTable.questID] then
+					print("|cFF33FF99Capping|r: NEW AVAILABLE QUEST, TELL THE DEVS!", questTable.questID, questTable.title)
+					geterrorhandler()("|cFF33FF99Capping|r: NEW AVAILABLE QUEST, TELL THE DEVS! ".. tostring(questTable.questID) ..", ".. tostring(questTable.title))
 					BasicMessageDialog.Text:SetText("Capping error, see chat for details")
 					BasicMessageDialog:Show()
 				end
