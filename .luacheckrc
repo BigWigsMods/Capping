@@ -26,6 +26,7 @@ globals = {
 	"C_Map",
 	"C_Minimap",
 	"C_PvP",
+	"C_QuestLog",
 	"C_Spell",
 	"C_Texture",
 	"C_Timer",

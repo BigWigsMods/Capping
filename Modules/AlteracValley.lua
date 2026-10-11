@@ -12,6 +12,7 @@ do
 	local GetGossipAvailableQuests = C_GossipInfo.GetAvailableQuests
 	local GetGossipOptions = C_GossipInfo.GetOptions
 	local GetItemCount = C_Item.GetItemCount
+	local IsQuestComplete = C_QuestLog.IsComplete
 
 	local knownBadGossipIDs = {
 		-- Open Quest to Smith or Murgot
@@ -40,6 +41,8 @@ do
 		[29173] = true, -- Tell me about graveyards. [Frostwolf Herald (11998) - Horde]
 		[29174] = true, -- Tell me about mines. [Frostwolf Herald (11998) - Horde]
 		[29175] = true, -- Tell me about towers. [Frostwolf Herald (11998) - Horde]
+
+		[30482] = true, -- Have you made contact with Ivus, Archdruid? [Archdruid Renferal (13442) - Alliance]
 	}
 	local knownGoodGossipIDs = {
 		-- Open Quest to Smith or Murgot
@@ -49,13 +52,13 @@ do
 		[35736] = true, -- horde
 		[35737] = true, -- horde
 		[35738] = true, -- horde
+
+		[32605] = true, -- With pleasure. These things stink! [Stormpike Stable Master (13617) - Alliance]
 	}
 
 	local knownBadQuestIDs = {
-		[5892] = true, -- Irondeep Supplies [Stormpike Quartermaster (12096) - Alliance]
-		[6982] = true, -- Coldtooth Supplies [Stormpike Quartermaster (12096) - Alliance]
-		[6985] = true, -- Irondeep Supplies [Frostwolf Quartermaster (12097) - Horde]
-		[5893] = true, -- Coldtooth Supplies [Frostwolf Quartermaster (12097) - Horde]
+		[7027] = true, -- Empty Stables [Stormpike Stable Master (13617) - Alliance]
+		[7001] = true, -- Empty Stables [Frostwolf Stable Master (13616) - Horde]
 	}
 	local knownGoodQuestIDs = {
 		[6781] = true, -- More Armor Scraps [Alliance]
@@ -68,6 +71,11 @@ do
 		[6881] = true, -- Ivus the Forest Lord [Alliance]
 		[7026] = true, -- Stormpike Ram Rider Commander [Alliance, specific to Korrak's Revenge]
 		[7002] = true, -- Frostwolf Wolf Rider Commander [Horde, specific to Korrak's Revenge]
+
+		[5892] = true, -- Irondeep Supplies [Stormpike Quartermaster (12096) - Alliance]
+		[6982] = true, -- Coldtooth Supplies [Stormpike Quartermaster (12096) - Alliance]
+		[6985] = true, -- Irondeep Supplies [Frostwolf Quartermaster (12097) - Horde]
+		[5893] = true, -- Coldtooth Supplies [Frostwolf Quartermaster (12097) - Horde]
 	}
 	function mod:GOSSIP_SHOW()
 		if not cap.db.profile.autoTurnIn then return end
@@ -140,6 +148,12 @@ do
 			if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
 				self:SelectGossipAvailableQuestID(57306)
 			end
+		-- Alliance, Stormpike Stable Master (13617)
+		elseif self:GetGossipID(32605) then
+			self:SelectGossipID(32605) -- With pleasure. These things stink!
+		-- Horde, Frostwolf Stable Master (13616)
+		--elseif self:GetGossipID(32605) then
+		--	self:SelectGossipID(32605) -- With pleasure. These things stink!
 		-- Horde, Primalist Thurloga
 		elseif self:GetGossipAvailableQuestID(7385) and GetItemCount(17306) >= 5 then -- A Gallon of Blood
 			self:SelectGossipAvailableQuestID(7385)
@@ -164,6 +178,16 @@ do
 			if GetItemCount(17642) > 0 then -- Alterac Ram Hide 17642
 				self:SelectGossipAvailableQuestID(7002) -- Ram Hide Harnesses
 			end
+		-- Alliance, Stormpike Quartermaster (12096)
+		elseif self:GetGossipActiveQuestID(5892) and IsQuestComplete(5892) then -- Irondeep Supplies
+			self:SelectGossipActiveQuestID(5892)
+		elseif self:GetGossipActiveQuestID(6982) and IsQuestComplete(6982) then -- Coldtooth Supplies
+			self:SelectGossipActiveQuestID(6982)
+		-- Horde, Frostwolf Quartermaster (12097)
+		elseif self:GetGossipActiveQuestID(6985) and IsQuestComplete(6985) then -- Irondeep Supplies
+			self:SelectGossipActiveQuestID(6985)
+		elseif self:GetGossipActiveQuestID(5893) and IsQuestComplete(5893) then -- Coldtooth Supplies
+			self:SelectGossipActiveQuestID(5893)
 		end
 	end
 end

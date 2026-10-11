@@ -747,7 +747,6 @@ do
 
 	do
 		local GetAvailableQuests = C_GossipInfo.GetAvailableQuests
-		local SelectAvailableQuest = C_GossipInfo.SelectAvailableQuest
 		function API:GetGossipAvailableQuestID(id)
 			local gossipOptions = GetAvailableQuests()
 			for i = 1, #gossipOptions do
@@ -757,8 +756,29 @@ do
 				end
 			end
 		end
+	end
+	do
+		local SelectAvailableQuest = C_GossipInfo.SelectAvailableQuest
 		function API:SelectGossipAvailableQuestID(id)
 			SelectAvailableQuest(id)
+		end
+	end
+	do
+		local GetActiveQuests = C_GossipInfo.GetActiveQuests
+		function API:GetGossipActiveQuestID(id)
+			local gossipOptions = GetActiveQuests()
+			for i = 1, #gossipOptions do
+				local gossipTable = gossipOptions[i]
+				if gossipTable.questID == id then
+					return true
+				end
+			end
+		end
+	end
+	do
+		local SelectActiveQuest = C_GossipInfo.SelectActiveQuest
+		function API:SelectGossipActiveQuestID(id)
+			SelectActiveQuest(id)
 		end
 	end
 
