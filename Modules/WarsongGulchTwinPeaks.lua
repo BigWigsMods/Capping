@@ -29,7 +29,7 @@ do
 			if minutes and seconds then
 				local remaining = seconds + (minutes*60) + 1
 				local bar = self:GetBar(L.timeRemaining)
-				if remaining > 3 and (not bar or bar.remaining > remaining+5 or bar.remaining < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
+				if remaining > 3 and (not bar or bar:GetRemainingTime() > remaining+5 or bar:GetRemainingTime() < remaining-5) then -- Don't restart bars for subtle changes +/- 5s
 					self:StartBar(L.timeRemaining, remaining, 134420, "colorOther") -- Interface/Icons/INV_Misc_Rune_07
 				end
 			end

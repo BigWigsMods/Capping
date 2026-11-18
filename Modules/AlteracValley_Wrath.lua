@@ -201,7 +201,7 @@ do
 			for bar in next, CappingFrame.bars do
 				local poiId = bar:Get("capping:poiid")
 				if poiId then
-					str = string.format("%s%d-%d~", str, poiId, math.floor(bar.remaining))
+					str = string.format("%s%d-%d~", str, poiId, math.floor(bar:GetRemainingTime()))
 				end
 			end
 

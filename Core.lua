@@ -62,7 +62,7 @@ do
 				elseif idB and not idA then
 					return
 				else
-					return a.remaining < b.remaining
+					return a:GetRemainingTime() < b:GetRemainingTime()
 				end
 			end
 			RearrangeBars = function()
