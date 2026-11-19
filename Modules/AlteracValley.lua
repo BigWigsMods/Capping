@@ -44,6 +44,7 @@ do
 		[29175] = true, -- Tell me about towers. [Frostwolf Herald (11998) - Horde]
 
 		[30482] = true, -- Have you made contact with Ivus, Archdruid? [Archdruid Renferal (13442) - Alliance]
+		[97515] = true, -- Have you made contact with Ivus, Archdruid? [Archdruid Renferal (13442) - Alliance] (WoW Forever)
 	}
 	local knownGoodGossipIDs = {
 		-- Open Quest to Smith or Murgot
