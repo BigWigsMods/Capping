@@ -3,7 +3,8 @@
 local addonName, mod = ...
 local frame = CreateFrame("Frame", "CappingFrame", UIParent)
 local L = mod.L
-mod.isRetail = true
+mod.isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+--mod.isRetail = GetGameType() == "standard" -- XXX 12.1.7
 
 local format, type = string.format, type
 local db, core

@@ -40,6 +40,7 @@ globals = {
 	"GetBattlefieldTimeWaited",
 	"GetBattlegroundInfo",
 	"geterrorhandler",
+	"GetGameType",
 	"GetInstanceInfo",
 	"GetItemCount",
 	"GetLocale",
@@ -70,6 +71,8 @@ globals = {
 	"UnitHealthMax",
 	"UnitName",
 	"UnitPosition",
+	"WOW_PROJECT_ID", -- XXX remove
+	"WOW_PROJECT_MAINLINE", -- XXX remove
 
 	-- WoW (global tables)
 	"SlashCmdList",
