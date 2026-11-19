@@ -25,7 +25,7 @@ do
 						local spell = GetSpellName(34709)
 						local icon = GetSpellTexture(34709)
 						self:StartBar(spell, 93, icon, "colorOther")
-						self:StartBar(L.timeRemaining, remaining, nil, "colorOther")
+						self:StartBar(L.timeRemaining, remaining, 136106, "colorOther") -- 136106 = Interface/Icons/Spell_nature_timestop
 					end
 				end
 			end

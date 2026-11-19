@@ -226,7 +226,7 @@ local NewTicker = C_Timer.NewTicker
 local hereFromTheStart, hasData = true, true
 local stopTimer = nil
 --local function allow() hereFromTheStart = false end
-local function stop() hereFromTheStart = true hasData = true stopTimer = nil end
+local function stop() hereFromTheStart = true stopTimer = nil end
 --local GetScoreInfo = C_PvP.GetScoreInfo
 local SendAddonMessage = C_ChatInfo.SendAddonMessage
 --local function AVSyncRequest()
@@ -273,14 +273,14 @@ do
 				local id, remaining = strsplit("-", arg)
 				if id and remaining then
 					local widget, barTime = tonumber(id), tonumber(remaining)
-					if widget and barTime and barTime > 5 and barTime < 245 then
+					if widget and barTime and barTime > 5 and barTime < (isRetail and 245 or 303) then
 						inProgressDataTbl[widget] = barTime
 					end
 				end
 			end
 
 			if next(inProgressDataTbl) then
-				self:RestoreFlagCaptures(inProgressDataTbl, 242)
+				self:RestoreFlagCaptures(inProgressDataTbl, isRetail and 242 or 300)
 			end
 		end
 

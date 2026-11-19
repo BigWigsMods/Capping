@@ -64,8 +64,8 @@ do -- estimated wait timer and port timer
 				end
 			end
 
-			local esttime = GetBattlefieldEstimatedWaitTime(queueId) / 1000 -- 0 when queue is paused
-			local waited = GetBattlefieldTimeWaited(queueId) / 1000
+			local esttime = math.floor(GetBattlefieldEstimatedWaitTime(queueId) / 1000) -- 0 when queue is paused
+			local waited = math.floor(GetBattlefieldTimeWaited(queueId) / 1000)
 			local estremain = esttime - waited
 			local bar = self:GetBarByData("capping:queueid", queueId)
 
@@ -80,11 +80,12 @@ do -- estimated wait timer and port timer
 						end
 					end
 					self:StopBarByData("capping:queueid", queueId)
-					local newBar = self:StartBar(mapName, estremain, icon or 134400, "colorQueue", true) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
+					local newBar = self:StartBar(mapName, estremain, icon or 134400, "colorQueue", true, esttime) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
 					newBar:Set("capping:queueid", queueId)
+					newBar:SetPauseWhenDone(true)
 				end
 			else -- Negative queue (in queue longer than estimated time) or 0 queue (paused)
-				if not bar or bar:GetRemainingTime() ~= 1 then
+				if not bar or bar:GetRemainingTime() ~= 1 or bar:GetLabel() ~= mapName then
 					local icon
 					for i = 1, GetNumBattlegroundTypes() do
 						local name,_,_,_,_,_,_,_,_,bgIcon = GetBattlegroundInfo(i)
@@ -96,7 +97,9 @@ do -- estimated wait timer and port timer
 					self:StopBarByData("capping:queueid", queueId)
 					local newBar = self:StartBar(mapName, 1, icon or 134400, "colorQueue", true) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
 					newBar:Pause()
+					newBar:SetFill(false)
 					newBar:SetTimeVisibility(false)
+					newBar:Set("capping:customchat", function() end)
 					newBar:Set("capping:queueid", queueId)
 				end
 			end

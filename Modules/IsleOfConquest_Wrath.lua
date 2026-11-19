@@ -35,6 +35,7 @@ do
 						local hp = newHp / baseGateHealth * 100
 						if hp < 0.5 then
 							bar:Stop()
+							hordeGateBar = nil
 						else
 							bar.candyBarBar:SetValue(hp)
 							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
@@ -54,6 +55,7 @@ do
 						local hp = newHp / baseGateHealth * 100
 						if hp < 0.5 then
 							bar:Stop()
+							allianceGateBar = nil
 						else
 							bar.candyBarBar:SetValue(hp)
 							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
@@ -77,6 +79,7 @@ local function initGateBars()
 	mod:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	local aBar = mod:StartBar(L.allianceGate, 100, 132362, "colorHorde", true) -- Interface/Icons/ability_warrior_shieldwall
 	aBar:Pause()
+	aBar:SetTimeVisibility(true)
 	aBar.candyBarBar:SetValue(100)
 	aBar.candyBarDuration:SetText("100%")
 	aBar:Set("capping:englishprint", "Alliance Gate/")
@@ -89,6 +92,7 @@ local function initGateBars()
 	end)
 	local hBar = mod:StartBar(L.hordeGate, 100, 132362, "colorAlliance", true) -- Interface/Icons/ability_warrior_shieldwall
 	hBar:Pause()
+	hBar:SetTimeVisibility(true)
 	hBar.candyBarBar:SetValue(100)
 	hBar.candyBarDuration:SetText("100%")
 	hBar:Set("capping:englishprint", "Horde Gate/")
@@ -103,8 +107,9 @@ local function initGateBars()
 end
 
 local IoCSyncRequest
+local hereFromTheStart, hasData = true, true
+local timer, stopTimer = nil, nil
 do
-	local timer = nil
 	local NewTicker = C_Timer.NewTicker
 	local function SendIoCGates()
 		timer = nil
@@ -118,8 +123,6 @@ do
 		end
 	end
 
-	local hereFromTheStart, hasData = true, true
-	local stopTimer = nil
 	local function allow() hereFromTheStart = false end
 	local function stop() hereFromTheStart = true stopTimer = nil end
 	--local GetScoreInfo = C_PvP.GetScoreInfo
@@ -189,6 +192,7 @@ do
 						local hp = lowestHordeHp / baseGateHealth * 100
 						if hp < 1 then
 							hordeGateBar:Stop()
+							hordeGateBar = nil
 						else
 							hordeGateBar.candyBarBar:SetValue(hp)
 							hordeGateBar.candyBarDuration:SetFormattedText("%.1f%%", hp)
@@ -203,6 +207,7 @@ do
 						local hp = lowestAllianceHp / baseGateHealth * 100
 						if hp < 1 then
 							allianceGateBar:Stop()
+							allianceGateBar = nil
 						else
 							allianceGateBar.candyBarBar:SetValue(hp)
 							allianceGateBar.candyBarDuration:SetFormattedText("%.1f%%", hp)
@@ -230,6 +235,7 @@ end
 do
 	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 	function mod:EnterZone()
+		hereFromTheStart, hasData = true, false
 		lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
 		hordeGates = {
 			["195494"] = baseGateHealth,
@@ -254,10 +260,20 @@ do
 end
 
 function mod:ExitZone()
+	if timer then
+		timer:Cancel()
+		timer = nil
+	end
+	if stopTimer then
+		stopTimer:Cancel()
+		stopTimer = nil
+	end
 	self:UnregisterEvent("CHAT_MSG_ADDON")
 	self:UnregisterEvent("CHAT_MSG_MONSTER_YELL")
 	self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:StopFlagCaptures()
+	self:StopHealthCheck()
+	hordeGateBar, allianceGateBar = nil, nil
 end
 
 mod:RegisterZone(628)

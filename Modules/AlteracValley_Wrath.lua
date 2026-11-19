@@ -6,7 +6,7 @@ do
 end
 
 do
-	local UnitGUID, strsplit, GetNumGossipActiveQuests, SelectGossipActiveQuest = UnitGUID, strsplit, C_GossipInfo.GetNumActiveQuests, C_GossipInfo.SelectActiveQuest
+	local UnitGUID, strsplit, GetNumGossipActiveQuests = UnitGUID, strsplit, C_GossipInfo.GetNumActiveQuests
 	local tonumber, GetGossipOptions = tonumber, C_GossipInfo.GetOptions
 	local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount -- XXX 10.2.6
 	local blockedIds = {
@@ -67,17 +67,17 @@ do
 							end
 						end
 					end
-				end
 
-				if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
-					if self:GetGossipAvailableQuestID(6781) then -- Alliance, More Armor Scraps
-						self:SelectGossipAvailableQuestID(6781)
-					elseif self:GetGossipAvailableQuestID(6741) then -- Horde, More Booty!
-						self:SelectGossipAvailableQuestID(6741)
-					elseif self:GetGossipAvailableQuestID(57318) then -- Horde, More Booty! [Specific to Korrak's Revenge]
-						self:SelectGossipAvailableQuestID(57318)
-					elseif self:GetGossipAvailableQuestID(57306) then -- Alliance, More Armor Scraps [Specific to Korrak's Revenge]
-						self:SelectGossipAvailableQuestID(57306)
+					if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
+						if self:GetGossipAvailableQuestID(6781) then -- Alliance, More Armor Scraps
+							self:SelectGossipAvailableQuestID(6781)
+						elseif self:GetGossipAvailableQuestID(6741) then -- Horde, More Booty!
+							self:SelectGossipAvailableQuestID(6741)
+						elseif self:GetGossipAvailableQuestID(57318) then -- Horde, More Booty! [Specific to Korrak's Revenge]
+							self:SelectGossipAvailableQuestID(57318)
+						elseif self:GetGossipAvailableQuestID(57306) then -- Alliance, More Armor Scraps [Specific to Korrak's Revenge]
+							self:SelectGossipAvailableQuestID(57306)
+						end
 					end
 				end
 			elseif mobId == 13236 then -- Horde, Primalist Thurloga
@@ -91,7 +91,6 @@ do
 							geterrorhandler()("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS! ".. tostring(questTable.questID) ..", ".. mobId ..", ".. tostring(questTable.title))
 						end
 						return
-						SelectGossipActiveQuest(1)
 					elseif self:GetGossipAvailableQuestID(7385) and num >= 5 then -- A Gallon of Blood
 						self:SelectGossipAvailableQuestID(7385)
 					elseif self:GetGossipAvailableQuestID(6801) then -- Lokholar the Ice Lord
@@ -109,7 +108,6 @@ do
 							geterrorhandler()("|cFF33FF99Capping|r: NEW ACTIVE QUEST, TELL THE DEVS! ".. tostring(questTable.questID) ..", ".. mobId ..", ".. tostring(questTable.title))
 						end
 						return
-						SelectGossipActiveQuest(1)
 					elseif self:GetGossipAvailableQuestID(7386) and num >= 5 then -- Crystal Cluster
 						self:SelectGossipAvailableQuestID(7386)
 					elseif self:GetGossipAvailableQuestID(6881) then -- Ivus the Forest Lord
@@ -170,9 +168,9 @@ end
 
 local NewTicker = C_Timer.NewTicker
 local hereFromTheStart, hasData = true, true
-local stopTimer = nil
+local timer, stopTimer = nil, nil
 local function allow() hereFromTheStart = false end
-local function stop() hereFromTheStart = true hasData = true stopTimer = nil end
+local function stop() hereFromTheStart = true stopTimer = nil end
 --local GetScoreInfo = C_PvP.GetScoreInfo
 local SendAddonMessage = C_ChatInfo.SendAddonMessage
 local function AVSyncRequest()
@@ -193,7 +191,6 @@ local function AVSyncRequest()
 end
 
 do
-	local timer = nil
 	local function SendAVTimers()
 		timer = nil
 		if IsInGroup(2) then -- We've not just ragequit
@@ -219,14 +216,14 @@ do
 				local id, remaining = strsplit("-", arg)
 				if id and remaining then
 					local widget, barTime = tonumber(id), tonumber(remaining)
-					if widget and barTime and barTime > 5 and barTime < 245 then
+					if widget and barTime and barTime > 5 and barTime < 248 then
 						inProgressDataTbl[widget] = barTime
 					end
 				end
 			end
 
 			if next(inProgressDataTbl) then
-				self:RestoreFlagCaptures(inProgressDataTbl, 242)
+				self:RestoreFlagCaptures(inProgressDataTbl, 245)
 			end
 		end
 
@@ -254,6 +251,7 @@ end
 do
 	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 	function mod:EnterZone(id)
+		hereFromTheStart, hasData = true, false
 		if id == 2197 then
 			self:StartFlagCaptures(241) -- Korrak's Revenge (WoW 15th)
 		else
@@ -276,6 +274,14 @@ do
 end
 
 function mod:ExitZone()
+	if timer then
+		timer:Cancel()
+		timer = nil
+	end
+	if stopTimer then
+		stopTimer:Cancel()
+		stopTimer = nil
+	end
 	self:UnregisterEvent("GOSSIP_SHOW")
 	self:UnregisterEvent("QUEST_PROGRESS")
 	self:UnregisterEvent("QUEST_COMPLETE")

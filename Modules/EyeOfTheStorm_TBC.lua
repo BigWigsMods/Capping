@@ -16,9 +16,9 @@ do
 	end
 end
 
+local ticker1, ticker2 = nil, nil
 do
 	-- EotS PvP Brawl: Gravity Lapse
-	local ticker1, ticker2 = nil, nil
 	local extraMsg = nil
 	local color = {r=0,g=1,b=0}
 	local NewTicker = C_Timer.NewTicker
@@ -52,13 +52,12 @@ do
 			local name = GetSpellName(44224) -- Gravity Lapse
 			local icon = GetSpellTexture(44224) -- Gravity Lapse
 			self:StartBar(name, 15, icon, "colorOther")
-			self:Timer(15, StartNextGravTimer)
-			self:Timer(10, PrintExtraMessage)
 			if ticker1 then
 				ticker1:Cancel()
 				ticker2:Cancel()
-				ticker1, ticker2 = nil, nil
 			end
+			ticker1 = NewTicker(15, StartNextGravTimer, 1)
+			ticker2 = NewTicker(10, PrintExtraMessage, 1)
 		end
 	end
 end
@@ -87,6 +86,11 @@ do
 end
 
 function mod:ExitZone()
+	if ticker1 then
+		ticker1:Cancel()
+		ticker2:Cancel()
+		ticker1, ticker2 = nil, nil
+	end
 	self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_HORDE")
 	self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE")
 	--self:UnregisterEvent("RAID_BOSS_WHISPER")

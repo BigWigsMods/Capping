@@ -7,6 +7,7 @@ do
 end
 
 local strmatch = string.match
+local prevMinutes = nil
 do
 	local icon = {136441, C_Minimap.GetPOITextureCoords(45)}
 	function mod:CHAT_MSG(msg)
@@ -42,7 +43,8 @@ do
 			if tbl and tbl.state == 1 then
 				local minutes = strmatch(tbl.text, "(%d+)")
 				minutes = tonumber(minutes)
-				if minutes and minutes < 16 then -- Starts at 25min, wait until 15min is left
+				if minutes and minutes > 0 and minutes < 16 and minutes ~= prevMinutes then -- Starts at 25min, wait until 15min is left
+					prevMinutes = minutes
 					local remaining = minutes * 60
 					self:StartBar(L.timeRemaining, remaining, 134420, "colorOther", nil, minutes > 5 and 900 or 300) -- Interface/Icons/INV_Misc_Rune_07
 				end
@@ -67,8 +69,10 @@ do
 end
 
 function mod:ExitZone()
+	prevMinutes = nil
 	self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_HORDE")
 	self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE")
+	self:UnregisterEvent("UPDATE_UI_WIDGET")
 end
 
 mod:RegisterZone(2106) -- Warsong Gultch

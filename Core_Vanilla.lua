@@ -29,7 +29,7 @@ do
 				if not custom then
 					local colorid = bar:Get("capping:colorid")
 					local faction = colorid == "colorHorde" and _G.FACTION_HORDE or colorid == "colorAlliance" and _G.FACTION_ALLIANCE or ""
-					local timeLeft = bar.candyBarDuration:GetText()
+					local timeLeft = bar.durationBinding:GetFormattedText()
 					if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
 					C_ChatInfo.SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
 				else
@@ -366,15 +366,16 @@ do
 				local hp = tonumber(strhp)
 				if strid and hp and collection[strid] and hp <= 100 and hp >= 0 and (hp < 0) ~= (hp >= 0) then -- Check hp is 0-100 and isn't NaN
 					if collection[strid].candyBarBar then
-						if hp < 100 then
+						if hp > 0 and hp < 100 then
 							reset[strid] = 0
 						end
 						collection[strid].candyBarBar:SetValue(hp)
 						collection[strid].candyBarDuration:SetFormattedText("%.1f%%", hp)
-					elseif hp < 100 then
+					elseif hp < 100 and hp > 0 then
 						local tbl = collection[strid]
 						local bar = curMod:StartBar(tbl[1], 100, tbl[3], tbl[4], true)
 						bar:Pause()
+						bar:SetTimeVisibility(true)
 						bar.candyBarBar:SetValue(hp)
 						bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 						bar:Set("capping:customchat", function(candyBar)
@@ -416,7 +417,7 @@ do
 		local timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
 		local maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
 		local aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
-		local aBases, hBases = 0, 0
+		local aBases, hBases, prevABases, prevHBases = 0, 0, 0, 0
 		local aTime, hTime = 0, 0
 		local prevfinalAScore, prevfinalHScore = 0, 0
 		local curMod = nil
@@ -436,7 +437,9 @@ do
 					if txt ~= prevText or timeToWin ~= prevTimeToWin then
 						prevTimeToWin = timeToWin
 						curMod:StopBar(prevText)
-						curMod:StartBar(txt, timeToWin-0.5, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+						if timeToWin > 0 then
+							curMod:StartBar(txt, timeToWin-0.5, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+						end
 						prevText = txt
 					end
 				elseif aTicksToWin < hTicksToWin then -- Alliance is winning
@@ -446,7 +449,9 @@ do
 					if txt ~= prevText or timeToWin ~= prevTimeToWin then
 						prevTimeToWin = timeToWin
 						curMod:StopBar(prevText)
-						curMod:StartBar(txt, timeToWin-0.5, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+						if timeToWin > 0 then
+							curMod:StartBar(txt, timeToWin-0.5, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+						end
 						prevText = txt
 					end
 				end
@@ -460,10 +465,13 @@ do
 				local dataTbl = GetIconAndTextWidgetVisualizationInfo(widgetInfo.widgetID)
 				if not dataTbl or not dataTbl.text then return end
 				if prevTime == 0 then
-					prevTime = GetTime()
 					local allianceTbl = GetIconAndTextWidgetVisualizationInfo(3116)
-					prevAScore = tonumber(string.match(allianceTbl.text, "(%d+)/%d+")) or 0
 					local hordeTbl = GetIconAndTextWidgetVisualizationInfo(3117)
+					if not allianceTbl or not allianceTbl.text or not hordeTbl or not hordeTbl.text then return end
+					prevTime = GetTime()
+					local ascoreStr, maxscoreStr = string.match(allianceTbl.text, "(%d+)/(%d+)")
+					prevAScore = tonumber(ascoreStr) or 0
+					maxscore = tonumber(maxscoreStr) or maxscore
 					prevHScore = tonumber(string.match(hordeTbl.text, "(%d+)/%d+")) or 0
 					return
 				end
@@ -474,8 +482,11 @@ do
 				if elapsed > 0.5 then
 					-- If there's only 1 update, it could be either alliance or horde, so we update both stats in this one
 					local allianceTbl = GetIconAndTextWidgetVisualizationInfo(3116)
-					ascore = tonumber(string.match(allianceTbl.text, "(%d+)/%d+")) or 0
 					local hordeTbl = GetIconAndTextWidgetVisualizationInfo(3117)
+					if not allianceTbl or not allianceTbl.text or not hordeTbl or not hordeTbl.text then return end
+					local ascoreStr, maxscoreStr = string.match(allianceTbl.text, "(%d+)/(%d+)")
+					ascore = tonumber(ascoreStr) or 0
+					maxscore = tonumber(maxscoreStr) or maxscore
 					hscore = tonumber(string.match(hordeTbl.text, "(%d+)/%d+")) or 0
 					aIncrease = ascore - prevAScore
 					hIncrease = hscore - prevHScore
@@ -491,18 +502,26 @@ do
 					Timer(0.5, UpdatePredictor)
 				else
 					-- If elapsed < 0.5 then the event fired twice because both alliance and horde have bases.
-					-- 1st update = horde, 2nd update = alliance
 					-- If only one faction has bases, the event only fires once.
-					-- Unfortunately we need to wait for the 2nd event to fire (the alliance update) to know the true alliance stats.
-					-- In this one where we have 2 updates, we overwrite the alliance stats from the 1st update.
-					local allianceTbl = GetIconAndTextWidgetVisualizationInfo(3116)
-					ascore = tonumber(string.match(allianceTbl.text, "(%d+)/%d+")) or 0
-					aIncrease = ascore - prevAScore
-					aRemain = maxscore - ascore
-					-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
-					-- If ticks are 0 (no bases) then set to a random huge number (10,000)
-					aTicksToWin = ceil(aIncrease == 0 and 10000 or aRemain / aIncrease)
-					prevAScore = ascore
+					-- Unfortunately we need to wait for the 2nd event to fire to know the true stats for the other faction.
+					-- In this one where we have 2 updates, we overwrite the stats from the 1st update.
+					if widgetInfo.widgetID == 3116 then
+						ascore = tonumber(string.match(dataTbl.text, "(%d+)/%d+")) or 0
+						aIncrease = ascore - prevAScore
+						aRemain = maxscore - ascore
+						-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
+						-- If ticks are 0 (no bases) then set to a random huge number (10,000)
+						aTicksToWin = ceil(aIncrease == 0 and 10000 or aRemain / aIncrease)
+						prevAScore = ascore
+					else
+						hscore = tonumber(string.match(dataTbl.text, "(%d+)/%d+")) or 0
+						hIncrease = hscore - prevHScore
+						hRemain = maxscore - hscore
+						-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
+						-- If ticks are 0 (no bases) then set to a random huge number (10,000)
+						hTicksToWin = ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
+						prevHScore = hscore
+					end
 				end
 			end
 		end
@@ -516,45 +535,63 @@ do
 				local curTime = GetTime()
 
 				local allianceTbl = GetIconAndTextWidgetVisualizationInfo(1893)
-				local aBasesStr, ascoreStr = string.match(allianceTbl.text, "(%d)[^%d]+(%d+)/%d+")
-				aBases, ascore = tonumber(aBasesStr), tonumber(ascoreStr)
 				local hordeTbl = GetIconAndTextWidgetVisualizationInfo(1894)
+				if not allianceTbl or not allianceTbl.text or not hordeTbl or not hordeTbl.text then return end
+				local aBasesStr, ascoreStr, maxscoreStr = string.match(allianceTbl.text, "(%d)[^%d]+(%d+)/(%d+)")
+				aBases, ascore = tonumber(aBasesStr), tonumber(ascoreStr)
+				maxscore = tonumber(maxscoreStr) or maxscore
 				local hBasesStr, hscoreStr = string.match(hordeTbl.text, "(%d)[^%d]+(%d+)/%d+")
 				hBases, hscore = tonumber(hBasesStr), tonumber(hscoreStr)
+				if not aBases or not ascore or not hBases or not hscore then return end
 
 				-- Hackjob backport of original code
-				local allowUpdate = false
-				if ascore and ascore ~= prevAScore then
-					prevAScore, aTime, allowUpdate = ascore, curTime, true
+				local aTicked, hTicked = false, false
+				if aBases == 0 then
+					aTime = 0
+				elseif ascore ~= prevAScore then
+					prevAScore, aTime, aTicked = ascore, curTime, true
 				end
-				if hscore and hscore ~= prevHScore then
-					prevHScore, hTime, allowUpdate = hscore, curTime, true
+				if hBases == 0 then
+					hTime = 0
+				elseif hscore ~= prevHScore then
+					prevHScore, hTime, hTicked = hscore, curTime, true
 				end
-				if not allowUpdate then return end
+				if not aTicked and not hTicked then return end
 
 				local apps, hpps = abTable[aBases] or 0, abTable[hBases] or 0
-				local ATimeRemain = ((maxscore - ascore) / apps) - (curTime - aTime)
+				local ATimeRemain = ((maxscore - ascore) / apps) - (aTime > 0 and (curTime - aTime) or 0)
 				if ATimeRemain > 10000 then ATimeRemain = 10000 end
-				local HTimeRemain = ((maxscore - hscore) / hpps) - (curTime - hTime)
+				local HTimeRemain = ((maxscore - hscore) / hpps) - (hTime > 0 and (curTime - hTime) or 0)
 				if HTimeRemain > 10000 then HTimeRemain = 10000 end
 
+				local basesChanged = aBases ~= prevABases or hBases ~= prevHBases
+				if aTicked or aBases == 0 then
+					prevABases = aBases
+				end
+				if hTicked or hBases == 0 then
+					prevHBases = hBases
+				end
 				if HTimeRemain < ATimeRemain then -- Horde is winning
 					local finalAScore = 10 * math.floor((HTimeRemain * apps + ascore + 5) * 0.1)
 					finalAScore = (finalAScore < 0 and 0) or (finalAScore < maxscore and finalAScore) or (maxscore - 10)
 					local txt = format(L.finalScore, finalAScore, maxscore)
-					if txt ~= prevText and finalAScore ~= (prevfinalAScore+10) then
+					if basesChanged or (txt ~= prevText and finalAScore ~= (prevfinalAScore+10)) then
 						curMod:StopBar(prevText)
-						curMod:StartBar(txt, HTimeRemain, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+						if HTimeRemain > 0 then
+							curMod:StartBar(txt, HTimeRemain, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+						end
 						prevText = txt
 						prevfinalAScore = finalAScore
 					end
-				else -- Alliance is winning
+				elseif ATimeRemain < HTimeRemain then -- Alliance is winning
 					local finalHScore = 10 * math.floor((ATimeRemain * hpps + hscore + 5) * 0.1)
 					finalHScore = (finalHScore < 0 and 0) or (finalHScore < maxscore and finalHScore) or (maxscore - 10)
 					local txt = format(L.finalScore, maxscore, finalHScore)
-					if txt ~= prevText and finalHScore ~= (prevfinalHScore+10) then
+					if basesChanged or (txt ~= prevText and finalHScore ~= (prevfinalHScore+10)) then
 						curMod:StopBar(prevText)
-						curMod:StartBar(txt, ATimeRemain, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+						if ATimeRemain > 0 then
+							curMod:StartBar(txt, ATimeRemain, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+						end
 						prevText = txt
 						prevfinalHScore = finalHScore
 					end
@@ -578,6 +615,7 @@ do
 			timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
 			maxscore, ascore, hscore, aIncrease, hIncrease = 2000, 0, 0, 0, 0
 			aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
+			prevABases, prevHBases = 0, 0
 			aTime, hTime = 0, 0
 			prevfinalAScore, prevfinalHScore = 0, 0
 
@@ -688,10 +726,18 @@ do
 		local GetAtlasInfo = C_Texture.GetAtlasInfo
 		--local GetSpellName = C_Spell.GetSpellName
 		local GetBestMapForUnit = C_Map.GetBestMapForUnit
+		local IsRatedSoloRBG = C_PvP.IsRatedSoloRBG or function() return false end
 
 		local function UpdatePOI()
 			local curMapID = GetBestMapForUnit("player")
 			if not curMapID then return end
+			if type(capTime) == "table" then
+				if IsRatedSoloRBG() then
+					capTime = capTime[1]
+				else
+					capTime = capTime[2]
+				end
+			end
 			local pois = GetAreaPOIForMap(curMapID)
 			for i = 1, #pois do
 				local tbl = GetAreaPOIInfo(curMapID, pois[i])
@@ -709,6 +755,7 @@ do
 								if id == 30 then -- Alterac Valley
 									local bar = curMod:StartBar(name, 3600, GetIconData(icon), icon == 2 and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
 									bar:Pause()
+									bar:SetFill(false)
 									bar:SetTimeVisibility(false)
 									bar:Set("capping:customchat", function() end)
 								end
@@ -720,7 +767,7 @@ do
 					if landmarkCache[name] ~= atlasName then
 						--print(name, atlasName)
 						landmarkCache[name] = atlasName
-						if atlasColors[atlasName] then
+						if atlasColors and atlasColors[atlasName] then
 							local bar = curMod:StartBar(
 								name,
 								capTime,
@@ -771,13 +818,16 @@ do
 
 		function API:RestoreFlagCaptures(inProgressDataTbl, maxBarTime)
 			local uiMapID = GetBestMapForUnit("player")
+			if not uiMapID then return end
 			local pois = GetAreaPOIForMap(uiMapID)
 			for i = 1, #pois do
 				local tbl = GetAreaPOIInfo(uiMapID, pois[i])
 				local name, icon, areaPoiID = tbl.name, tbl.textureIndex, tbl.areaPoiID
 				local timer = inProgressDataTbl[areaPoiID]
 				if timer and iconDataConflict[icon] then
-					self:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon], nil, maxBarTime)
+					landmarkCache[name] = icon
+					local bar = self:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon], nil, maxBarTime)
+					bar:Set("capping:poiid", areaPoiID)
 				end
 			end
 		end

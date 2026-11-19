@@ -33,6 +33,12 @@ local defensiveTowers = {
 	["307878"] = L.northWestKeep,
 	["307894"] = L.southWestKeep,
 }
+local defensiveTowersEnglish = {
+	["307877"] = "North-East Fortress Tower",
+	["307936"] = "South-East Fortress Tower",
+	["307878"] = "North-West Fortress Tower",
+	["307894"] = "South-West Fortress Tower",
+}
 local objectWallNames = {
 	["308077"] = L.northWest, -- 1
 	["307922"] = L.northWest, -- 2
@@ -59,6 +65,32 @@ local objectWallNames = {
 	["307840"] = L.innerEast, -- 2
 	["307870"] = L.innerEast, -- 3
 }
+local objectWallNamesEnglish = {
+	["308077"] = "North-West Wall", -- 1
+	["307922"] = "North-West Wall", -- 2
+	["307937"] = "North-West Wall", -- 3
+	["307907"] = "North-West Wall", -- 4
+	["308035"] = "South-West Wall", -- 1
+	["307897"] = "South-West Wall", -- 2
+	["307898"] = "South Wall", -- 1
+	["307893"] = "South Gate",
+	["307899"] = "South Wall", -- 2
+	["307879"] = "South-East Wall", -- 1
+	["307896"] = "South-East Wall", -- 2
+	["307927"] = "North-East Wall", -- 1
+	["307919"] = "North-East Wall", -- 2
+	["307867"] = "North-East Wall", -- 3
+	["308083"] = "North-East Wall", -- 4
+	["307963"] = "Inner-West Wall", -- 1
+	["308078"] = "Inner-West Wall", -- 2
+	["307908"] = "Inner-West Wall", -- 3
+	["307941"] = "Inner-South Wall", -- 1
+	["307925"] = "Inner-South Wall", -- 2
+	["307916"] = "Inner-South Wall", -- 3
+	["307938"] = "Inner-East Wall", -- 1
+	["307840"] = "Inner-East Wall", -- 2
+	["307870"] = "Inner-East Wall", -- 3
+}
 local function StartNewBar(self, name, english, icon)
 	local tbl = GetAreaPOIInfo(1334, 6027) -- Main entrance POI
 	local color = "colorAlliance"
@@ -67,6 +99,7 @@ local function StartNewBar(self, name, english, icon)
 	end
 	local bar = self:StartBar(name, 100, icon, color, true) -- Interface/Icons/inv_essenceofwintergrasp
 	bar:Pause()
+	bar:SetTimeVisibility(true)
 	bar.candyBarBar:SetValue(100)
 	bar.candyBarDuration:SetText("100%")
 	bar:Set("capping:customchat", function(candyBar)
@@ -87,6 +120,7 @@ do
 			local _, _, _, _, _, strid = strsplit("-", destGUID)
 			if towers[strid] then
 				local newHp = towers[strid] - amount
+				if newHp < 0 then newHp = 0 end
 				towers[strid] = newHp
 				local bar = self:GetBar(towerNames[strid])
 				if bar then
@@ -103,16 +137,19 @@ do
 					onDemandTrackers[strid] = wallHealth
 				end
 				local newHp = onDemandTrackers[strid] - amount
+				if newHp < 0 then newHp = 0 end
 				onDemandTrackers[strid] = newHp
 				local hp = newHp / wallHealth * 100
 				if hp < 80 then
 					local bar = self:GetBar(objectWallNames[strid])
-					if not bar then
-						bar = StartNewBar(self, objectWallNames[strid], objectWallNames[strid], 134456)
-					end
 					if hp < 0.5 then
-						bar:Stop()
+						if bar then
+							bar:Stop()
+						end
 					else
+						if not bar then
+							bar = StartNewBar(self, objectWallNames[strid], objectWallNamesEnglish[strid], 134456)
+						end
 						local value = bar.candyBarBar:GetValue()
 						if hp < value then
 							bar.candyBarBar:SetValue(hp)
@@ -125,32 +162,40 @@ do
 					onDemandTrackers[strid] = defenseTowerHealth
 				end
 				local newHp = onDemandTrackers[strid] - amount
+				if newHp < 0 then newHp = 0 end
 				onDemandTrackers[strid] = newHp
 				local hp = newHp / defenseTowerHealth * 100
 				if hp < 90 then
 					local bar = self:GetBar(defensiveTowers[strid])
-					if not bar then
-						bar = StartNewBar(self, defensiveTowers[strid], defensiveTowers[strid], 237021) -- Interface/Icons/inv_essenceofwintergrasp
-					end
 					if hp < 1.5 then
-						bar:Stop()
+						if bar then
+							bar:Stop()
+						end
 					else
+						if not bar then
+							bar = StartNewBar(self, defensiveTowers[strid], defensiveTowersEnglish[strid], 237021) -- Interface/Icons/inv_essenceofwintergrasp
+						end
 						bar.candyBarBar:SetValue(hp)
 						bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 					end
 				end
 			elseif strid == "307964" then -- Main Entrance
-				local bar = self:GetBar(L.mainEntrance)
-				if not bar then
-					bar = StartNewBar(self, L.mainEntrance, "Main Entrance", 134957)
+				if not onDemandTrackers[strid] then
 					onDemandTrackers[strid] = mainEntranceHealth
 				end
 				local newHp = onDemandTrackers[strid] - amount
+				if newHp < 0 then newHp = 0 end
 				onDemandTrackers[strid] = newHp
 				local hp = newHp / mainEntranceHealth * 100
+				local bar = self:GetBar(L.mainEntrance)
 				if hp < 0.5 then
-					bar:Stop()
+					if bar then
+						bar:Stop()
+					end
 				else
+					if not bar then
+						bar = StartNewBar(self, L.mainEntrance, "Main Entrance", 134957)
+					end
 					bar.candyBarBar:SetValue(hp)
 					bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 				end
@@ -174,19 +219,21 @@ do
 		for i = 1, #pois do
 			local POI = pois[i]
 			local tbl = GetAreaPOIInfo(1334, POI)
-			local ti = wallTextures[POI]
-			local textureIndex = tbl.textureIndex
-			if tbl and ((ti and ti ~= textureIndex) or (not ti and poiWallNames[POI])) then
-				if intactTextures[ti] and damaged[textureIndex] then -- intact before, damaged now
-					local msg = string.format(L.damaged, poiWallNames[POI])
-					RaidWarningFrame:OnEvent("CHAT_MSG_RAID_WARNING", msg)
-					print(msg)
-				elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
-					local msg = string.format(L.destroyed, poiWallNames[POI])
-					RaidWarningFrame:OnEvent("CHAT_MSG_RAID_WARNING", msg)
-					print(msg)
+			if tbl then
+				local ti = wallTextures[POI]
+				local textureIndex = tbl.textureIndex
+				if (ti and ti ~= textureIndex) or (not ti and poiWallNames[POI]) then
+					if intactTextures[ti] and damaged[textureIndex] then -- intact before, damaged now
+						local msg = string.format(L.damaged, poiWallNames[POI])
+						RaidWarningFrame:OnEvent("CHAT_MSG_RAID_WARNING", msg)
+						print(msg)
+					elseif damaged[ti] and destroyed[textureIndex] then -- damaged before, destroyed now
+						local msg = string.format(L.destroyed, poiWallNames[POI])
+						RaidWarningFrame:OnEvent("CHAT_MSG_RAID_WARNING", msg)
+						print(msg)
+					end
+					wallTextures[POI] = all[textureIndex] and textureIndex or ti
 				end
-				wallTextures[POI] = all[textureIndex] and textureIndex or ti
 			end
 		end
 	end
@@ -209,6 +256,7 @@ do
 		for towerId, towerName in next, towerNames do
 			local bar = mod:StartBar(towerName, 100, 236351, color, true)
 			bar:Pause()
+			bar:SetTimeVisibility(true)
 			bar.candyBarBar:SetValue(100)
 			bar.candyBarDuration:SetText("100%")
 			bar:Set("capping:customchat", function(candyBar)
@@ -255,8 +303,8 @@ do
 				towers["308062"], towers["308013"], towers["307935"], -- West, Mid, East
 				onDemandTrackers["307877"] or defenseTowerHealth, -- North-East
 				onDemandTrackers["307936"] or defenseTowerHealth, -- South-East
-				onDemandTrackers["307878"] or defenseTowerHealth, -- North-West
-				onDemandTrackers["307894"] or defenseTowerHealth -- South-West
+				onDemandTrackers["307894"] or defenseTowerHealth, -- South-West
+				onDemandTrackers["307878"] or defenseTowerHealth -- North-West
 			)
 			local msg2 = "z:"
 			for k, v in next, onDemandTrackers do
@@ -289,32 +337,30 @@ do
 
 		for k, v in next, onDemandTrackers do
 			if k == "307964" then -- Main Entrance
-				local bar = self:GetBar(L.mainEntrance)
-				if not bar then
-					bar = StartNewBar(self, L.mainEntrance, "Main Entrance", 134957)
-				end
 				local hp = v / mainEntranceHealth * 100
+				local bar = self:GetBar(L.mainEntrance)
 				if hp < 0.5 then
-					bar:Stop()
+					if bar then
+						bar:Stop()
+					end
 				else
+					if not bar then
+						bar = StartNewBar(self, L.mainEntrance, "Main Entrance", 134957)
+					end
 					bar.candyBarBar:SetValue(hp)
 					bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 				end
 			elseif objectWallNames[k] then
 				local hp = v / wallHealth * 100
-				if hp < 80 then
+				if hp < 80 and hp >= 0.5 then
 					local bar = self:GetBar(objectWallNames[k])
 					if not bar then
-						bar = StartNewBar(self, objectWallNames[k], objectWallNames[k], 134456)
+						bar = StartNewBar(self, objectWallNames[k], objectWallNamesEnglish[k], 134456)
 					end
-					if hp < 0.5 then
-						bar:Stop()
-					else
-						local value = bar.candyBarBar:GetValue()
-						if hp < value then
-							bar.candyBarBar:SetValue(hp)
-							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
-						end
+					local value = bar.candyBarBar:GetValue()
+					if hp < value then
+						bar.candyBarBar:SetValue(hp)
+						bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 					end
 				end
 			end
@@ -348,10 +394,10 @@ do
 						["308013"] = midHp, -- Winter's Edge Tower (Mid)
 						["307935"] = eastHp, -- Flamewatch Tower (East)
 					}
-					onDemandTrackers["307877"] = neRawHp ~= defenseTowerHealth and neRawHp or nil
-					onDemandTrackers["307936"] = seRawHp ~= defenseTowerHealth and seRawHp or nil
-					onDemandTrackers["307878"] = swRawHp ~= defenseTowerHealth and swRawHp or nil
-					onDemandTrackers["307894"] = nwRawHp ~= defenseTowerHealth and nwRawHp or nil
+					onDemandTrackers["307877"] = neHp ~= defenseTowerHealth and neHp or nil
+					onDemandTrackers["307936"] = seHp ~= defenseTowerHealth and seHp or nil
+					onDemandTrackers["307894"] = swHp ~= defenseTowerHealth and swHp or nil
+					onDemandTrackers["307878"] = nwHp ~= defenseTowerHealth and nwHp or nil
 
 					for towerId, towerHp in next, towers do
 						local bar = self:GetBar(towerNames[towerId])
@@ -372,12 +418,14 @@ do
 							local hp = raw / defenseTowerHealth * 100
 							if hp < 90 then
 								local bar = self:GetBar(defensiveTowers[k])
-								if not bar then
-									bar = StartNewBar(self, defensiveTowers[k], defensiveTowers[k], 237021) -- Interface/Icons/inv_essenceofwintergrasp
-								end
 								if hp < 1.5 then
-									bar:Stop()
+									if bar then
+										bar:Stop()
+									end
 								else
+									if not bar then
+										bar = StartNewBar(self, defensiveTowers[k], defensiveTowersEnglish[k], 237021) -- Interface/Icons/inv_essenceofwintergrasp
+									end
 									bar.candyBarBar:SetValue(hp)
 									bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 								end
@@ -401,7 +449,7 @@ do
 		for i = 1, #pois do
 			local POI = pois[i]
 			local tbl = GetAreaPOIInfo(1334, POI)
-			if poiWallNames[POI] and tbl.textureIndex then
+			if tbl and poiWallNames[POI] and tbl.textureIndex then
 				wallTextures[POI] = tbl.textureIndex
 			end
 		end

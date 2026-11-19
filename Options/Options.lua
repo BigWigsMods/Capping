@@ -31,7 +31,9 @@ local barClickSetOptions = function(info, value)
 	cap.db.profile[info[#info]] = value
 	if cap.db.profile.barOnShift ~= "NONE" or cap.db.profile.barOnControl ~= "NONE" or cap.db.profile.barOnAlt ~= "NONE" then
 		for bar in next, cap.bars do
-			bar:EnableMouse(true)
+			if bar:GetScript("OnMouseUp") then -- Check if we should enable the mouse (Clickable bars commented out on retail)
+				bar:EnableMouse(true)
+			end
 		end
 	else
 		for bar in next, cap.bars do
@@ -109,7 +111,9 @@ local options = function()
 						set = function(_, value)
 							cap.db.profile.timeText = value
 							for bar in next, cap.bars do
-								bar:SetTimeVisibility(value)
+								if not bar.paused then
+									bar:SetTimeVisibility(value)
+								end
 							end
 						end,
 					},
@@ -120,7 +124,9 @@ local options = function()
 						set = function(_, value)
 							cap.db.profile.fill = value
 							for bar in next, cap.bars do
-								bar:SetFill(value)
+								if not bar.paused then
+									bar:SetFill(value)
+								end
 							end
 						end,
 					},
@@ -423,7 +429,7 @@ local options = function()
 							cap.db.profile.queueBars = value
 							if not value then
 								for bar in next, cap.bars do
-									if bar:Get("capping:queueid") then
+									if bar:Get("capping:queueid") and bar:Get("capping:colorid") == "colorQueue" then
 										bar:Stop()
 									end
 								end

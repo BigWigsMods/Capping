@@ -30,7 +30,7 @@ do
 		--		if not custom then
 		--			local colorid = bar:Get("capping:colorid")
 		--			local faction = colorid == "colorHorde" and _G.FACTION_HORDE or colorid == "colorAlliance" and _G.FACTION_ALLIANCE or ""
-		--			local timeLeft = bar.candyBarDuration:GetText()
+		--			local timeLeft = bar.durationBinding:GetFormattedText()
 		--			if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
 		--			C_ChatInfo.SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
 		--		else
@@ -367,15 +367,16 @@ do
 				local hp = tonumber(strhp)
 				if strid and hp and collection[strid] and hp <= 100 and hp >= 0 and (hp < 0) ~= (hp >= 0) then -- Check hp is 0-100 and isn't NaN
 					if collection[strid].candyBarBar then
-						if hp < 100 then
+						if hp > 0 and hp < 100 then
 							reset[strid] = 0
 						end
 						collection[strid].candyBarBar:SetValue(hp)
 						collection[strid].candyBarDuration:SetFormattedText("%.1f%%", hp)
-					elseif hp < 100 then
+					elseif hp < 100 and hp > 0 then
 						local tbl = collection[strid]
 						local bar = curMod:StartBar(tbl[1], 100, tbl[3], tbl[4], true)
 						bar:Pause()
+						bar:SetTimeVisibility(true)
 						bar.candyBarBar:SetValue(hp)
 						bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
 						bar:Set("capping:customchat", function(candyBar)
@@ -434,7 +435,9 @@ do
 					if txt ~= prevText or timeToWin ~= prevTimeToWin then
 						prevTimeToWin = timeToWin
 						curMod:StopBar(prevText)
-						curMod:StartBar(txt, timeToWin-0.5, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+						if timeToWin > 0 then
+							curMod:StartBar(txt, timeToWin-0.5, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+						end
 						prevText = txt
 					end
 				elseif aTicksToWin < hTicksToWin then -- Alliance is winning
@@ -444,7 +447,9 @@ do
 					if txt ~= prevText or timeToWin ~= prevTimeToWin then
 						prevTimeToWin = timeToWin
 						curMod:StopBar(prevText)
-						curMod:StartBar(txt, timeToWin-0.5, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+						if timeToWin > 0 then
+							curMod:StartBar(txt, timeToWin-0.5, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+						end
 						prevText = txt
 					end
 				end
@@ -460,6 +465,7 @@ do
 				if not dataTbl or not dataTbl.leftBarMax then return end
 				if prevTime == 0 then
 					prevTime = GetTime()
+					maxscore = dataTbl.leftBarMax
 					prevAScore, prevHScore = dataTbl.leftBarValue, dataTbl.rightBarValue
 					return
 				end
@@ -490,13 +496,22 @@ do
 					-- If only one faction has bases, the event only fires once.
 					-- Unfortunately we need to wait for the 2nd event to fire (the horde update) to know the true horde stats.
 					-- In this one where we have 2 updates, we overwrite the horde stats from the 1st update.
-					hscore = dataTbl.rightBarValue -- Horde Bar
-					hIncrease = hscore - prevHScore
-					hRemain = maxscore - hscore
-					-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
-					-- If ticks are 0 (no bases) then set to a random huge number (10,000)
-					hTicksToWin = ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
-					prevHScore = hscore
+					if dataTbl.leftBarValue ~= prevAScore then
+						ascore = dataTbl.leftBarValue -- Alliance Bar
+						aIncrease = ascore - prevAScore
+						aRemain = maxscore - ascore
+						aTicksToWin = ceil(aIncrease == 0 and 10000 or aRemain / aIncrease)
+						prevAScore = ascore
+					end
+					if dataTbl.rightBarValue ~= prevHScore then
+						hscore = dataTbl.rightBarValue -- Horde Bar
+						hIncrease = hscore - prevHScore
+						hRemain = maxscore - hscore
+						-- Always round ticks upwards. 1.2 ticks will always be 2 ticks to end.
+						-- If ticks are 0 (no bases) then set to a random huge number (10,000)
+						hTicksToWin = ceil(hIncrease == 0 and 10000 or hRemain / hIncrease)
+						prevHScore = hscore
+					end
 				end
 			end
 		end
@@ -632,7 +647,8 @@ do
 				local tbl = GetAreaPOIInfo(curMapID, pois[i])
 				local name, icon, atlasName, areaPoiID = tbl.name, tbl.textureIndex, tbl.atlasName, tbl.areaPoiID
 				if icon then
-					if landmarkCache[name] ~= icon then
+					local prevIcon = landmarkCache[name]
+					if prevIcon ~= icon then
 						landmarkCache[name] = icon
 						if iconDataConflict[icon] then
 							local bar = curMod:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
@@ -642,7 +658,7 @@ do
 							end
 						else
 							curMod:StopBar(name)
-							if icon == 136 or icon == 138 then -- Workshop in IoC
+							if (icon == 136 or icon == 138) and (prevIcon == 137 or prevIcon == 139) then -- Workshop in IoC
 								curMod:StartBar(GetSpellName(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
 							elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
 								-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
@@ -650,6 +666,7 @@ do
 								if id == 30 or id == 628 or id == 2197 then -- Alterac Valley, IoC, Korrak's Revenge (WoW 15th)
 									local bar = curMod:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
 									bar:Pause()
+									bar:SetFill(false)
 									bar:SetTimeVisibility(false)
 									bar:Set("capping:customchat", function() end)
 								end
@@ -661,7 +678,7 @@ do
 					if landmarkCache[name] ~= atlasName then
 						--print(name, atlasName)
 						landmarkCache[name] = atlasName
-						if atlasColors[atlasName] then
+						if atlasColors and atlasColors[atlasName] then
 							local bar = curMod:StartBar(
 								name,
 								capTime,
@@ -712,13 +729,16 @@ do
 
 		function API:RestoreFlagCaptures(inProgressDataTbl, maxBarTime)
 			local uiMapID = GetBestMapForUnit("player")
+			if not uiMapID then return end
 			local pois = GetAreaPOIForMap(uiMapID)
 			for i = 1, #pois do
 				local tbl = GetAreaPOIInfo(uiMapID, pois[i])
 				local name, icon, areaPoiID = tbl.name, tbl.textureIndex, tbl.areaPoiID
 				local timer = inProgressDataTbl[areaPoiID]
 				if timer and iconDataConflict[icon] then
-					self:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon], nil, maxBarTime)
+					landmarkCache[name] = icon
+					local bar = self:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon], nil, maxBarTime)
+					bar:Set("capping:poiid", areaPoiID)
 				end
 			end
 		end

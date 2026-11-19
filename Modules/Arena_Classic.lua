@@ -31,7 +31,4 @@ function mod:ExitZone()
 	self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
 end
 
-mod:RegisterZone(559) -- Nagrand Arena
-mod:RegisterZone(562) -- Blade's Edge Arena
-mod:RegisterZone(572) -- Ruins of Lordaeron
-mod:RegisterZone(617) -- Dalaran Sewers
+mod:RegisterZone("arena")

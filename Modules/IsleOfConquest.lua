@@ -35,6 +35,7 @@ do
 						local hp = newHp / baseGateHealth * 100
 						if hp < 0.5 then
 							bar:Stop()
+							hordeGateBar = nil
 						else
 							bar.candyBarBar:SetValue(hp)
 							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
@@ -54,6 +55,7 @@ do
 						local hp = newHp / baseGateHealth * 100
 						if hp < 0.5 then
 							bar:Stop()
+							allianceGateBar = nil
 						else
 							bar.candyBarBar:SetValue(hp)
 							bar.candyBarDuration:SetFormattedText("%.1f%%", hp)
@@ -77,6 +79,7 @@ local function initGateBars()
 	mod:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	local aBar = mod:StartBar(L.allianceGate, 100, 2054277, "colorHorde", true) -- Interface/Icons/spell_tailor_defenceup01
 	aBar:Pause()
+	aBar:SetTimeVisibility(true)
 	aBar.candyBarBar:SetValue(100)
 	aBar.candyBarDuration:SetText("100%")
 	aBar:Set("capping:englishprint", "Alliance Gate/")
@@ -89,6 +92,7 @@ local function initGateBars()
 	end)
 	local hBar = mod:StartBar(L.hordeGate, 100, 2054277, "colorAlliance", true) -- Interface/Icons/spell_tailor_defenceup01
 	hBar:Pause()
+	hBar:SetTimeVisibility(true)
 	hBar.candyBarBar:SetValue(100)
 	hBar.candyBarDuration:SetText("100%")
 	hBar:Set("capping:englishprint", "Horde Gate/")
@@ -189,6 +193,7 @@ do
 						local hp = lowestHordeHp / baseGateHealth * 100
 						if hp < 1 then
 							hordeGateBar:Stop()
+							hordeGateBar = nil
 						else
 							hordeGateBar.candyBarBar:SetValue(hp)
 							hordeGateBar.candyBarDuration:SetFormattedText("%.1f%%", hp)
@@ -203,6 +208,7 @@ do
 						local hp = lowestAllianceHp / baseGateHealth * 100
 						if hp < 1 then
 							allianceGateBar:Stop()
+							allianceGateBar = nil
 						else
 							allianceGateBar.candyBarBar:SetValue(hp)
 							allianceGateBar.candyBarDuration:SetFormattedText("%.1f%%", hp)
@@ -258,6 +264,8 @@ function mod:ExitZone()
 	--self:UnregisterEvent("CHAT_MSG_MONSTER_YELL")
 	--self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:StopFlagCaptures()
+	--self:StopHealthCheck()
+	hordeGateBar, allianceGateBar = nil, nil
 end
 
 mod:RegisterZone(628)
