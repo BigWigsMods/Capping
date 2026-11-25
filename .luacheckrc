@@ -66,9 +66,11 @@ globals = {
 	"StopSound",
 	"strmatch",
 	"strsplit",
+	"UnitFactionGroup",
 	"UnitGUID",
 	"UnitHealth",
 	"UnitHealthMax",
+	"UnitIsMercenary",
 	"UnitName",
 	"UnitPosition",
 	"WOW_PROJECT_ID", -- XXX remove
