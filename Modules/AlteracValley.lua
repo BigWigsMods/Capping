@@ -27,8 +27,8 @@ do
 		[35741] = true, -- horde
 
 		[29176] = true, -- How many more supplies are needed to send ground assaults? [Stormpike Quartermaster (12096) - Alliance]
-		[29178] = true, -- I want to browse your goods. [Stormpike Quartermaster (12096) - Alliance]
 		[97018] = true, -- How many more supplies are needed to send ground assaults? [Stormpike Quartermaster (12096) - Alliance] (WoW Forever)
+		[29178] = true, -- I want to browse your goods. [Stormpike Quartermaster (12096) - Alliance]
 		[97016] = true, -- I want to browse your goods. [Stormpike Quartermaster (12096) - Alliance] (WoW Forever)
 		[32488] = true, -- How many more supplies are needed to send a ground assault? [Frostwolf Quartermaster (12097) - Horde]
 		[32490] = true, -- I want to browse your goods. [Frostwolf Quartermaster (12097) - Horde]
@@ -66,6 +66,11 @@ do
 
 		[32605] = true, -- With pleasure. These things stink! [Stormpike Stable Master (13617) - Alliance]
 		--[32605] = true, -- With pleasure. These things stink! [Frostwolf Stable Master (13616) - Horde]
+
+		-- Wing Commanders in the towers
+		[97516] = true, -- I got your back, Ichman. GO GO GO! [Wing Commander Ichman (13437) - Alliance] (WoW Forever)
+		[96694] = true, -- I got you covered, Vipore. Move out! [Wing Commander Vipore (13439) - Alliance] (WoW Forever)
+		[96695] = true, -- I got your back, Slidore, but to be honest, you do stink. Take a shower, man. [Wing Commander Slidore (13438) - Alliance] (WoW Forever)
 	}
 
 	local knownBadQuestIDs = {
