@@ -28,6 +28,7 @@ L.lokholar = "洛克霍拉"
 L.handIn = "|cFF33FF99Capping|r: 自动交任务物品。"
 L.anchorTooltip = "|cffeda55f右击|r打开选项"
 L.anchorTooltipNote = "打开选项并锁定来隐藏移动锚点。"
+--L.cannotReportInCombat = "|cFF33FF99Capping|r: You cannot report timers whilst you're in combat."
 
 --- Alliance IoC Workshop yells:
 -- 侏儒技师喊道：我就要完成了！挡住那帮部落的家伙。他们可不是在工程学校进行战斗教学！

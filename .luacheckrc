@@ -51,6 +51,7 @@ globals = {
 	"GetSpellInfo",
 	"GetSpellTexture",
 	"GetTime",
+	"InCombatLockdown",
 	"IsAltKeyDown",
 	"IsControlKeyDown",
 	"IsInGroup",

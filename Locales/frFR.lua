@@ -28,6 +28,7 @@ L.lokholar = "Lokholar" -- Lokholar le Seigneur des glaces
 L.handIn = "|cFF33FF99Capping|r: Remise automatique des objets de quête."
 L.anchorTooltip = "|cffeda55fClic droit|r pour accéder aux options."
 L.anchorTooltipNote = "Ouvre les options et verrouille les barres afin de cacher l'ancre à déplacer."
+--L.cannotReportInCombat = "|cFF33FF99Capping|r: You cannot report timers whilst you're in combat."
 
 --- Alliance IoC Workshop yells:
 -- Mécano gnome crie : J'en suis à la moitié ! Tenez la Horde à distance. On n'apprend pas à se battre dans les écoles d'ingénieurs !

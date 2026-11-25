@@ -27,6 +27,7 @@ L.lokholar = "Lokholar" -- Lokholar el Señor del Hielo
 L.handIn = "|cFF33FF99Capping|r: Entregando objetos de misión automáticamente."
 L.anchorTooltip = "|cffeda55fRight-Clic|r para acceder a las opciones"
 L.anchorTooltipNote = "Abre las opciones y bloquea las barras para esconder este ancla móvil."
+--L.cannotReportInCombat = "|cFF33FF99Capping|r: You cannot report timers whilst you're in combat."
 
 --- Alliance IoC Workshop yells:
 -- Mecánico gnomo grita: ¡Estoy a medias! Mantén a la Horda alejada de aquí. ¡En la escuela de ingeniería no enseñan a luchar!

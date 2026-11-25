@@ -28,6 +28,7 @@ L.lokholar = "洛克霍拉"
 L.handIn = "|cFF33FF99Capping|r: 自動上交任務物品。"
 L.anchorTooltip = "|cffeda55f右鍵點擊|r打開選項"
 L.anchorTooltipNote = "打開選項，並鎖定位置，就能隱藏此綠色移動錨點。"
+--L.cannotReportInCombat = "|cFF33FF99Capping|r: You cannot report timers whilst you're in combat."
 
 --- Alliance IoC Workshop yells:
 -- Gnomish Mechanic yells: I'm halfway there! Keep the Horde away from here.  They don't teach fighting in engineering school!

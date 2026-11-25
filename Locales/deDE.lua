@@ -28,6 +28,7 @@ L.lokholar = "Lokholar" -- Lokholar der Eislord
 L.handIn = "|cFF33FF99Capping|r: Gebe Quest-Gegenstände automatisch ab."
 L.anchorTooltip = "|cffeda55fRechtsklick|r, um auf die Optionen zuzugreifen"
 L.anchorTooltipNote = "Öffne die Optionen und sperre die Balken, um diesen beweglichen Anker auszublenden."
+--L.cannotReportInCombat = "|cFF33FF99Capping|r: You cannot report timers whilst you're in combat."
 
 --- Alliance IoC Workshop yells:
 -- Gnomenmechaniker: Ich hab's gleich! Haltet die Horde von hier fern. Kämpfen stand in der Ingenieursschule nicht auf dem

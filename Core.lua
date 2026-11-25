@@ -22,35 +22,99 @@ do
 	local API = {}
 	local public = {}
 	do
-		--local BarOnClick
-		--do
-		--	local function ReportBar(bar, channel)
-		--		if not activeBars[bar] then return end
-		--		if channel == "INSTANCE_CHAT" and not IsInGroup(2) then channel = "RAID" end -- LE_PARTY_CATEGORY_INSTANCE = 2
-		--		local custom = bar:Get("capping:customchat")
-		--		if not custom then
-		--			local colorid = bar:Get("capping:colorid")
-		--			local faction = colorid == "colorHorde" and _G.FACTION_HORDE or colorid == "colorAlliance" and _G.FACTION_ALLIANCE or ""
-		--			local timeLeft = bar.durationBinding:GetFormattedText()
-		--			if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
-		--			C_ChatInfo.SendChatMessage(format("Capping: %s - %s %s", bar:GetLabel(), timeLeft, faction == "" and faction or "("..faction..")"), channel)
-		--		else
-		--			local msg = custom(bar)
-		--			if msg then
-		--				C_ChatInfo.SendChatMessage(format("Capping: %s", msg), channel)
-		--			end
-		--		end
-		--	end
-		--	function BarOnClick(bar)
-		--		if IsShiftKeyDown() and db.profile.barOnShift ~= "NONE" then
-		--			ReportBar(bar, db.profile.barOnShift)
-		--		elseif IsControlKeyDown() and db.profile.barOnControl ~= "NONE" then
-		--			ReportBar(bar, db.profile.barOnControl)
-		--		elseif IsAltKeyDown() and db.profile.barOnAlt ~= "NONE" then
-		--			ReportBar(bar, db.profile.barOnAlt)
-		--		end
-		--	end
-		--end
+		local BarOnEnter, ClearBarClickProxy
+		do
+			local clickProxy = CreateFrame("Button", nil, frame, "InsecureActionButtonTemplate")
+			clickProxy:Hide()
+			clickProxy:RegisterForClicks("AnyUp")
+			clickProxy:SetAttribute("useOnKeyDown", false)
+			clickProxy:SetAttribute("type", "macro")
+
+			local channelSlash = {
+				SAY = _G.SLASH_SAY1,
+				INSTANCE_CHAT = _G.SLASH_INSTANCE_CHAT1,
+				RAID = _G.SLASH_RAID1,
+			}
+
+			local function BuildReportMacroText(bar, channel)
+				if not activeBars[bar] then return end
+				if channel == "INSTANCE_CHAT" and not IsInGroup(2) then channel = "RAID" end -- LE_PARTY_CATEGORY_INSTANCE = 2
+				local slash = channelSlash[channel]
+				if not slash then return end
+				local custom = bar:Get("capping:customchat")
+				if not custom then
+					local colorid = bar:Get("capping:colorid")
+					local faction = colorid == "colorHorde" and _G.FACTION_HORDE or colorid == "colorAlliance" and _G.FACTION_ALLIANCE or ""
+					local timeLeft = bar.durationBinding:GetFormattedText()
+					if not timeLeft or timeLeft == "" then return end
+					if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
+					local label = bar:GetLabel()
+					return format("%s Capping: %s - %s %s", slash, label, timeLeft, faction == "" and faction or "("..faction..")")
+				else
+					local msg = custom(bar)
+					if msg then
+						return format("%s Capping: %s", slash, msg)
+					end
+				end
+			end
+
+			clickProxy:SetScript("PreClick", function(self)
+				local bar = self.bar
+				if not bar or not activeBars[bar] then
+					self:SetAttribute("macrotext", nil)
+					return
+				end
+				local channel
+				if IsShiftKeyDown() and db.profile.barOnShift ~= "NONE" then
+					channel = db.profile.barOnShift
+				elseif IsControlKeyDown() and db.profile.barOnControl ~= "NONE" then
+					channel = db.profile.barOnControl
+				elseif IsAltKeyDown() and db.profile.barOnAlt ~= "NONE" then
+					channel = db.profile.barOnAlt
+				end
+				if not channel then
+					self:SetAttribute("macrotext", nil)
+					return
+				end
+				if InCombatLockdown() then
+					self:SetAttribute("macrotext", nil)
+					print(L.cannotReportInCombat)
+					return
+				end
+				local macroText = BuildReportMacroText(bar, channel)
+				self:SetAttribute("macrotext", macroText)
+			end)
+
+			clickProxy:SetScript("PostClick", function(self)
+				self:SetAttribute("macrotext", nil)
+			end)
+
+			clickProxy:SetScript("OnLeave", function(self)
+				self.bar = nil
+				self:SetAttribute("macrotext", nil)
+				self:Hide()
+				self:ClearAllPoints()
+			end)
+
+			function BarOnEnter(bar)
+				clickProxy.bar = bar
+				local strata = bar:GetFrameStrata()
+				clickProxy:ClearAllPoints()
+				clickProxy:SetFrameStrata(strata)
+				clickProxy:SetFrameLevel(bar:GetFrameLevel() + 5)
+				clickProxy:SetAllPoints(bar)
+				clickProxy:Show()
+			end
+
+			function ClearBarClickProxy(bar)
+				if clickProxy.bar == bar then
+					clickProxy.bar = nil
+					clickProxy:SetAttribute("macrotext", nil)
+					clickProxy:Hide()
+					clickProxy:ClearAllPoints()
+				end
+			end
+		end
 
 		local RearrangeBars
 		do
@@ -137,12 +201,12 @@ do
 			end
 			bar.candyBarLabel:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 			bar.candyBarDuration:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
-			--bar:SetScript("OnMouseUp", BarOnClick)
-			--if db.profile.barOnShift ~= "NONE" or db.profile.barOnControl ~= "NONE" or db.profile.barOnAlt ~= "NONE" then
-			--	bar:EnableMouse(true)
-			--else
+			bar:SetScript("OnEnter", BarOnEnter)
+			if db.profile.barOnShift ~= "NONE" or db.profile.barOnControl ~= "NONE" or db.profile.barOnAlt ~= "NONE" then
+				bar:EnableMouse(true)
+			else
 				bar:EnableMouse(false)
-			--end
+			end
 			bar:Start(maxBarTime)
 			RearrangeBars()
 			return bar
@@ -185,6 +249,7 @@ do
 		end
 
 		candy.RegisterCallback(API, "LibCandyBar_Stop", function(_, bar)
+			ClearBarClickProxy(bar)
 			if activeBars[bar] then
 				activeBars[bar] = nil
 				RearrangeBars()

@@ -28,6 +28,7 @@ L.lokholar = "로크홀라"
 L.handIn = "|cFF33FF99Capping|r: 퀘스트 아이템 자동 반납 중."
 L.anchorTooltip = "옵션에 접근하려면 |cffeda55f오른쪽 클릭|r하세요"
 L.anchorTooltipNote = "옵션을 열고 바를 잠그면 이 이동 앵커가 숨겨집니다."
+--L.cannotReportInCombat = "|cFF33FF99Capping|r: You cannot report timers whilst you're in combat."
 
 --- Alliance IoC Workshop yells:
 -- 노움 정비사의 외침: 반쯤 됐다고! 호드가 절 못 때리게 해주세요. 기계 공학 학교에서는 싸움은 안 가르친다구요!

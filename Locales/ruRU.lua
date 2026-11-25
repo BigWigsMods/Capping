@@ -28,6 +28,7 @@ L.lokholar = "Локолар" -- Локолар Владыка Льда
 L.handIn = "|cFF33FF99Capping|r: Автоматическая сдача квестовых предметов." -- проверить на проде // spellcheck on live
 L.anchorTooltip = "|cffeda55fПравый клик|r открыть настройки"
 --L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."
+--L.cannotReportInCombat = "|cFF33FF99Capping|r: You cannot report timers whilst you're in combat."
 
 --- Alliance IoC Workshop yells:
 --Гном-механик кричит: Я уже почти закончил! Только не подпускай ко мне Орду – в инженерной школе не учат махать мечом!
