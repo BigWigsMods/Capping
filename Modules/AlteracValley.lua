@@ -68,8 +68,11 @@ do
 		--[32605] = true, -- With pleasure. These things stink! [Frostwolf Stable Master (13616) - Horde]
 
 		-- Wing Commanders in the towers
+		[30406] = true, -- I got your back, Ichman. GO GO GO! [Wing Commander Ichman (13437) - Alliance]
 		[97516] = true, -- I got your back, Ichman. GO GO GO! [Wing Commander Ichman (13437) - Alliance] (WoW Forever)
+		[30407] = true, -- I got you covered, Vipore. Move out! [Wing Commander Vipore (13439) - Alliance]
 		[96694] = true, -- I got you covered, Vipore. Move out! [Wing Commander Vipore (13439) - Alliance] (WoW Forever)
+		[30614] = true, -- I got your back, Slidore, but to be honest, you do stink. Take a shower, man. [Wing Commander Slidore (13438) - Alliance]
 		[96695] = true, -- I got your back, Slidore, but to be honest, you do stink. Take a shower, man. [Wing Commander Slidore (13438) - Alliance] (WoW Forever)
 	}
 
