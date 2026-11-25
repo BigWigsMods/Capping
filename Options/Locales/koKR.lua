@@ -40,7 +40,7 @@ L.barBackground = "바 배경"
 --- Features
 L.features = "기능"
 L.queueBarsDesc = "대기열과 예상 대기 시간을 보여주는 바를 활성화합니다."
-L.barClickDesc = "바를 클릭할 때 특정 채팅 출력을 위한 키보드 수정자를 설정합니다. 세 가지 모두 '없음'으로 설정하면 클릭 가능한 바가 비활성화되어 바를 통과하여 클릭할 수 있습니다."
+L.barClickDesc = "바를 클릭할 때 특정 채팅 출력을 위한 키보드 수정자를 설정합니다."
 L.shiftClick = "Shift-Click"
 L.controlClick = "Ctrl-Click"
 L.altClick = "Alt-Click"

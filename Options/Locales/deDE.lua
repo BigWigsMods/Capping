@@ -39,7 +39,7 @@ L.barBackground = "Leistenhintergrund"
 --- Features
 L.features = "Eigenschaften"
 L.queueBarsDesc = "Aktivieren Sie die Leisten, die anzeigen, welchen Warteschlangen Sie beigetreten sind und wie lange Sie sich voraussichtlich in Ihnen befinden werden."
-L.barClickDesc = "Konfigurieren Sie den Tastaturmodifikator, den Sie für bestimmte Chatausgaben beim Klicken auf eine Leiste verwenden möchten. Wenn Sie alle 3 auf 'Keine' setzen, werden klickbare Leisten deaktiviert, so dass Sie sich durch sie hindurchklicken können."
+L.barClickDesc = "Konfigurieren Sie den Tastaturmodifikator, den Sie für bestimmte Chatausgaben beim Klicken auf eine Leiste verwenden möchten."
 L.shiftClick = "Shift-Klick"
 L.controlClick = "Control-Klick"
 L.altClick = "Alt-Klick"

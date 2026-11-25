@@ -40,7 +40,7 @@ L.barBackground = "Fond de la barre"
 --- Features
 L.features = "Fonctionnalités"
 L.queueBarsDesc = "Activez les barres indiquant les files d'attente auxquelles vous vous êtes joint et le temps estimé pendant lequel vous serez dans la file d'attente."
-L.barClickDesc = "Configurez le modificateur de clavier que vous souhaitez utiliser pour une sortie de discussion spécifique lorsque vous cliquez sur une barre. Régler les 3 sur «Aucun» désactivera les barres cliquables, vous permettant de cliquer dessus."
+L.barClickDesc = "Configurez le modificateur de clavier que vous souhaitez utiliser pour une sortie de discussion spécifique lorsque vous cliquez sur une barre."
 L.shiftClick = "Maj + clic"
 L.controlClick = "Ctrl + clic"
 L.altClick = "Alt + clic"

@@ -40,7 +40,7 @@ L.barBackground = "計時條背景"
 --- Features
 L.features = "功能"
 L.queueBarsDesc = "啟用此計時條可以顯示你正在等待的隊列，以及隊列就緒的預估時間。"
-L.barClickDesc = "設定組合鍵，當你用組合鍵點擊計時條時，會在指定頻道通報剩餘時間。將三個選項均設為「無」可以禁用點擊功能，使計時條可以點擊穿透。"
+L.barClickDesc = "設定組合鍵，當你用組合鍵點擊計時條時，會在指定頻道通報剩餘時間。"
 L.shiftClick = "Shift-點擊"
 L.controlClick = "Control-點擊"
 L.altClick = "Alt-點擊"

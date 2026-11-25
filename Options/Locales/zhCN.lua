@@ -40,7 +40,7 @@ L.barBackground = "计时条背景"
 --- Features
 L.features ="特色"
 L.queueBarsDesc ="启用队列计时条，显示您已加入的队列以及您在队列中的估计时间。"
-L.barClickDesc ="设置组合键，使您用组合键点击计时条时可以发送计时条信息至指定频道。将三个选项均设置为 '无' 将启用点击穿透，禁用可点击计时条。"
+L.barClickDesc = "设置组合键，使您用组合键点击计时条时可以发送计时条信息至指定频道。"
 L.shiftClick ="Shift-点击"
 L.controlClick ="Control-点击"
 L.altClick ="Alt-点击"

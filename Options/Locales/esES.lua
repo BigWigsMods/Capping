@@ -39,7 +39,7 @@ L.barBackground = "Fondo de barra"
 --- Features
 L.features = "Características"
 L.queueBarsDesc = "Activa las barras mostrando a qué colas te has unido y qué tiempo estimado en cola estarás."
-L.barClickDesc = "Configura el modificador de teclado que desees usar para la salida de chat específica cuando hagas click en una barra. Seleccionando las 3 a 'Ninguno' desactivará las barras clicables, permitiéndote clicar a través de ellas."
+L.barClickDesc = "Configura el modificador de teclado que desees usar para la salida de chat específica cuando hagas click en una barra."
 L.shiftClick = "Shift-Clic"
 L.controlClick = "Control-Clic"
 L.altClick = "Alt-Clic"

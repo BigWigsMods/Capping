@@ -20,8 +20,53 @@ do
 	local API = {}
 	local public = {}
 	do
-		local BarOnClick
+		local BarOnClick, IsClickModifierDown, EnsureModifierEvent, UnregisterModifierEvent
 		do
+			local modifierEventRegistered = false
+
+			local function HasClickModifierEnabled()
+				return db.profile.barOnShift ~= "NONE" or db.profile.barOnControl ~= "NONE" or db.profile.barOnAlt ~= "NONE"
+			end
+
+			function IsClickModifierDown()
+				return (db.profile.barOnShift ~= "NONE" and IsShiftKeyDown())
+					or (db.profile.barOnControl ~= "NONE" and IsControlKeyDown())
+					or (db.profile.barOnAlt ~= "NONE" and IsAltKeyDown())
+			end
+
+			local function UpdateBarMouseState()
+				local enabled = IsClickModifierDown()
+				for bar in next, activeBars do
+					bar:EnableMouse(enabled)
+				end
+			end
+
+			function EnsureModifierEvent()
+				if not modifierEventRegistered and HasClickModifierEnabled() then
+					modifierEventRegistered = true
+					core:RegisterEvent("MODIFIER_STATE_CHANGED", UpdateBarMouseState)
+				end
+			end
+
+			function UnregisterModifierEvent()
+				if modifierEventRegistered and not next(activeBars) then
+					modifierEventRegistered = false
+					core:UnregisterEvent("MODIFIER_STATE_CHANGED")
+				end
+			end
+
+			frame.UpdateBarClickState = function()
+				local shouldListen = next(activeBars) ~= nil and HasClickModifierEnabled()
+				if shouldListen and not modifierEventRegistered then
+					modifierEventRegistered = true
+					core:RegisterEvent("MODIFIER_STATE_CHANGED", UpdateBarMouseState)
+				elseif not shouldListen and modifierEventRegistered then
+					modifierEventRegistered = false
+					core:UnregisterEvent("MODIFIER_STATE_CHANGED")
+				end
+				UpdateBarMouseState()
+			end
+
 			local function ReportBar(bar, channel)
 				if not activeBars[bar] then return end
 				if channel == "INSTANCE_CHAT" and not IsInGroup(2) then channel = "RAID" end -- LE_PARTY_CATEGORY_INSTANCE = 2
@@ -46,6 +91,8 @@ do
 					ReportBar(bar, db.profile.barOnControl)
 				elseif IsAltKeyDown() and db.profile.barOnAlt ~= "NONE" then
 					ReportBar(bar, db.profile.barOnAlt)
+				else
+					UpdateBarMouseState()
 				end
 			end
 		end
@@ -136,11 +183,9 @@ do
 			bar.candyBarLabel:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 			bar.candyBarDuration:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 			bar:SetScript("OnMouseUp", BarOnClick)
-			if db.profile.barOnShift ~= "NONE" or db.profile.barOnControl ~= "NONE" or db.profile.barOnAlt ~= "NONE" then
-				bar:EnableMouse(true)
-			else
-				bar:EnableMouse(false)
-			end
+			local clickEnabled = IsClickModifierDown()
+			bar:EnableMouse(clickEnabled)
+			EnsureModifierEvent()
 			bar:Start(maxBarTime)
 			RearrangeBars()
 			return bar
@@ -186,6 +231,7 @@ do
 			if activeBars[bar] then
 				activeBars[bar] = nil
 				RearrangeBars()
+				UnregisterModifierEvent()
 			end
 		end)
 	end

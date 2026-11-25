@@ -22,13 +22,64 @@ do
 	local API = {}
 	local public = {}
 	do
-		local BarOnEnter, ClearBarClickProxy
+		local BarOnEnter, ClearBarClickProxy, IsClickModifierDown, EnsureModifierEvent, UnregisterModifierEvent
 		do
 			local clickProxy = CreateFrame("Button", nil, frame, "InsecureActionButtonTemplate")
 			clickProxy:Hide()
 			clickProxy:RegisterForClicks("AnyUp")
 			clickProxy:SetAttribute("useOnKeyDown", false)
 			clickProxy:SetAttribute("type", "macro")
+
+			local modifierEventRegistered = false
+
+			local function HasClickModifierEnabled()
+				return db.profile.barOnShift ~= "NONE" or db.profile.barOnControl ~= "NONE" or db.profile.barOnAlt ~= "NONE"
+			end
+
+			function IsClickModifierDown()
+				return (db.profile.barOnShift ~= "NONE" and IsShiftKeyDown())
+					or (db.profile.barOnControl ~= "NONE" and IsControlKeyDown())
+					or (db.profile.barOnAlt ~= "NONE" and IsAltKeyDown())
+			end
+
+			local function UpdateBarMouseState()
+				local enabled = IsClickModifierDown()
+				if not enabled then
+					ClearBarClickProxy()
+				end
+				for bar in next, activeBars do
+					bar:EnableMouse(enabled)
+					if enabled and not clickProxy.bar and bar:IsMouseOver() then
+						BarOnEnter(bar)
+					end
+				end
+			end
+
+			function EnsureModifierEvent()
+				if not modifierEventRegistered and HasClickModifierEnabled() then
+					modifierEventRegistered = true
+					core:RegisterEvent("MODIFIER_STATE_CHANGED", UpdateBarMouseState)
+				end
+			end
+
+			function UnregisterModifierEvent()
+				if modifierEventRegistered and not next(activeBars) then
+					modifierEventRegistered = false
+					core:UnregisterEvent("MODIFIER_STATE_CHANGED")
+				end
+			end
+
+			frame.UpdateBarClickState = function()
+				local shouldListen = next(activeBars) ~= nil and HasClickModifierEnabled()
+				if shouldListen and not modifierEventRegistered then
+					modifierEventRegistered = true
+					core:RegisterEvent("MODIFIER_STATE_CHANGED", UpdateBarMouseState)
+				elseif not shouldListen and modifierEventRegistered then
+					modifierEventRegistered = false
+					core:UnregisterEvent("MODIFIER_STATE_CHANGED")
+				end
+				UpdateBarMouseState()
+			end
 
 			local channelSlash = {
 				SAY = _G.SLASH_SAY1,
@@ -97,6 +148,10 @@ do
 			end)
 
 			function BarOnEnter(bar)
+				if not IsClickModifierDown() then
+					UpdateBarMouseState()
+					return
+				end
 				clickProxy.bar = bar
 				local strata = bar:GetFrameStrata()
 				clickProxy:ClearAllPoints()
@@ -107,7 +162,7 @@ do
 			end
 
 			function ClearBarClickProxy(bar)
-				if clickProxy.bar == bar then
+				if clickProxy.bar and (not bar or clickProxy.bar == bar) then
 					clickProxy.bar = nil
 					clickProxy:SetAttribute("macrotext", nil)
 					clickProxy:Hide()
@@ -202,11 +257,9 @@ do
 			bar.candyBarLabel:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 			bar.candyBarDuration:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 			bar:SetScript("OnEnter", BarOnEnter)
-			if db.profile.barOnShift ~= "NONE" or db.profile.barOnControl ~= "NONE" or db.profile.barOnAlt ~= "NONE" then
-				bar:EnableMouse(true)
-			else
-				bar:EnableMouse(false)
-			end
+			local clickEnabled = IsClickModifierDown()
+			bar:EnableMouse(clickEnabled)
+			EnsureModifierEvent()
 			bar:Start(maxBarTime)
 			RearrangeBars()
 			return bar
@@ -253,6 +306,7 @@ do
 			if activeBars[bar] then
 				activeBars[bar] = nil
 				RearrangeBars()
+				UnregisterModifierEvent()
 			end
 		end)
 	end

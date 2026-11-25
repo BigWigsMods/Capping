@@ -40,7 +40,7 @@ L.barBackground = "Fundo da Barra"
 --- Features
 L.features = "Características"
 L.queueBarsDesc = "Ativa as barras que mostram em quais filas você entrou e o tempo estimado que ficará na fila."
-L.barClickDesc = "Configure o modificador de teclado que deseja usar para saída de bate-papo específica ao clicar em uma barra. Definir todos os 3 como 'Nenhuma' desativará as barras clicáveis, permitindo que você clique através delas."
+L.barClickDesc = "Configure o modificador de teclado que deseja usar para saída de bate-papo específica ao clicar em uma barra."
 L.shiftClick = "Shift-Clique"
 L.controlClick = "Control-Clique"
 L.altClick = "Alt-Clique"

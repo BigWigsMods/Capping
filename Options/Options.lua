@@ -29,15 +29,7 @@ local barClickOptions = {
 }
 local barClickSetOptions = function(info, value)
 	cap.db.profile[info[#info]] = value
-	if cap.db.profile.barOnShift ~= "NONE" or cap.db.profile.barOnControl ~= "NONE" or cap.db.profile.barOnAlt ~= "NONE" then
-		for bar in next, cap.bars do
-			bar:EnableMouse(true)
-		end
-	else
-		for bar in next, cap.bars do
-			bar:EnableMouse(false)
-		end
-	end
+	cap.UpdateBarClickState()
 end
 
 local options = function()
