@@ -86,6 +86,8 @@ do
 				INSTANCE_CHAT = _G.SLASH_INSTANCE_CHAT1,
 				RAID = _G.SLASH_RAID1,
 			}
+			local hordeFaction = _G.FACTION_HORDE == "Horde" and "Horde" or "Horde/".._G.FACTION_HORDE
+			local allianceFaction = _G.FACTION_ALLIANCE == "Alliance" and "Alliance" or "Alliance/".._G.FACTION_ALLIANCE
 
 			local function BuildReportMacroText(bar, channel)
 				if not activeBars[bar] then return end
@@ -94,13 +96,21 @@ do
 				if not slash then return end
 				local custom = bar:Get("capping:customchat")
 				if not custom then
-					local colorid = bar:Get("capping:colorid")
-					local faction = colorid == "colorHorde" and _G.FACTION_HORDE or colorid == "colorAlliance" and _G.FACTION_ALLIANCE or ""
 					local timeLeft = bar.durationBinding:GetFormattedText()
 					if not timeLeft or timeLeft == "" then return end
 					if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
 					local label = bar:GetLabel()
-					return format("%s Capping: %s - %s %s", slash, label, timeLeft, faction == "" and faction or "("..faction..")")
+					local englishName = bar:Get("capping:englishname")
+					if englishName and englishName ~= label then
+						label = englishName .."/".. label
+					end
+					local colorid = bar:Get("capping:colorid")
+					local faction = colorid == "colorHorde" and hordeFaction or colorid == "colorAlliance" and allianceFaction or nil
+					if faction then
+						return format("%s Capping: %s - %s (%s)", slash, timeLeft, label, faction)
+					else
+						return format("%s Capping: %s - %s", slash, timeLeft, label)
+					end
 				else
 					local msg = custom(bar)
 					if msg then
@@ -737,6 +747,7 @@ do
 			[219] = "colorHorde",
 		}
 		local atlasColors = nil
+		local poiEnglishNames = nil
 		local capTime = 0
 		local curMod = nil
 		local path = {136441}
@@ -745,12 +756,21 @@ do
 			return path
 		end
 		local landmarkCache = {}
+		local reportedUnknownPOIs = {}
 		local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 		local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 		local GetAtlasInfo = C_Texture.GetAtlasInfo
 		local GetSpellName = C_Spell.GetSpellName
 		local GetBestMapForUnit = C_Map.GetBestMapForUnit
 		local IsRatedSoloRBG = C_PvP.IsRatedSoloRBG or function() return false end
+
+		local function ReportUnknownPOI(areaPoiID, name, mapID, icon)
+			if not reportedUnknownPOIs[areaPoiID] then
+				reportedUnknownPOIs[areaPoiID] = true
+				print("|cFF33FF99Capping|r: NEW POI ID FOUND, TELL THE DEVS!", areaPoiID, name, mapID, icon)
+				geterrorhandler()("|cFF33FF99Capping|r: NEW POI ID FOUND, TELL THE DEVS! ".. tostring(areaPoiID) ..", ".. tostring(name) ..", ".. tostring(mapID) ..", ".. tostring(icon))
+			end
+		end
 
 		local function UpdatePOI()
 			local curMapID = GetBestMapForUnit("player")
@@ -774,6 +794,14 @@ do
 							if iconDataConflict[icon] then
 								local bar = curMod:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
 								bar:Set("capping:poiid", areaPoiID)
+								if poiEnglishNames then
+									local englishName = poiEnglishNames[areaPoiID]
+									if englishName then
+										bar:Set("capping:englishname", englishName)
+									else
+										ReportUnknownPOI(areaPoiID, name, curMapID, icon)
+									end
+								end
 								if icon == 137 or icon == 139 then -- Workshop in IoC
 									curMod:StopBar((GetSpellName(56661))) -- Build Siege Engine
 								end
@@ -814,6 +842,14 @@ do
 									atlasColors[atlasName] -- Color
 								)
 								bar:Set("capping:poiid", areaPoiID)
+								if poiEnglishNames then
+									local englishName = poiEnglishNames[areaPoiID]
+									if englishName then
+										bar:Set("capping:englishname", englishName)
+									else
+										ReportUnknownPOI(areaPoiID, name, curMapID, atlasName)
+									end
+								end
 								--if atlasName == WORKSHOPHORDE or atlasName == WORKSHOPALLIANCE then -- Workshop in IoC
 								--	curMod:StopBar((GetSpellName(56661))) -- Build Siege Engine
 								--end
@@ -838,8 +874,9 @@ do
 			end
 		end
 
-		function API:StartFlagCaptures(bgcaptime, colors)
+		function API:StartFlagCaptures(bgcaptime, colors, englishNames)
 			atlasColors = colors
+			poiEnglishNames = englishNames
 			capTime = bgcaptime -- cap time
 			landmarkCache = {}
 			curMod = self
@@ -847,6 +884,7 @@ do
 		end
 
 		function API:StopFlagCaptures()
+			poiEnglishNames = nil
 			self:UnregisterEvent("AREA_POIS_UPDATED")
 		end
 
@@ -863,6 +901,14 @@ do
 						landmarkCache[name] = icon
 						local bar = self:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon], nil, maxBarTime)
 						bar:Set("capping:poiid", areaPoiID)
+						if poiEnglishNames then
+							local englishName = poiEnglishNames[areaPoiID]
+							if englishName then
+								bar:Set("capping:englishname", englishName)
+							else
+								ReportUnknownPOI(areaPoiID, name, uiMapID, icon)
+							end
+						end
 					end
 				end
 			end

@@ -301,11 +301,84 @@ end
 
 do
 	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
+	local poiEnglishNames = {
+		-- Alterac Valley (map 30) - Alliance Bunkers
+		[1353] = "Dun Baldar North Bunker", -- Alliance conflict
+		[1354] = "Dun Baldar North Bunker", -- Horde conflict
+		[1356] = "Dun Baldar South Bunker", -- Alliance conflict
+		[1357] = "Dun Baldar South Bunker", -- Horde conflict
+		[1381] = "Icewing Bunker", -- Alliance conflict
+		[1382] = "Icewing Bunker", -- Horde conflict
+		[1390] = "Stonehearth Bunker", -- Alliance conflict
+		[1391] = "Stonehearth Bunker", -- Horde conflict
+
+		-- Alterac Valley (map 30) - Horde Towers
+		[1378] = "Iceblood Tower", -- Horde conflict
+		[1379] = "Iceblood Tower", -- Alliance conflict
+		[1406] = "Tower Point", -- Horde conflict
+		[1407] = "Tower Point", -- Alliance conflict
+		[1529] = "West Frostwolf Tower", -- Horde conflict
+		[1530] = "West Frostwolf Tower", -- Alliance conflict
+		[1363] = "East Frostwolf Tower", -- Alliance conflict
+		[1364] = "East Frostwolf Tower", -- Horde conflict
+
+		-- Alterac Valley (map 30) - Graveyards
+		[1396] = "Stormpike Aid Station", -- Alliance conflict
+		[1397] = "Stormpike Aid Station", -- Horde conflict
+		[1399] = "Stormpike Graveyard", -- Alliance conflict
+		[1400] = "Stormpike Graveyard", -- Horde conflict
+		[1393] = "Stonehearth Graveyard", -- Alliance conflict
+		[1394] = "Stonehearth Graveyard", -- Horde conflict
+		[1387] = "Snowfall Graveyard", -- Horde conflict
+		[1388] = "Snowfall Graveyard", -- Alliance conflict
+		[1375] = "Iceblood Graveyard", -- Alliance conflict
+		[1376] = "Iceblood Graveyard", -- Horde conflict
+		[1369] = "Frostwolf Graveyard", -- Alliance conflict
+		[1370] = "Frostwolf Graveyard", -- Horde conflict
+		[1372] = "Frostwolf Relief Hut", -- Horde conflict
+		[1373] = "Frostwolf Relief Hut", -- Alliance conflict
+
+		-- Korrak's Revenge (map 2197) - Alliance Bunkers
+		[6423] = "Dun Baldar North Bunker", -- Alliance conflict
+		[6424] = "Dun Baldar North Bunker", -- Horde conflict
+		[6426] = "Dun Baldar South Bunker", -- Alliance conflict
+		[6427] = "Dun Baldar South Bunker", -- Horde conflict
+		[6446] = "Icewing Bunker", -- Alliance conflict
+		[6447] = "Icewing Bunker", -- Horde conflict
+		[6454] = "Stonehearth Bunker", -- Alliance conflict
+		[6455] = "Stonehearth Bunker", -- Horde conflict
+
+		-- Korrak's Revenge (map 2197) - Horde Towers
+		[6443] = "Iceblood Tower", -- Horde conflict
+		[6444] = "Iceblood Tower", -- Alliance conflict
+		[6466] = "Tower Point", -- Horde conflict
+		[6467] = "Tower Point", -- Alliance conflict
+		[6470] = "West Frostwolf Tower", -- Horde conflict
+		[6471] = "West Frostwolf Tower", -- Alliance conflict
+		[6431] = "East Frostwolf Tower", -- Alliance conflict
+		[6432] = "East Frostwolf Tower", -- Horde conflict
+
+		-- Korrak's Revenge (map 2197) - Graveyards
+		[6460] = "Stormpike Aid Station", -- Alliance conflict
+		[6461] = "Stormpike Aid Station", -- Horde conflict
+		[6463] = "Stormpike Graveyard", -- Alliance conflict
+		[6464] = "Stormpike Graveyard", -- Horde conflict
+		[6457] = "Stonehearth Graveyard", -- Alliance conflict
+		[6458] = "Stonehearth Graveyard", -- Horde conflict
+		[6451] = "Snowfall Graveyard", -- Horde conflict
+		[6452] = "Snowfall Graveyard", -- Alliance conflict
+		[6440] = "Iceblood Graveyard", -- Alliance conflict
+		[6441] = "Iceblood Graveyard", -- Horde conflict
+		[6434] = "Frostwolf Graveyard", -- Alliance conflict
+		[6435] = "Frostwolf Graveyard", -- Horde conflict
+		[6437] = "Frostwolf Relief Hut", -- Horde conflict
+		[6438] = "Frostwolf Relief Hut", -- Alliance conflict
+	}
 	function mod:EnterZone(id)
 		if id == 2197 then
-			self:StartFlagCaptures(241) -- Korrak's Revenge (WoW 15th)
+			self:StartFlagCaptures(241, nil, poiEnglishNames) -- Korrak's Revenge (WoW 15th)
 		else
-			self:StartFlagCaptures(isRetail and 242 or 300) -- 300 on Forever
+			self:StartFlagCaptures(isRetail and 242 or 300, nil, poiEnglishNames) -- 300 on Forever
 		end
 		--self:SetupHealthCheck("11946", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
 		--self:SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
