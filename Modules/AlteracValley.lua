@@ -28,6 +28,8 @@ do
 
 		[29176] = true, -- How many more supplies are needed to send ground assaults? [Stormpike Quartermaster (12096) - Alliance]
 		[29178] = true, -- I want to browse your goods. [Stormpike Quartermaster (12096) - Alliance]
+		[97018] = true, -- How many more supplies are needed to send ground assaults? [Stormpike Quartermaster (12096) - Alliance] (WoW Forever)
+		[97016] = true, -- I want to browse your goods. [Stormpike Quartermaster (12096) - Alliance] (WoW Forever)
 		[32488] = true, -- How many more supplies are needed to send a ground assault? [Frostwolf Quartermaster (12097) - Horde]
 		[32490] = true, -- I want to browse your goods. [Frostwolf Quartermaster (12097) - Horde]
 
@@ -37,9 +39,13 @@ do
 		[34598] = true, -- Where is the Frostwolf Quartermaster? [Sergeant Yazra Bloodsnarl (13448) - Horde]
 
 		[33622] = true, -- Tell me about Alterac Valley. [Stormpike Herald (11997) - Alliance]
+		[97630] = true, -- Tell me about Alterac Valley. [Stormpike Herald (11997) - Alliance] (WoW Forever)
 		[33623] = true, -- Tell me about graveyards. [Stormpike Herald (11997) - Alliance]
+		[97629] = true, -- Tell me about graveyards. [Stormpike Herald (11997) - Alliance] (WoW Forever)
 		[33624] = true, -- Tell me about mines. [Stormpike Herald (11997) - Alliance]
+		[97628] = true, -- Tell me about mines. [Stormpike Herald (11997) - Alliance] (WoW Forever)
 		[33625] = true, -- Tell me about towers. [Stormpike Herald (11997) - Alliance]
+		[97627] = true, -- Tell me about towers. [Stormpike Herald (11997) - Alliance] (WoW Forever)
 		[29172] = true, -- Tell me about Alterac Valley. [Frostwolf Herald (11998) - Horde]
 		[29173] = true, -- Tell me about graveyards. [Frostwolf Herald (11998) - Horde]
 		[29174] = true, -- Tell me about mines. [Frostwolf Herald (11998) - Horde]
@@ -51,12 +57,12 @@ do
 	local knownGoodGossipIDs = {
 		-- Open Quest to Smith or Murgot
 		[30904] = true, -- Upgrade to seasoned units! [Alliance]
+		[97833] = true, -- Upgrade to seasoned units! [Alliance] (WoW Forever)
 		[30905] = true, -- Upgrade to veteran units! [Alliance]
 		[30906] = true, -- Upgrade to champion units! [Alliance]
 		[35736] = true, -- Upgrade to seasoned units! [Horde]
 		[35737] = true, -- Upgrade to veteran units! [Horde]
 		[35738] = true, -- Upgrade to champion units! [Horde]
-		[97833] = true, -- Upgrade to seasoned units! [Alliance] (WoW Forever)
 
 		[32605] = true, -- With pleasure. These things stink! [Stormpike Stable Master (13617) - Alliance]
 		--[32605] = true, -- With pleasure. These things stink! [Frostwolf Stable Master (13616) - Horde]
