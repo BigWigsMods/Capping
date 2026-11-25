@@ -54,6 +54,7 @@ do
 		[35736] = true, -- horde
 		[35737] = true, -- horde
 		[35738] = true, -- horde
+		[97833] = true, -- ?
 
 		[32605] = true, -- With pleasure. These things stink! [Stormpike Stable Master (13617) - Alliance]
 	}
@@ -134,6 +135,8 @@ do
 			self:SelectGossipID(35737) -- Upgrade to veteran units!
 		elseif self:GetGossipID(35738) then -- Horde
 			self:SelectGossipID(35738) -- Upgrade to champion units!
+		elseif self:GetGossipID(97833) then -- ? [WoW Forever]
+			self:SelectGossipID(97833) -- Upgrade to seasoned units!
 		elseif self:GetGossipAvailableQuestID(6781) then -- Alliance, More Armor Scraps
 			if GetItemCount(17422) >= 20 then -- Armor Scraps 17422
 				self:SelectGossipAvailableQuestID(6781)
