@@ -162,12 +162,14 @@ do
 				local pois = GetAreaPOIForMap(169)
 				for i = 1, #pois do
 					local tbl = GetAreaPOIInfo(169, pois[i])
-					local icon = tbl.textureIndex
-					if icon == 136 or icon == 138 then -- Workshop in IoC
-						local text = GetSpellName(56661) -- Build Siege Engine
-						local bar = self:GetBar(text)
-						if not bar then
-							self:StartBar(text, msg == "rb" and 181 or 90.5, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- 252187 = ability_vehicle_siegeengineram
+					if tbl then
+						local icon = tbl.textureIndex
+						if icon == 136 or icon == 138 then -- Workshop in IoC
+							local text = GetSpellName(56661) -- Build Siege Engine
+							local bar = self:GetBar(text)
+							if not bar then
+								self:StartBar(text, msg == "rb" and 181 or 90.5, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- 252187 = ability_vehicle_siegeengineram
+							end
 						end
 					end
 				end

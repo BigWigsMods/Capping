@@ -765,70 +765,73 @@ do
 			local pois = GetAreaPOIForMap(curMapID)
 			for i = 1, #pois do
 				local tbl = GetAreaPOIInfo(curMapID, pois[i])
-				local name, icon, atlasName, areaPoiID = tbl.name, tbl.textureIndex, tbl.atlasName, tbl.areaPoiID
-				if icon then
-					local prevIcon = landmarkCache[name]
-					if prevIcon ~= icon then
-						landmarkCache[name] = icon
-						if iconDataConflict[icon] then
-							local bar = curMod:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
-							bar:Set("capping:poiid", areaPoiID)
-							if icon == 137 or icon == 139 then -- Workshop in IoC
-								curMod:StopBar((GetSpellName(56661))) -- Build Siege Engine
-							end
-						else
-							curMod:StopBar(name)
-							if (icon == 136 or icon == 138) and (prevIcon == 137 or prevIcon == 139) then -- Workshop in IoC
-								curMod:StartBar(GetSpellName(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
-							elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
-								-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
-								local _, _, _, id = UnitPosition("player")
-								if id == 30 or id == 628 or id == 2197 then -- Alterac Valley, IoC, Korrak's Revenge (WoW 15th)
-									local bar = curMod:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
-									bar:Pause()
-									bar:SetFill(false)
-									bar:SetTimeVisibility(false)
-									bar:Set("capping:customchat", function() end)
+				if tbl then
+					local name, icon, atlasName, areaPoiID = tbl.name, tbl.textureIndex, tbl.atlasName, tbl.areaPoiID
+					if icon then
+						local prevIcon = landmarkCache[name]
+						if prevIcon ~= icon then
+							landmarkCache[name] = icon
+							if iconDataConflict[icon] then
+								local bar = curMod:StartBar(name, capTime, GetIconData(icon), iconDataConflict[icon])
+								bar:Set("capping:poiid", areaPoiID)
+								if icon == 137 or icon == 139 then -- Workshop in IoC
+									curMod:StopBar((GetSpellName(56661))) -- Build Siege Engine
+								end
+							else
+								curMod:StopBar(name)
+								if (icon == 136 or icon == 138) and (prevIcon == 137 or prevIcon == 139) then -- Workshop in IoC
+									curMod:StartBar(GetSpellName(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+								elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
+									-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+									local _, _, _, id = UnitPosition("player")
+									if id == 30 or id == 628 or id == 2197 then -- Alterac Valley, IoC, Korrak's Revenge (WoW 15th)
+										local bar = curMod:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
+										bar:Pause()
+										bar:SetFill(false)
+										bar:SetTimeVisibility(false)
+										bar:Set("capping:customchat", function() end)
+									end
 								end
 							end
 						end
-					end
-				elseif atlasName then
-					local atlasTbl = GetAtlasInfo(atlasName)
-					if landmarkCache[name] ~= atlasName then
-						--print(name, atlasName)
-						landmarkCache[name] = atlasName
-						if atlasColors and atlasColors[atlasName] then
-							local bar = curMod:StartBar(
-								name,
-								capTime,
-								{ -- Begin Icon Texture
+					elseif atlasName then
+						if landmarkCache[name] ~= atlasName then
+							--print(name, atlasName)
+							landmarkCache[name] = atlasName
+							if atlasColors and atlasColors[atlasName] then
+								local atlasTbl = GetAtlasInfo(atlasName)
+								local iconTbl = atlasTbl and { -- Begin Icon Texture
 									atlasTbl.file,
 									atlasTbl.leftTexCoord,
 									atlasTbl.rightTexCoord,
 									atlasTbl.topTexCoord,
 									atlasTbl.bottomTexCoord,
-								}, -- End Icon Texture
-								atlasColors[atlasName] -- Color
-							)
-							bar:Set("capping:poiid", areaPoiID)
-							--if atlasName == WORKSHOPHORDE or atlasName == WORKSHOPALLIANCE then -- Workshop in IoC
-							--	curMod:StopBar((GetSpellName(56661))) -- Build Siege Engine
-							--end
-						else
-							curMod:StopBar(name)
-							--if icon == 136 or icon == 138 then -- Workshop in IoC
-							--	curMod:StartBar(GetSpellName(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
-							--elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
-							--	-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
-							--	local _, _, _, id = UnitPosition("player")
-							--	if id == 30 or id == 628 then -- Alterac Valley, IoC
-							--		local bar = curMod:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
-							--		bar:Pause()
-							--		bar:SetTimeVisibility(false)
-							--		bar:Set("capping:customchat", function() end)
-							--	end
-							--end
+								} -- End Icon Texture
+								local bar = curMod:StartBar(
+									name,
+									capTime,
+									iconTbl,
+									atlasColors[atlasName] -- Color
+								)
+								bar:Set("capping:poiid", areaPoiID)
+								--if atlasName == WORKSHOPHORDE or atlasName == WORKSHOPALLIANCE then -- Workshop in IoC
+								--	curMod:StopBar((GetSpellName(56661))) -- Build Siege Engine
+								--end
+							else
+								curMod:StopBar(name)
+								--if icon == 136 or icon == 138 then -- Workshop in IoC
+								--	curMod:StartBar(GetSpellName(56661), 181, 252187, icon == 136 and "colorAlliance" or "colorHorde") -- Build Siege Engine, 252187 = ability_vehicle_siegeengineram
+								--elseif icon == 2 or icon == 3 or icon == 151 or icon == 153 or icon == 18 or icon == 20 then
+								--	-- Horde mine, Alliance mine, Alliance Refinery, Horde Refinery, Alliance Quarry, Horde Quarry
+								--	local _, _, _, id = UnitPosition("player")
+								--	if id == 30 or id == 628 then -- Alterac Valley, IoC
+								--		local bar = curMod:StartBar(name, 3600, GetIconData(icon), (icon == 3 or icon == 151 or icon == 18) and "colorAlliance" or "colorHorde", true) -- Paused bar for mine status
+								--		bar:Pause()
+								--		bar:SetTimeVisibility(false)
+								--		bar:Set("capping:customchat", function() end)
+								--	end
+								--end
+							end
 						end
 					end
 				end
@@ -853,12 +856,14 @@ do
 			local pois = GetAreaPOIForMap(uiMapID)
 			for i = 1, #pois do
 				local tbl = GetAreaPOIInfo(uiMapID, pois[i])
-				local name, icon, areaPoiID = tbl.name, tbl.textureIndex, tbl.areaPoiID
-				local timer = inProgressDataTbl[areaPoiID]
-				if timer and iconDataConflict[icon] then
-					landmarkCache[name] = icon
-					local bar = self:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon], nil, maxBarTime)
-					bar:Set("capping:poiid", areaPoiID)
+				if tbl then
+					local name, icon, areaPoiID = tbl.name, tbl.textureIndex, tbl.areaPoiID
+					local timer = inProgressDataTbl[areaPoiID]
+					if timer and iconDataConflict[icon] then
+						landmarkCache[name] = icon
+						local bar = self:StartBar(name, timer, GetIconData(icon), iconDataConflict[icon], nil, maxBarTime)
+						bar:Set("capping:poiid", areaPoiID)
+					end
 				end
 			end
 		end

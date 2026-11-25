@@ -23,7 +23,7 @@ do
 	local function GetTimeRemaining(self)
 		-- 6: WSG & TP, 630: TP old versions (changed at some point prior to 11.1.5)
 		local tbl = GetIconAndTextWidgetVisualizationInfo(6) or GetIconAndTextWidgetVisualizationInfo(630)
-		if tbl and tbl.state == 1 then
+		if tbl and tbl.text and tbl.state == 1 then
 			local minutes, seconds = strmatch(tbl.text, "(%d%d)[^%d]+(%d%d)")
 			minutes = tonumber(minutes)
 			seconds = tonumber(seconds)
@@ -40,7 +40,7 @@ do
 	function mod:WSGTimeLeft(widgetInfo)
 		if widgetInfo and widgetInfo.widgetID == 4330 then -- Wrath, not sure about Vanilla/TBC/Cata/Mists
 			local tbl = GetIconAndTextWidgetVisualizationInfo(widgetInfo.widgetID)
-			if tbl and tbl.state == 1 then
+			if tbl and tbl.text and tbl.state == 1 then
 				local minutes = strmatch(tbl.text, "(%d+)")
 				minutes = tonumber(minutes)
 				if minutes and minutes > 0 and minutes < 16 and minutes ~= prevMinutes then -- Starts at 25min, wait until 15min is left

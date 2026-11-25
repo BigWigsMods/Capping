@@ -49,7 +49,6 @@ globals = {
 	"GetQuestReward",
 	"GetRealmName",
 	"GetSpellInfo",
-	"GetSpellTexture",
 	"GetTime",
 	"InCombatLockdown",
 	"IsAltKeyDown",
