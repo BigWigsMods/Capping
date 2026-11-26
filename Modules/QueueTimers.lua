@@ -40,6 +40,25 @@ do -- estimated wait timer and port timer
 	local ARENA = ARENA
 	local GetBattlegroundInfo = C_PvP.GetBattlegroundInfo
 
+	local backupIcons = { -- WoW Forever doesn't actually have icon data for the first 3
+		[GetRealZoneText(489)] = 134420, -- Warsong Gulch (inv_misc_rune_07)
+		[GetRealZoneText(529)] = 133282, -- Arathi Basin (inv_jewelry_amulet_07)
+		[GetRealZoneText(30)] = 133308, -- Alterac Valley (inv_jewelry_necklace_21)
+		[GetRealZoneText(2997)] = 237427, -- Darkspear Islands (inv_misc_rune_14)
+	}
+	local function GetQueueIcon(mapName)
+		for i = 1, GetNumBattlegroundTypes() do
+			local battlegroundInfoTable = GetBattlegroundInfo(i)
+			if battlegroundInfoTable and battlegroundInfoTable.name == mapName then
+				if battlegroundInfoTable.icon then
+					return battlegroundInfoTable.icon
+				end
+				break
+			end
+		end
+		return backupIcons[mapName] or 134400 -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
+	end
+
 	function mod:PLAYER_ENTERING_WORLD()
 		self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
@@ -79,31 +98,17 @@ do -- estimated wait timer and port timer
 
 			if estremain > 1 then -- Not a paused queue (0) and not a negative queue (in queue longer than estimated time).
 				if not bar or estremain > bar:GetRemainingTime()+10 or estremain < bar:GetRemainingTime()-10 or bar:GetLabel() ~= mapName then -- Don't restart bars for subtle changes +/- 10s
-					local icon
-					for i = 1, GetNumBattlegroundTypes() do
-						local battlegroundInfoTable = GetBattlegroundInfo(i)
-						if battlegroundInfoTable and battlegroundInfoTable.name == mapName then
-							icon = battlegroundInfoTable.icon
-							break
-						end
-					end
+					local icon = GetQueueIcon(mapName)
 					self:StopBarByData("capping:queueid", queueId)
-					local newBar = self:StartBar(mapName, estremain, icon or 134400, "colorQueue", true, esttime) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
+					local newBar = self:StartBar(mapName, estremain, icon, "colorQueue", true, esttime)
 					newBar:Set("capping:queueid", queueId)
 					newBar:SetPauseWhenDone(true)
 				end
 			else -- Negative queue (in queue longer than estimated time) or 0 queue (paused)
 				if not bar or bar:GetRemainingTime() ~= 1 or bar:GetLabel() ~= mapName then
-					local icon
-					for i = 1, GetNumBattlegroundTypes() do
-						local battlegroundInfoTable = GetBattlegroundInfo(i)
-						if battlegroundInfoTable and battlegroundInfoTable.name == mapName then
-							icon = battlegroundInfoTable.icon
-							break
-						end
-					end
+					local icon = GetQueueIcon(mapName)
 					self:StopBarByData("capping:queueid", queueId)
-					local newBar = self:StartBar(mapName, 1, icon or 134400, "colorQueue", true) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
+					local newBar = self:StartBar(mapName, 1, icon, "colorQueue", true)
 					newBar:Pause()
 					newBar:SetFill(false)
 					newBar:SetTimeVisibility(false)
