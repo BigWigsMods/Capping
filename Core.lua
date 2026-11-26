@@ -1217,6 +1217,9 @@ do
 		local timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
 		local maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
 		local aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
+		local prevABases, prevHBases = 0, 0
+		local aTime, hTime = 0, 0
+		local prevfinalAScore, prevfinalHScore = 0, 0
 		local curMod = nil
 
 		local function UpdatePredictor()
@@ -1273,6 +1276,7 @@ do
 		end
 
 		local GetDoubleStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetDoubleStatusBarWidgetVisualizationInfo
+		local GetDoubleStateIconRowVisualizationInfo = C_UIWidgetManager.GetDoubleStateIconRowVisualizationInfo
 		local ceil, floor = math.ceil, math.floor
 		local function ScorePredictor(widgetInfo)
 			 -- 1671 is used for most BGs with score predictors, but Deep Gorge uses 2074, Deephaul Ravine uses 5153, and Temple of Kotmogu uses 1689
@@ -1340,6 +1344,115 @@ do
 			aRemain, hRemain, aTicksToWin, hTicksToWin = 0, 0, 0, 0
 
 			self:RegisterEvent("UPDATE_UI_WIDGET", ScorePredictor)
+		end
+		-- WoW Forever Arathi Basin (independent per-team ticks: +10 every 12s/9s/6s/3s for 1-4 bases, +30 every 1s for 5 bases)
+		local abTable = {0.8333, 1.1111, 1.6667, 3.3333, 30}
+		local function ScorePredictorAB(widgetInfo)
+			-- 7467: DoubleStatusBar (Alliance/Horde scores), 1645: DoubleStateIconRow (base counter)
+			if widgetInfo and (widgetInfo.widgetID == 7467 or widgetInfo.widgetID == 1645) then
+				local scoreTbl = GetDoubleStatusBarWidgetVisualizationInfo(7467)
+				local basesTbl = GetDoubleStateIconRowVisualizationInfo(1645)
+				if not scoreTbl or not scoreTbl.leftBarMax or scoreTbl.leftBarMax == 0 or not basesTbl or not basesTbl.leftIcons or not basesTbl.rightIcons then return end
+
+				local curTime = GetTime()
+				maxscore = scoreTbl.leftBarMax
+				ascore, hscore = scoreTbl.leftBarValue, scoreTbl.rightBarValue
+
+				-- iconState: 0 = hidden, 1 = contested, 2 = captured
+				local aBases, hBases = 0, 0
+				for i = 1, #basesTbl.leftIcons do
+					if basesTbl.leftIcons[i].iconState == 2 then
+						aBases = aBases + 1
+					end
+				end
+				for i = 1, #basesTbl.rightIcons do
+					if basesTbl.rightIcons[i].iconState == 2 then
+						hBases = hBases + 1
+					end
+				end
+
+				local aBasesChanged = aBases ~= prevABases
+				local hBasesChanged = hBases ~= prevHBases
+				local basesChanged = aBasesChanged or hBasesChanged
+
+				local aTicked, hTicked = false, false
+				if aBases == 0 then
+					prevAScore, aTime = ascore, 0
+				elseif ascore ~= prevAScore then
+					prevAScore, aTime, aTicked = ascore, curTime, true
+				elseif aBasesChanged then
+					aTime = curTime
+				end
+				if hBases == 0 then
+					prevHScore, hTime = hscore, 0
+				elseif hscore ~= prevHScore then
+					prevHScore, hTime, hTicked = hscore, curTime, true
+				elseif hBasesChanged then
+					hTime = curTime
+				end
+				if not aTicked and not hTicked and not basesChanged then return end
+
+				prevABases, prevHBases = aBases, hBases
+
+				local apps, hpps = abTable[aBases] or 0, abTable[hBases] or 0
+				local ATimeRemain = apps > 0 and (((maxscore - ascore) / apps) - (aTime > 0 and (curTime - aTime) or 0)) or 10000
+				if ATimeRemain < 0 then ATimeRemain = 0 elseif ATimeRemain > 10000 then ATimeRemain = 10000 end
+				local HTimeRemain = hpps > 0 and (((maxscore - hscore) / hpps) - (hTime > 0 and (curTime - hTime) or 0)) or 10000
+				if HTimeRemain < 0 then HTimeRemain = 0 elseif HTimeRemain > 10000 then HTimeRemain = 10000 end
+
+				if HTimeRemain < ATimeRemain then -- Horde is winning
+					local finalAScore = 10 * floor((HTimeRemain * apps + ascore + 5) * 0.1)
+					finalAScore = (finalAScore < 0 and 0) or (finalAScore < maxscore and finalAScore) or (maxscore - 10)
+					local txt = format(L.finalScore, finalAScore, maxscore)
+					if basesChanged or (txt ~= prevText and finalAScore ~= (prevfinalAScore+10)) then
+						curMod:StopBar(prevText)
+						if HTimeRemain > 0 then
+							curMod:StartBar(txt, HTimeRemain, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+						end
+						prevText = txt
+						prevfinalAScore = finalAScore
+					end
+				elseif ATimeRemain < HTimeRemain then -- Alliance is winning
+					local finalHScore = 10 * floor((ATimeRemain * hpps + hscore + 5) * 0.1)
+					finalHScore = (finalHScore < 0 and 0) or (finalHScore < maxscore and finalHScore) or (maxscore - 10)
+					local txt = format(L.finalScore, maxscore, finalHScore)
+					if basesChanged or (txt ~= prevText and finalHScore ~= (prevfinalHScore+10)) then
+						curMod:StopBar(prevText)
+						if ATimeRemain > 0 then
+							curMod:StartBar(txt, ATimeRemain, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+						end
+						prevText = txt
+						prevfinalHScore = finalHScore
+					end
+				else -- Draw or neither faction has bases
+					if ATimeRemain < 10000 then
+						local txt = format(L.finalScore, maxscore, maxscore)
+						if basesChanged or txt ~= prevText then
+							curMod:StopBar(prevText)
+							if ATimeRemain > 0 then
+								curMod:StartBar(txt, ATimeRemain, 136001, "colorOther") -- 136001 = Interface/Icons/spell_misc_hellifrepvpcombatmorale
+							end
+							prevText = txt
+							prevfinalAScore, prevfinalHScore = maxscore, maxscore
+						end
+					elseif prevText ~= "" then
+						curMod:StopBar(prevText)
+						prevText = ""
+						prevfinalAScore, prevfinalHScore = 0, 0
+					end
+				end
+			end
+		end
+		function API:StartScoreEstimatorAB()
+			prevText = ""
+			curMod = self
+			prevAScore, prevHScore = 0, 0
+			maxscore, ascore, hscore = 2000, 0, 0
+			prevABases, prevHBases = 0, 0
+			aTime, hTime = 0, 0
+			prevfinalAScore, prevfinalHScore = 0, 0
+
+			self:RegisterEvent("UPDATE_UI_WIDGET", ScorePredictorAB)
 		end
 		function API:StopScoreEstimator()
 			self:UnregisterEvent("UPDATE_UI_WIDGET")

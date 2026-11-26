@@ -1,13 +1,18 @@
 
-local mod
+local mod, isForever
 do
 	local _, core = ...
 	mod = core:NewMod()
+	isForever = core.isForever
 end
 
 function mod:EnterZone()
 	self:StartFlagCaptures({30, 60}) -- 30 sec when solo RBG, 60 otherwise
-	self:StartScoreEstimator()
+	if isForever then
+		self:StartScoreEstimatorAB() -- WoW Forever uses Classic per-team tick intervals
+	else
+		self:StartScoreEstimator()
+	end
 end
 
 function mod:ExitZone()
