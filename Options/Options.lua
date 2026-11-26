@@ -275,15 +275,6 @@ do
 							cap.UpdateProfile()
 						end,
 					},
-					resetAll = {
-						type = "execute",
-						name = L.resetAll,
-						desc = L.resetAllDesc:format("Capping"),
-						order = 17,
-						func = function()
-							cap.db:ResetProfile()
-						end,
-					},
 				},
 			},
 			text = {
@@ -949,6 +940,32 @@ do
 						desc = L.autoTurnInDesc,
 						order = 8,
 						width = "full",
+					},
+					resetSpacer = {
+						type = "description",
+						name = "\n\n",
+						order = 9,
+						width = "full",
+					},
+					resetHeader = {
+						type = "header",
+						name = "",
+						order = 10,
+					},
+					reset = {
+						type = "execute",
+						name = L.reset,
+						desc = L.resetDesc,
+						order = 11,
+						func = function()
+							cap.db.profile.queueBars = defaultProfile.queueBars
+							cap.db.profile.useMasterForQueue = defaultProfile.useMasterForQueue
+							cap.db.profile.barOnShift = defaultProfile.barOnShift
+							cap.db.profile.barOnControl = defaultProfile.barOnControl
+							cap.db.profile.barOnAlt = defaultProfile.barOnAlt
+							cap.db.profile.autoTurnIn = defaultProfile.autoTurnIn
+							cap.UpdateProfile()
+						end,
 					},
 				},
 			},
