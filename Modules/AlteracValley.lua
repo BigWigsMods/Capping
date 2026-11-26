@@ -22,6 +22,9 @@ do
 		[30907] = true, -- alliance
 		[30908] = true, -- alliance
 		[30909] = true, -- alliance
+		[97828] = true, -- How many more supplies are needed for the next upgrade? [Murgot Deepforge (13257) Alliance] (WoW Forever)
+		[97829] = true, -- How many more supplies are needed for the next upgrade? [Murgot Deepforge (13257) Alliance] (WoW Forever)
+		[97830] = true, -- How many more supplies are needed for the next upgrade? [Murgot Deepforge (13257) Alliance] (WoW Forever)
 		[35739] = true, -- horde
 		[35740] = true, -- horde
 		[35741] = true, -- horde
@@ -52,7 +55,14 @@ do
 		[29175] = true, -- Tell me about towers. [Frostwolf Herald (11998) - Horde]
 
 		[30482] = true, -- Have you made contact with Ivus, Archdruid? [Archdruid Renferal (13442) - Alliance]
+		[97513] = true, -- The forest shakes and shudders! The winds howl! Does the Forest Lord approach? [Archdruid Renferal (13442) - Alliance] (WoW Forever)
+		[97514] = true, -- The air is abuzz with energy, Arch Druid. What is the status of the Forest Lord? [Archdruid Renferal (13442) - Alliance] (WoW Forever)
 		[97515] = true, -- Have you made contact with Ivus, Archdruid? [Archdruid Renferal (13442) - Alliance] (WoW Forever)
+
+		-- Wing Commanders after rescue
+		[96890] = true, -- Take the base. We'll be sieging it from the ground. [Wing Commander Ichman (13437) - Alliance] (WoW Forever)
+		[96743] = true, -- Tactical suppression fire, Vipore. Lay it on thick. [Wing Commander Vipore (13439) - Alliance] (WoW Forever)
+		[97707] = true, -- I want a surgical strike, Slidore. Carpet the road with fire! [Wing Commander Slidore (13438) - Alliance] (WoW Forever)
 	}
 	local knownGoodGossipIDs = {
 		-- Open Quest to Smith or Murgot
@@ -74,6 +84,11 @@ do
 		[96694] = true, -- I got you covered, Vipore. Move out! [Wing Commander Vipore (13439) - Alliance] (WoW Forever)
 		[30614] = true, -- I got your back, Slidore, but to be honest, you do stink. Take a shower, man. [Wing Commander Slidore (13438) - Alliance]
 		[96695] = true, -- I got your back, Slidore, but to be honest, you do stink. Take a shower, man. [Wing Commander Slidore (13438) - Alliance] (WoW Forever)
+
+		-- Wing Commanders after rescue
+		[96891] = true, -- I'm your man, Ich. Give me a beacon! [Wing Commander Ichman (13437) - Alliance] (WoW Forever)
+		[96744] = true, -- I am ready to rock, Vipore! Give me a beacon. [Wing Commander Vipore (13439) - Alliance] (WoW Forever)
+		[97708] = true, -- Give me the beacon, Slidore! Also, you still stink! [Wing Commander Slidore (13438) - Alliance] (WoW Forever)
 	}
 
 	local knownBadQuestIDs = {
