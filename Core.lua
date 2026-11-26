@@ -1222,6 +1222,7 @@ do
 
 	do
 		local prevText = ""
+		local englishFinalScore = not L.finalScore:find("^Final") and "Final"
 		local prevTime, prevAScore, prevHScore, prevAIncrease, prevHIncrease = 0, 0, 0, 0, 0
 		local timeBetweenEachTick, prevTick, prevTimeToWin = 0, 0, 0
 		local maxscore, ascore, hscore, aIncrease, hIncrease = 0, 0, 0, 0, 0
@@ -1249,7 +1250,10 @@ do
 						prevTimeToWin = timeToWin
 						curMod:StopBar(prevText)
 						if timeToWin > 0 then
-							curMod:StartBar(txt, timeToWin-0.5, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+							local bar = curMod:StartBar(txt, timeToWin-0.5, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+							if englishFinalScore then
+								bar:Set("capping:englishname", englishFinalScore)
+							end
 						end
 						prevText = txt
 					end
@@ -1261,7 +1265,10 @@ do
 						prevTimeToWin = timeToWin
 						curMod:StopBar(prevText)
 						if timeToWin > 0 then
-							curMod:StartBar(txt, timeToWin-0.5, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+							local bar = curMod:StartBar(txt, timeToWin-0.5, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+							if englishFinalScore then
+								bar:Set("capping:englishname", englishFinalScore)
+							end
 						end
 						prevText = txt
 					end
@@ -1273,7 +1280,10 @@ do
 							prevTimeToWin = timeToWin
 							curMod:StopBar(prevText)
 							if timeToWin > 0 then
-								curMod:StartBar(txt, timeToWin-0.5, 136001, "colorOther") -- 136001 = Interface/Icons/spell_misc_hellifrepvpcombatmorale
+								local bar = curMod:StartBar(txt, timeToWin-0.5, 136001, "colorOther") -- 136001 = Interface/Icons/spell_misc_hellifrepvpcombatmorale
+								if englishFinalScore then
+									bar:Set("capping:englishname", englishFinalScore)
+								end
 							end
 							prevText = txt
 						end
@@ -1423,7 +1433,10 @@ do
 					if basesChanged or (txt ~= prevText and finalAScore ~= (prevfinalAScore+10)) then
 						curMod:StopBar(prevText)
 						if HTimeRemain > 0 then
-							curMod:StartBar(txt, HTimeRemain, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+							local bar = curMod:StartBar(txt, HTimeRemain, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
+							if englishFinalScore then
+								bar:Set("capping:englishname", englishFinalScore)
+							end
 						end
 						prevText = txt
 						prevfinalAScore, prevfinalHScore = finalAScore, maxscore
@@ -1435,7 +1448,10 @@ do
 					if basesChanged or (txt ~= prevText and finalHScore ~= (prevfinalHScore+10)) then
 						curMod:StopBar(prevText)
 						if ATimeRemain > 0 then
-							curMod:StartBar(txt, ATimeRemain, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+							local bar = curMod:StartBar(txt, ATimeRemain, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
+							if englishFinalScore then
+								bar:Set("capping:englishname", englishFinalScore)
+							end
 						end
 						prevText = txt
 						prevfinalAScore, prevfinalHScore = maxscore, finalHScore
@@ -1446,7 +1462,10 @@ do
 						if basesChanged or txt ~= prevText then
 							curMod:StopBar(prevText)
 							if ATimeRemain > 0 then
-								curMod:StartBar(txt, ATimeRemain, 136001, "colorOther") -- 136001 = Interface/Icons/spell_misc_hellifrepvpcombatmorale
+								local bar = curMod:StartBar(txt, ATimeRemain, 136001, "colorOther") -- 136001 = Interface/Icons/spell_misc_hellifrepvpcombatmorale
+								if englishFinalScore then
+									bar:Set("capping:englishname", englishFinalScore)
+								end
 							end
 							prevText = txt
 							prevfinalAScore, prevfinalHScore = maxscore, maxscore
