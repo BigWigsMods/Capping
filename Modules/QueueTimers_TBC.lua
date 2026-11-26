@@ -77,7 +77,7 @@ do -- estimated wait timer and port timer
 			local bar = self:GetBarByData("capping:queueid", queueId)
 
 			if estremain > 1 then -- Not a paused queue (0) and not a negative queue (in queue longer than estimated time).
-				if not bar or estremain > bar:GetRemainingTime()+10 or estremain < bar:GetRemainingTime()-10 or bar:GetLabel() ~= mapName then -- Don't restart bars for subtle changes +/- 10s
+				if not bar or bar.paused or estremain > bar:GetRemainingTime()+10 or estremain < bar:GetRemainingTime()-10 or bar:GetLabel() ~= mapName then -- Don't restart bars for subtle changes +/- 10s
 					self:StopBarByData("capping:queueid", queueId)
 					local newBar = self:StartBar(mapName, estremain, 134400, "colorQueue", true, esttime) -- Question mark icon for random battleground (134400) Interface/Icons/INV_Misc_QuestionMark
 					newBar:Set("capping:queueid", queueId)

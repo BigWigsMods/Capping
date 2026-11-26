@@ -15,7 +15,7 @@ do
 			local id = tbl.widgetID
 			local dataTbl = GetIconAndTextWidgetVisualizationInfo(id)
 			if dataTbl and dataTbl.text and dataTbl.state == 1 then
-				local minutes, seconds = strmatch(dataTbl.text, "(%d+):(%d+)")
+				local minutes, seconds = strmatch(dataTbl.text, "(%d+)[^%d]+(%d+)")
 				minutes = tonumber(minutes)
 				seconds = tonumber(seconds)
 				if minutes and seconds then

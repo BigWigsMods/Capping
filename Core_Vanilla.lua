@@ -706,7 +706,15 @@ do
 
 			local function ReportBar(bar, channel)
 				if not activeBars[bar] then return end
-				if channel == "INSTANCE_CHAT" and not IsInGroup(2) then channel = "RAID" end -- LE_PARTY_CATEGORY_INSTANCE = 2
+				if channel == "INSTANCE_CHAT" and not IsInGroup(2) then -- LE_PARTY_CATEGORY_INSTANCE = 2
+					if IsInRaid() then
+						channel = "RAID"
+					elseif IsInGroup(1) then -- LE_PARTY_CATEGORY_HOME = 1
+						channel = "PARTY"
+					else
+						return
+					end
+				end
 				local custom = bar:Get("capping:customchat")
 				if not custom then
 					local timeLeft = bar.durationBinding:GetFormattedText()
@@ -1325,7 +1333,7 @@ do
 							curMod:StartBar(txt, HTimeRemain, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
 						end
 						prevText = txt
-						prevfinalAScore = finalAScore
+						prevfinalAScore, prevfinalHScore = finalAScore, maxscore
 					end
 				elseif ATimeRemain < HTimeRemain then -- Alliance is winning
 					local finalHScore = 10 * math.floor((ATimeRemain * hpps + hscore + 5) * 0.1)
@@ -1337,7 +1345,7 @@ do
 							curMod:StartBar(txt, ATimeRemain, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
 						end
 						prevText = txt
-						prevfinalHScore = finalHScore
+						prevfinalAScore, prevfinalHScore = maxscore, finalHScore
 					end
 				else -- Draw or neither faction has bases
 					if ATimeRemain < 10000 then

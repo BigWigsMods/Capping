@@ -720,13 +720,22 @@ do
 				SAY = _G.SLASH_SAY1,
 				INSTANCE_CHAT = _G.SLASH_INSTANCE_CHAT1,
 				RAID = _G.SLASH_RAID1,
+				PARTY = _G.SLASH_PARTY1,
 			}
 			local hordeFaction = _G.FACTION_HORDE == "Horde" and "Horde" or "Horde/".._G.FACTION_HORDE
 			local allianceFaction = _G.FACTION_ALLIANCE == "Alliance" and "Alliance" or "Alliance/".._G.FACTION_ALLIANCE
 
 			local function BuildReportMacroText(bar, channel)
 				if not activeBars[bar] then return end
-				if channel == "INSTANCE_CHAT" and not IsInGroup(2) then channel = "RAID" end -- LE_PARTY_CATEGORY_INSTANCE = 2
+				if channel == "INSTANCE_CHAT" and not IsInGroup(2) then -- LE_PARTY_CATEGORY_INSTANCE = 2
+					if IsInRaid() then
+						channel = "RAID"
+					elseif IsInGroup(1) then -- LE_PARTY_CATEGORY_HOME = 1
+						channel = "PARTY"
+					else
+						return
+					end
+				end
 				local slash = channelSlash[channel]
 				if not slash then return end
 				local custom = bar:Get("capping:customchat")
@@ -1354,7 +1363,7 @@ do
 		end
 		-- WoW Forever Arathi Basin (independent per-team ticks: +10 every 12s/9s/6s/3s for 1-4 bases, +30 every 1s for 5 bases)
 		local abTable = {0.8333, 1.1111, 1.6667, 3.3333, 30}
-		local function ScorePredictorAB(widgetInfo)
+		local function ScorePredictorWoWForeverArathiBasin(widgetInfo)
 			-- 7467: DoubleStatusBar (Alliance/Horde scores), 1645: DoubleStateIconRow (base counter)
 			if widgetInfo and (widgetInfo.widgetID == 7467 or widgetInfo.widgetID == 1645) then
 				local scoreTbl = GetDoubleStatusBarWidgetVisualizationInfo(7467)
@@ -1417,7 +1426,7 @@ do
 							curMod:StartBar(txt, HTimeRemain, 132485, "colorHorde") -- 132485 = Interface/Icons/INV_BannerPVP_01
 						end
 						prevText = txt
-						prevfinalAScore = finalAScore
+						prevfinalAScore, prevfinalHScore = finalAScore, maxscore
 					end
 				elseif ATimeRemain < HTimeRemain then -- Alliance is winning
 					local finalHScore = 10 * floor((ATimeRemain * hpps + hscore + 5) * 0.1)
@@ -1429,7 +1438,7 @@ do
 							curMod:StartBar(txt, ATimeRemain, 132486, "colorAlliance") -- 132486 = Interface/Icons/INV_BannerPVP_02
 						end
 						prevText = txt
-						prevfinalHScore = finalHScore
+						prevfinalAScore, prevfinalHScore = maxscore, finalHScore
 					end
 				else -- Draw or neither faction has bases
 					if ATimeRemain < 10000 then
@@ -1450,7 +1459,7 @@ do
 				end
 			end
 		end
-		function API:StartScoreEstimatorAB()
+		function API:StartScoreEstimatorWoWForeverArathiBasin()
 			prevText = ""
 			curMod = self
 			prevAScore, prevHScore = 0, 0
@@ -1459,7 +1468,7 @@ do
 			aTime, hTime = 0, 0
 			prevfinalAScore, prevfinalHScore = 0, 0
 
-			self:RegisterEvent("UPDATE_UI_WIDGET", ScorePredictorAB)
+			self:RegisterEvent("UPDATE_UI_WIDGET", ScorePredictorWoWForeverArathiBasin)
 		end
 		function API:StopScoreEstimator()
 			self:UnregisterEvent("UPDATE_UI_WIDGET")

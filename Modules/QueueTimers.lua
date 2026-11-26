@@ -1,8 +1,9 @@
 
-local mod, L, cap
+local mod, L, cap, isForever
 do
 	local _, core = ...
 	mod, L, cap = core:NewMod()
+	isForever = core.isForever
 end
 
 --[[
@@ -44,8 +45,10 @@ do -- estimated wait timer and port timer
 		[GetRealZoneText(489)] = 134420, -- Warsong Gulch (inv_misc_rune_07)
 		[GetRealZoneText(529)] = 133282, -- Arathi Basin (inv_jewelry_amulet_07)
 		[GetRealZoneText(30)] = 133308, -- Alterac Valley (inv_jewelry_necklace_21)
-		[GetRealZoneText(2997)] = 237427, -- Darkspear Islands (inv_misc_rune_14)
 	}
+	if isForever then
+		backupIcons[GetRealZoneText(2997)] = 237427 -- Darkspear Islands (inv_misc_rune_14)
+	end
 	local function GetQueueIcon(mapName)
 		for i = 1, GetNumBattlegroundTypes() do
 			local battlegroundInfoTable = GetBattlegroundInfo(i)
@@ -97,7 +100,7 @@ do -- estimated wait timer and port timer
 			local bar = self:GetBarByData("capping:queueid", queueId)
 
 			if estremain > 1 then -- Not a paused queue (0) and not a negative queue (in queue longer than estimated time).
-				if not bar or estremain > bar:GetRemainingTime()+10 or estremain < bar:GetRemainingTime()-10 or bar:GetLabel() ~= mapName then -- Don't restart bars for subtle changes +/- 10s
+				if not bar or bar.paused or estremain > bar:GetRemainingTime()+10 or estremain < bar:GetRemainingTime()-10 or bar:GetLabel() ~= mapName then -- Don't restart bars for subtle changes +/- 10s
 					local icon = GetQueueIcon(mapName)
 					self:StopBarByData("capping:queueid", queueId)
 					local newBar = self:StartBar(mapName, estremain, icon, "colorQueue", true, esttime)

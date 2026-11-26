@@ -55,6 +55,7 @@ globals = {
 	"IsAltKeyDown",
 	"IsControlKeyDown",
 	"IsInGroup",
+	"IsInRaid",
 	"IsLoggedIn",
 	"IsQuestCompletable",
 	"IsShiftKeyDown",

@@ -6,8 +6,7 @@ do
 end
 
 do
-	-- GetPOITextureCoords(45)
-	local icon = {136441, 0.625, 0.75, 0.625, 0.75}
+	local icon = {136441, C_Minimap.GetPOITextureCoords(45)}
 	function mod:CHAT_MSG(msg)
 		local found = strmatch(msg, L.takenTheFlagTrigger)
 		if (found and found == "L'Alliance") or strmatch(msg, L.capturedTheTrigger) then -- frFR
