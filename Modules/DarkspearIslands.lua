@@ -15,11 +15,20 @@ do
 	end
 end
 
-function mod:EnterZone()
-	self:StartFlagCaptures(60)
-	self:StartScoreEstimator()
-	self:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "CHAT_MSG")
-	self:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "CHAT_MSG")
+do
+	local poiEnglishNames = {
+		-- Darkspear Islands (map 2997)
+		[8768] = "Camp",
+		[8771] = "Ruins",
+		[8772] = "Abandoned Tower",
+		[8773] = "Shipwreck Cove",
+	}
+	function mod:EnterZone()
+		self:StartFlagCaptures(60, nil, poiEnglishNames)
+		self:StartScoreEstimator()
+		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_HORDE", "CHAT_MSG")
+		self:RegisterEvent("CHAT_MSG_BG_SYSTEM_ALLIANCE", "CHAT_MSG")
+	end
 end
 
 function mod:ExitZone()
