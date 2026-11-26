@@ -19,6 +19,8 @@ do
 	L = mod.L
 end
 
+local ClearImportState
+
 --------------------------------------------------------------------------------
 -- Options
 --
@@ -52,6 +54,86 @@ do
 		end
 		return copy
 	end
+
+	local sharingVersion = "CAP1"
+	local importString = ""
+	local importedProfile = nil
+
+	function ClearImportState()
+		importString = ""
+		importedProfile = nil
+	end
+
+	local function GetExportString()
+		local exportData = {
+			version = sharingVersion,
+			profile = {},
+		}
+		for k in next, defaultProfile do
+			local value = cap.db.profile[k]
+			if type(value) == "table" then
+				exportData.profile[k] = CopyTable(value)
+			else
+				exportData.profile[k] = value
+			end
+		end
+		local serialized = C_EncodingUtil.SerializeCBOR(exportData)
+		local compressed = C_EncodingUtil.CompressString(serialized, 0) -- Enum.CompressionMethod.Deflate = 0
+		local encoded = C_EncodingUtil.EncodeBase64(compressed)
+		return sharingVersion .. ":" .. encoded
+	end
+
+	local function DecodeImportString(str)
+		importedProfile = nil
+		if type(str) ~= "string" then return false end
+		str = str:match("^%s*(.-)%s*$")
+		if str == "" then return false end
+
+		local versionPlain, importData = str:match("^(%w+):(%S+)$")
+		if versionPlain ~= sharingVersion then return false end
+
+		local okDecode, decoded = pcall(C_EncodingUtil.DecodeBase64, importData)
+		if not okDecode or not decoded then return false end
+
+		local okDecompress, decompressed = pcall(C_EncodingUtil.DecompressString, decoded, 0) -- Enum.CompressionMethod.Deflate = 0
+		if not okDecompress or not decompressed then return false end
+
+		local okDeserialize, data = pcall(C_EncodingUtil.DeserializeCBOR, decompressed)
+		if not okDeserialize or type(data) ~= "table" then return false end
+		if data.version ~= sharingVersion or type(data.profile) ~= "table" then return false end
+
+		for k in next, defaultProfile do
+			if type(data.profile[k]) ~= "nil" then
+				importedProfile = data.profile
+				return true
+			end
+		end
+		return false
+	end
+
+	local function ImportProfile()
+		if not importedProfile then return end
+		for k, defaultValue in next, defaultProfile do
+			local value = importedProfile[k]
+			if type(value) ~= "nil" then
+				cap.db.profile[k] = type(value) == "table" and CopyTable(value) or value
+			elseif type(defaultValue) == "table" then
+				cap.db.profile[k] = CopyTable(defaultValue)
+			else
+				cap.db.profile[k] = defaultValue
+			end
+		end
+		ClearImportState()
+		cap.UpdateProfile()
+		local profileName = cap.db:GetCurrentProfile()
+		print("|cFF33FF99Capping|r: " .. L.importSuccess:format(profileName))
+	end
+
+	local profileOptions = LibStub("AceDBOptions-3.0"):GetOptionsTable(cap.db)
+	local profilesName = profileOptions.name
+	local profilesDesc = profileOptions.desc
+	profileOptions.name = L.general
+	profileOptions.order = 1
 
 	local anchorPointValues = {
 		TOPLEFT = L.TOPLEFT,
@@ -113,7 +195,7 @@ do
 			discord = {
 				type = "input",
 				get = function() return "discord.gg/gtDxWKvXE8" end,
-				set = function() end,
+				set = false,
 				name = "Discord",
 				order = 0.6,
 				width = 1,
@@ -977,10 +1059,93 @@ do
 					},
 				},
 			},
-			profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(cap.db),
+			profiles = {
+				name = profilesName,
+				desc = profilesDesc,
+				type = "group",
+				childGroups = "tab",
+				order = 7,
+				args = {
+					general = profileOptions,
+					import = {
+						type = "group",
+						name = L.import,
+						order = 2,
+						args = {
+							importInfo = {
+								type = "description",
+								name = L.importStringDesc,
+								order = 1,
+								width = "full",
+							},
+							importString = {
+								type = "input",
+								multiline = 10,
+								name = L.importString,
+								desc = L.importStringDesc,
+								order = 2,
+								width = "full",
+								setOnChange = true,
+								get = function()
+									return importString
+								end,
+								set = function(_, value)
+									importString = value
+									DecodeImportString(value)
+								end,
+							},
+							importInvalid = {
+								type = "description",
+								name = L.importInfoInvalid,
+								order = 3,
+								width = "full",
+								hidden = function()
+									return importedProfile ~= nil or not importString:find("%S")
+								end,
+							},
+							acceptImport = {
+								type = "execute",
+								name = L.import,
+								order = 4,
+								width = "full",
+								disabled = function()
+									return not importedProfile
+								end,
+								confirm = function()
+									local profileName = cap.db:GetCurrentProfile()
+									return L.confirmImport:format(profileName)
+								end,
+								func = ImportProfile,
+							},
+						},
+					},
+					export = {
+						type = "group",
+						name = L.export,
+						order = 3,
+						args = {
+							exportInfo = {
+								type = "description",
+								name = L.exportStringDesc,
+								order = 1,
+								width = "full",
+							},
+							exportString = {
+								type = "input",
+								multiline = 10,
+								name = L.exportString,
+								desc = L.exportStringDesc,
+								order = 2,
+								width = "full",
+								get = GetExportString,
+								set = false,
+							},
+						},
+					},
+				},
+			},
 		},
 	}
-	acOptions.args.profiles.order = 7
 	acr:RegisterOptionsTable("Capping", acOptions, true)
 end
 
@@ -1024,6 +1189,7 @@ do
 			f:EnableResize(false)
 			f:SetLayout("Fill")
 			f:SetCallback("OnClose", function(widget)
+				ClearImportState()
 				currentlyOpenContainer = nil
 				configFrame = nil
 				widget:ReleaseChildren()

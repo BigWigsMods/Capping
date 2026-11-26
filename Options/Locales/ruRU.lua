@@ -98,3 +98,14 @@ L.loudQueue = "Звук очереди" -- loud, посмотреть на пр�
 L.loudQueueDesc = "Когда наступит очередь, звуковое оповещение будет принудительно направлено через основной звуковой канал" -- посмотреть на проде // spellcheck on live // "When the queue is ready the sound notification will be forced to play over the 'Master' sound channel."
 --L.autoTurnIn = "Auto Turn-In"
 --L.autoTurnInDesc = "Automatically turn in quest items in zones like Alterac Valley and Ashran."
+
+--- Profiles
+L.import = "Импорт"
+L.importString = "Строка импорта"
+L.importStringDesc = "Вставьте сюда строку импорта."
+L.importInfoInvalid = "|cFFFF0000Строка импорта устарела либо несовместима.|r"
+--L.confirmImport = "The settings you are about to import will overwrite the settings in your currently selected profile:\n\n|cFF33FF99\"%s\"|r\n\nAre you sure you want to do this?"
+L.importSuccess = "Импортированно: %s"
+L.export = "Экспорт"
+L.exportString = "Строка экспорта"
+L.exportStringDesc = "Скопируйте эту строку, что бы победиться настройками."

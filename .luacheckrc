@@ -23,6 +23,7 @@ globals = {
 	"C_ChatInfo",
 	"C_CurrencyInfo",
 	"C_CVar",
+	"C_EncodingUtil",
 	"C_GossipInfo",
 	"C_Item",
 	"C_Map",
