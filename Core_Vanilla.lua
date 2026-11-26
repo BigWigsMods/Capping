@@ -1,5 +1,8 @@
 
--- LOCALS
+--------------------------------------------------------------------------------
+-- Locals
+--
+
 local addonName, mod = ...
 local frame = CreateFrame("Frame", "CappingFrame", UIParent)
 local L = mod.L
@@ -11,11 +14,642 @@ local zoneIds = {}
 local activeBars = { }
 frame.bars = activeBars
 
--- LIBRARIES
 local candy = LibStub("LibCandyBar-3.0")
-local media = LibStub("LibSharedMedia-3.0")
+local LibSharedMedia = LibStub("LibSharedMedia-3.0")
+local FONT = LibSharedMedia.MediaType and LibSharedMedia.MediaType.FONT or "font"
+local STATUSBAR = LibSharedMedia.MediaType and LibSharedMedia.MediaType.STATUSBAR or "statusbar"
+local BORDER = LibSharedMedia.MediaType and LibSharedMedia.MediaType.BORDER or "border"
+local BACKGROUND = LibSharedMedia.MediaType and LibSharedMedia.MediaType.BACKGROUND or "background"
+local minBarWidth, minBarHeight, maxBarWidth, maxBarHeight = 120, 10, 550, 100
+frame.minBarWidth = minBarWidth
+frame.maxBarWidth = maxBarWidth
+frame.minBarHeight = minBarHeight
+frame.maxBarHeight = maxBarHeight
+local backdropTbl = {}
 
+local function GetIconTexCoord(width, height, baseTexCoord)
+	local zoom = baseTexCoord and 1 or (1 - db.profile.iconZoom) -- Don't zoom POI/atlas icons since they don't have spell icon borders
+	local zoomedOffset = 1 - ((1 - zoom) / 2)
+	local offsetX, offsetY = zoomedOffset, zoomedOffset
+
+	if db.profile.iconKeepAspectRatio then
+		if width > height then
+			offsetY = 1 - (1 - (height / width) * zoom) / 2
+		elseif height > width then
+			offsetX = 1 - (1 - (width / height) * zoom) / 2
+		end
+	end
+
+	local u1, u2, v1, v2 = 1 - offsetX, offsetX, 1 - offsetY, offsetY
+	if baseTexCoord then
+		local left, right, top, bottom = baseTexCoord[1], baseTexCoord[2], baseTexCoord[3], baseTexCoord[4]
+		local du = right - left
+		local dv = bottom - top
+		return left + du * u1, left + du * u2, top + dv * v1, top + dv * v2
+	end
+	return u1, u2, v1, v2
+end
+
+--------------------------------------------------------------------------------
+-- Profile
+--
+
+local defaults = {
+	profile = {
+		lock = false,
+		position = {"CENTER", "CENTER", 0, 0, "UIParent"},
+		copyCustomAnchorWidth = false,
+		fontSize = 10,
+		barTexture = "Blizzard Raid Bar",
+		outline = "NONE",
+		monochrome = false,
+		font = LibSharedMedia:GetDefault("font"),
+		width = 200,
+		height = 20,
+		barHeightOffset = 0,
+		icon = true,
+		detachedIcon = false,
+		iconOffset = 2,
+		iconWidthOffset = 0,
+		iconZoom = 0.14,
+		iconKeepAspectRatio = true,
+		text = true,
+		textOffsetX = 0,
+		textOffsetY = 0,
+		timeText = true,
+		timeOffsetX = 0,
+		timeOffsetY = 0,
+		timeDecimals = 10,
+		fill = false,
+		growUp = false,
+		spacing = 0,
+		alignText = "LEFT",
+		alignTime = "RIGHT",
+		alignIcon = "LEFT",
+		borderName = "None",
+		borderColor = {0, 0, 0, 1},
+		borderOffset = 0,
+		borderSize = 1,
+		backgroundName = "Solid",
+		backgroundColor = {0, 0, 0, 0.75},
+		colorText = {1, 1, 1, 1},
+		colorTextShadow = {0, 0, 0, 1},
+		colorAlliance = {0, 0, 1, 1},
+		colorHorde = {1, 0, 0, 1},
+		colorQueue = {0.6, 0.6, 0.6, 1},
+		colorOther = {1, 1, 0, 1},
+		queueBars = true,
+		useMasterForQueue = true,
+		barOnShift = "SAY",
+		barOnControl = "INSTANCE_CHAT",
+		barOnAlt = "NONE",
+		autoTurnIn = true,
+	},
+}
+frame.defaultProfile = defaults.profile
+
+local barFont, barFontFlags, barTexture = nil, nil, nil
+local RefixPosition, UpdateMover, UpdateProfile, NotifyOptions, ApplyBarLayout
+do
+	local bitband, pcall = bit.band, pcall
+	local defaultProfile = defaults.profile
+	local activeAnchorFrame = nil
+	local hookedAnchorFrames = {}
+
+	local validFramePoints = {
+		["TOPLEFT"] = true, ["TOPRIGHT"] = true, ["BOTTOMLEFT"] = true, ["BOTTOMRIGHT"] = true,
+		["TOP"] = true, ["BOTTOM"] = true, ["LEFT"] = true, ["RIGHT"] = true, ["CENTER"] = true,
+	}
+	local function IsValidFramePoint(point)
+		return validFramePoints[point]
+	end
+	frame.IsValidFramePoint = IsValidFramePoint
+
+	local function IsValidFrame(frameName)
+		if type(frameName) ~= "string" then return false end
+		local targetFrame = _G[frameName]
+		if targetFrame == frame or frameName == "CappingTooltip" then return false end
+		if type(targetFrame) ~= "table" or type(targetFrame.IsObjectType) ~= "function" or type(targetFrame.IsForbidden) ~= "function" or type(targetFrame.GetWidth) ~= "function" then
+			return false
+		else
+			local success, isForbidden = pcall(targetFrame.IsForbidden, targetFrame)
+			if not success or isForbidden then return false end
+
+			local isFrameSuccess, isFrame = pcall(targetFrame.IsObjectType, targetFrame, "Frame")
+			if not isFrameSuccess or not isFrame then return false end
+
+			local hasWidthResult, width = pcall(targetFrame.GetWidth, targetFrame)
+			if not hasWidthResult or type(width) ~= "number" then return false end
+		end
+
+		-- Frames with forbidden aspects, Enum.ForbiddenAspect.UntrustedLayoutScriptExecution = 8
+		if type(targetFrame.GetInheritableForbiddenAspects) == "function" then
+			local success, value = pcall(targetFrame.GetInheritableForbiddenAspects, targetFrame, 1)
+			if not success or bitband(value, 8) == 8 then return false end
+		end
+
+		return true
+	end
+	frame.IsValidFrame = IsValidFrame
+
+	local IsValidMediaPath
+	do
+		local IsKnownFile = C_UIFileAsset and C_UIFileAsset.IsKnownFile
+		function IsValidMediaPath(mediaPath)
+			if type(mediaPath) ~= "string" then
+				return false
+			elseif IsKnownFile then
+				local result = IsKnownFile(mediaPath)
+				return result
+			else
+				return true
+			end
+		end
+	end
+
+	local function CopyTable(settingsTable)
+		local copy = {}
+		for key, value in next, settingsTable do
+			if type(value) == "table" then
+				copy[key] = CopyTable(value)
+			else
+				copy[key] = value
+			end
+		end
+		return copy
+	end
+
+	local function ValidateColor(current, default, alphaLimit)
+		for i = 1, 3 do
+			local n = current[i]
+			if type(n) ~= "number" or n < 0 or n > 1 then
+				current[1] = default[1] -- If 1 entry is bad, reset the whole table
+				current[2] = default[2]
+				current[3] = default[3]
+				current[4] = default[4]
+				return
+			end
+		end
+		if alphaLimit then
+			if type(current[4]) ~= "number" or current[4] < alphaLimit or current[4] > 1 then
+				current[4] = default[4]
+			end
+		elseif current[4] then
+			current[4] = nil
+		end
+	end
+
+	function NotifyOptions()
+		local acr = LibStub("AceConfigRegistry-3.0", true)
+		if acr then
+			acr:NotifyChange("Capping")
+		end
+	end
+
+	local function HookScript(self, width)
+		if self == activeAnchorFrame then
+			width = math.floor(width+0.5)
+			if width < minBarWidth then
+				width = minBarWidth
+			elseif width > maxBarWidth then
+				width = maxBarWidth
+			end
+			if width ~= db.profile.width then
+				db.profile.width = width
+				frame:SetWidth(width)
+				for bar in next, activeBars do
+					bar:SetWidth(width)
+				end
+				frame.RearrangeBars()
+				NotifyOptions()
+			end
+		end
+	end
+
+	function RefixPosition()
+		local pos = db.profile.position
+		frame:ClearAllPoints()
+		if pos[5] == defaultProfile.position[5] or IsValidFrame(pos[5]) then
+			frame:SetPoint(pos[1], pos[5], pos[2], pos[3], pos[4])
+		else
+			frame:SetPoint(defaultProfile.position[1], defaultProfile.position[5], defaultProfile.position[2], defaultProfile.position[3], defaultProfile.position[4])
+		end
+	end
+	frame.RefixPosition = RefixPosition
+
+	function UpdateMover()
+		local mover = frame.mover
+		if db.profile.lock then
+			frame:StopMovingOrSizing()
+			frame:SetMovable(false)
+			frame:SetClampRectInsets(0, 0, 0, 0)
+			mover:Hide()
+		else
+			mover:ClearAllPoints()
+			if db.profile.growUp then
+				mover:SetPoint("TOPLEFT", frame, "BOTTOMLEFT")
+				mover:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT")
+			else
+				mover:SetPoint("BOTTOMLEFT", frame, "TOPLEFT")
+				mover:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT")
+			end
+			if db.profile.position[5] == defaultProfile.position[5] then
+				frame:SetMovable(true)
+				if db.profile.growUp then
+					frame:SetClampRectInsets(0, 0, 0, -15)
+				else
+					frame:SetClampRectInsets(0, 0, 15, 0)
+				end
+			else
+				frame:StopMovingOrSizing()
+				frame:SetMovable(false)
+				frame:SetClampRectInsets(0, 0, 0, 0)
+			end
+			mover:Show()
+		end
+	end
+
+	local function ValidateMainSettings()
+		for k, v in next, db.profile do
+			local defaultType = type(defaultProfile[k])
+			if defaultType == "nil" then
+				db.profile[k] = nil
+			elseif type(v) ~= defaultType then
+				if defaultType == "table" then
+					db.profile[k] = CopyTable(defaultProfile[k])
+				else
+					db.profile[k] = defaultProfile[k]
+				end
+			end
+		end
+
+		ValidateColor(db.profile.borderColor, defaultProfile.borderColor, 0)
+		ValidateColor(db.profile.backgroundColor, defaultProfile.backgroundColor, 0)
+		ValidateColor(db.profile.colorText, defaultProfile.colorText, 0)
+		ValidateColor(db.profile.colorTextShadow, defaultProfile.colorTextShadow, 0)
+		ValidateColor(db.profile.colorAlliance, defaultProfile.colorAlliance, 0)
+		ValidateColor(db.profile.colorHorde, defaultProfile.colorHorde, 0)
+		ValidateColor(db.profile.colorQueue, defaultProfile.colorQueue, 0)
+		ValidateColor(db.profile.colorOther, defaultProfile.colorOther, 0)
+
+		if db.profile.borderOffset < 0 or db.profile.borderOffset > 32 or math.floor(db.profile.borderOffset+0.5) ~= db.profile.borderOffset then
+			db.profile.borderOffset = defaultProfile.borderOffset
+		end
+		if db.profile.borderSize < 1 or db.profile.borderSize > 32 or math.floor(db.profile.borderSize+0.5) ~= db.profile.borderSize then
+			db.profile.borderSize = defaultProfile.borderSize
+		end
+		if db.profile.fontSize < 10 or db.profile.fontSize > 200 or math.floor(db.profile.fontSize+0.5) ~= db.profile.fontSize then
+			db.profile.fontSize = defaultProfile.fontSize
+		end
+		if db.profile.outline ~= "NONE" and db.profile.outline ~= "OUTLINE" and db.profile.outline ~= "THICKOUTLINE" then
+			db.profile.outline = defaultProfile.outline
+		end
+		if db.profile.alignText ~= "LEFT" and db.profile.alignText ~= "CENTER" and db.profile.alignText ~= "RIGHT" then
+			db.profile.alignText = defaultProfile.alignText
+		end
+		if db.profile.alignTime ~= "LEFT" and db.profile.alignTime ~= "CENTER" and db.profile.alignTime ~= "RIGHT" then
+			db.profile.alignTime = defaultProfile.alignTime
+		end
+		if db.profile.alignIcon ~= "LEFT" and db.profile.alignIcon ~= "RIGHT" then
+			db.profile.alignIcon = defaultProfile.alignIcon
+		end
+		if db.profile.barOnShift ~= "NONE" and db.profile.barOnShift ~= "SAY" and db.profile.barOnShift ~= "INSTANCE_CHAT" then
+			db.profile.barOnShift = defaultProfile.barOnShift
+		end
+		if db.profile.barOnControl ~= "NONE" and db.profile.barOnControl ~= "SAY" and db.profile.barOnControl ~= "INSTANCE_CHAT" then
+			db.profile.barOnControl = defaultProfile.barOnControl
+		end
+		if db.profile.barOnAlt ~= "NONE" and db.profile.barOnAlt ~= "SAY" and db.profile.barOnAlt ~= "INSTANCE_CHAT" then
+			db.profile.barOnAlt = defaultProfile.barOnAlt
+		end
+		if db.profile.iconOffset < 1 or db.profile.iconOffset > 100 or math.floor(db.profile.iconOffset+0.5) ~= db.profile.iconOffset then
+			db.profile.iconOffset = defaultProfile.iconOffset
+		end
+		if db.profile.iconWidthOffset < -50 or db.profile.iconWidthOffset > 50 or math.floor(db.profile.iconWidthOffset+0.5) ~= db.profile.iconWidthOffset then
+			db.profile.iconWidthOffset = defaultProfile.iconWidthOffset
+		end
+		if db.profile.iconZoom < 0 or db.profile.iconZoom > 0.5 then
+			db.profile.iconZoom = defaultProfile.iconZoom
+		end
+		if db.profile.textOffsetX < -100 or db.profile.textOffsetX > 100 or math.floor(db.profile.textOffsetX+0.5) ~= db.profile.textOffsetX then
+			db.profile.textOffsetX = defaultProfile.textOffsetX
+		end
+		if db.profile.textOffsetY < -100 or db.profile.textOffsetY > 100 or math.floor(db.profile.textOffsetY+0.5) ~= db.profile.textOffsetY then
+			db.profile.textOffsetY = defaultProfile.textOffsetY
+		end
+		if db.profile.timeOffsetX < -100 or db.profile.timeOffsetX > 100 or math.floor(db.profile.timeOffsetX+0.5) ~= db.profile.timeOffsetX then
+			db.profile.timeOffsetX = defaultProfile.timeOffsetX
+		end
+		if db.profile.timeOffsetY < -100 or db.profile.timeOffsetY > 100 or math.floor(db.profile.timeOffsetY+0.5) ~= db.profile.timeOffsetY then
+			db.profile.timeOffsetY = defaultProfile.timeOffsetY
+		end
+		if db.profile.timeDecimals < 0 or db.profile.timeDecimals > 60 or math.floor(db.profile.timeDecimals+0.5) ~= db.profile.timeDecimals then
+			db.profile.timeDecimals = defaultProfile.timeDecimals
+		end
+		if db.profile.spacing < 0 or db.profile.spacing > 20 or math.floor(db.profile.spacing+0.5) ~= db.profile.spacing then
+			db.profile.spacing = defaultProfile.spacing
+		end
+		if db.profile.width < minBarWidth or db.profile.width > maxBarWidth or math.floor(db.profile.width+0.5) ~= db.profile.width then
+			db.profile.width = defaultProfile.width
+		end
+		if db.profile.height < minBarHeight or db.profile.height > maxBarHeight or math.floor(db.profile.height+0.5) ~= db.profile.height then
+			db.profile.height = defaultProfile.height
+		end
+		if db.profile.barHeightOffset < -100 or db.profile.barHeightOffset > 0 or math.floor(db.profile.barHeightOffset+0.5) ~= db.profile.barHeightOffset then
+			db.profile.barHeightOffset = defaultProfile.barHeightOffset
+		end
+
+		local pos = db.profile.position
+		if type(pos[1]) ~= "string" or type(pos[2]) ~= "string"
+		or type(pos[3]) ~= "number" or type(pos[4]) ~= "number"
+		or not IsValidFramePoint(pos[1]) or not IsValidFramePoint(pos[2])
+		or pos[3] < -10000 or pos[3] > 10000 or pos[4] < -10000 or pos[4] > 10000 then
+			db.profile.position = CopyTable(defaultProfile.position)
+			db.profile.copyCustomAnchorWidth = defaultProfile.copyCustomAnchorWidth
+		else
+			local x = math.floor(pos[3]+0.5)
+			if x ~= pos[3] then
+				pos[3] = x
+			end
+			local y = math.floor(pos[4]+0.5)
+			if y ~= pos[4] then
+				pos[4] = y
+			end
+			if type(pos[5]) ~= "string" or pos[5] == "" then
+				pos[5] = defaultProfile.position[5]
+			end
+		end
+	end
+
+	local function ValidateMediaSettings()
+		local fontPath = LibSharedMedia:IsValid(FONT, db.profile.font) and LibSharedMedia:Fetch(FONT, db.profile.font)
+		if not fontPath or not IsValidMediaPath(fontPath) then
+			db.profile.font = defaultProfile.font
+		end
+		local texturePath = LibSharedMedia:IsValid(STATUSBAR, db.profile.barTexture) and LibSharedMedia:Fetch(STATUSBAR, db.profile.barTexture)
+		if not texturePath or not IsValidMediaPath(texturePath) then
+			db.profile.barTexture = defaultProfile.barTexture
+		end
+		if db.profile.borderName ~= "None" then
+			local borderPath = LibSharedMedia:IsValid(BORDER, db.profile.borderName) and LibSharedMedia:Fetch(BORDER, db.profile.borderName)
+			if not borderPath or not IsValidMediaPath(borderPath) then
+				db.profile.borderName = defaultProfile.borderName -- If the border is suddenly invalid then reset the size and offset also
+				db.profile.borderSize = defaultProfile.borderSize
+				db.profile.borderOffset = defaultProfile.borderOffset
+			end
+		end
+		if db.profile.backgroundName ~= "None" then
+			local backgroundPath = LibSharedMedia:IsValid(BACKGROUND, db.profile.backgroundName) and LibSharedMedia:Fetch(BACKGROUND, db.profile.backgroundName)
+			if not backgroundPath or not IsValidMediaPath(backgroundPath) then
+				db.profile.backgroundName = defaultProfile.backgroundName
+			end
+		end
+	end
+
+	local function ValidateAnchorFrame()
+		activeAnchorFrame = nil
+		if db.profile.position[5] ~= defaultProfile.position[5] then
+			if not IsValidFrame(db.profile.position[5]) then
+				db.profile.position = CopyTable(defaultProfile.position)
+				db.profile.copyCustomAnchorWidth = defaultProfile.copyCustomAnchorWidth
+				db.profile.width = defaultProfile.width
+			elseif db.profile.copyCustomAnchorWidth then
+				local targetFrame = _G[db.profile.position[5]]
+				if not hookedAnchorFrames[targetFrame] then
+					local success = pcall(frame.HookScript, targetFrame, "OnSizeChanged", HookScript)
+					if not success then
+						db.profile.copyCustomAnchorWidth = defaultProfile.copyCustomAnchorWidth
+						db.profile.width = defaultProfile.width
+						return
+					end
+					hookedAnchorFrames[targetFrame] = true
+				end
+				activeAnchorFrame = targetFrame
+
+				local width = math.floor(targetFrame:GetWidth()+0.5)
+				if width < minBarWidth then
+					width = minBarWidth
+				elseif width > maxBarWidth then
+					width = maxBarWidth
+				end
+				db.profile.width = width
+			end
+		elseif db.profile.copyCustomAnchorWidth then
+			db.profile.copyCustomAnchorWidth = defaultProfile.copyCustomAnchorWidth
+			db.profile.width = defaultProfile.width
+		end
+	end
+
+	local function RebuildStyleCache()
+		if db.profile.monochrome and db.profile.outline ~= "NONE" then
+			barFontFlags = "MONOCHROME," .. db.profile.outline
+		elseif db.profile.monochrome then
+			barFontFlags = "MONOCHROME"
+		elseif db.profile.outline ~= "NONE" then
+			barFontFlags = db.profile.outline
+		else
+			barFontFlags = nil
+		end
+		barFont = LibSharedMedia:Fetch(FONT, db.profile.font)
+		barTexture = LibSharedMedia:Fetch(STATUSBAR, db.profile.barTexture)
+		local inset = db.profile.borderName ~= "None" and math.floor(db.profile.borderSize / 4) or 0
+		backdropTbl = {
+			bgFile = db.profile.backgroundName ~= "None" and LibSharedMedia:Fetch(BACKGROUND, db.profile.backgroundName) or nil,
+			edgeFile = db.profile.borderName ~= "None" and LibSharedMedia:Fetch(BORDER, db.profile.borderName) or nil,
+			edgeSize = db.profile.borderName ~= "None" and db.profile.borderSize or nil,
+			insets = { left = inset, right = inset, top = inset, bottom = inset },
+		}
+	end
+
+	function ApplyBarLayout(bar)
+		local height = db.profile.height
+		local iconWidth = height
+		if db.profile.icon and db.profile.iconWidthOffset ~= 0 then
+			iconWidth = math.max(height + db.profile.iconWidthOffset, 1)
+			bar.candyBarIconFrame:SetWidth(iconWidth)
+		end
+
+		local barHeightOffset = 0
+		if db.profile.icon and db.profile.detachedIcon then
+			barHeightOffset = db.profile.barHeightOffset
+			if -barHeightOffset >= height then
+				barHeightOffset = 0
+			end
+			bar.candyBarIconFrame:ClearAllPoints()
+			bar.candyBarBar:ClearAllPoints()
+			if db.profile.alignIcon == "LEFT" then
+				bar.candyBarIconFrame:SetPoint("TOPLEFT", bar, "TOPLEFT", -db.profile.iconOffset, 0)
+				bar.candyBarIconFrame:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", -db.profile.iconOffset, 0)
+				bar.candyBarBar:SetPoint("TOPLEFT", bar, "TOPLEFT", iconWidth, barHeightOffset)
+				bar.candyBarBar:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", iconWidth, 0)
+				bar.candyBarBar:SetPoint("TOPRIGHT", bar, "TOPRIGHT", 0, barHeightOffset)
+				bar.candyBarBar:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 0, 0)
+			else
+				bar.candyBarIconFrame:SetPoint("TOPRIGHT", bar, "TOPRIGHT", db.profile.iconOffset, 0)
+				bar.candyBarIconFrame:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", db.profile.iconOffset, 0)
+				bar.candyBarBar:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -iconWidth, barHeightOffset)
+				bar.candyBarBar:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -iconWidth, 0)
+				bar.candyBarBar:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, barHeightOffset)
+				bar.candyBarBar:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", 0, 0)
+			end
+		elseif db.profile.icon and db.profile.iconWidthOffset ~= 0 then
+			bar.candyBarBar:ClearAllPoints()
+			if db.profile.alignIcon == "LEFT" then
+				bar.candyBarBar:SetPoint("TOPLEFT", bar, "TOPLEFT", iconWidth, 0)
+				bar.candyBarBar:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", iconWidth, 0)
+				bar.candyBarBar:SetPoint("TOPRIGHT", bar, "TOPRIGHT", 0, 0)
+				bar.candyBarBar:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 0, 0)
+			else
+				bar.candyBarBar:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -iconWidth, 0)
+				bar.candyBarBar:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -iconWidth, 0)
+				bar.candyBarBar:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
+				bar.candyBarBar:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", 0, 0)
+			end
+		end
+
+		bar.candyBarLabel:ClearAllPoints()
+		bar.candyBarLabel:SetPoint("TOPLEFT", bar.candyBarBar, "TOPLEFT", 2 + db.profile.textOffsetX, -barHeightOffset / 2 + db.profile.textOffsetY)
+		bar.candyBarLabel:SetPoint("BOTTOMRIGHT", bar.candyBarBar, "BOTTOMRIGHT", -2 + db.profile.textOffsetX, barHeightOffset / 2 + db.profile.textOffsetY)
+		bar.candyBarDuration:ClearAllPoints()
+		bar.candyBarDuration:SetPoint("TOPLEFT", bar.candyBarBar, "TOPLEFT", 2 + db.profile.timeOffsetX, -barHeightOffset / 2 + db.profile.timeOffsetY)
+		bar.candyBarDuration:SetPoint("BOTTOMRIGHT", bar.candyBarBar, "BOTTOMRIGHT", -2 + db.profile.timeOffsetX, barHeightOffset / 2 + db.profile.timeOffsetY)
+
+		if db.profile.borderName ~= "None" or db.profile.backgroundName ~= "None" then
+			local border = bar.candyBarBackdrop
+			border:ClearAllPoints()
+			local borderOffset = db.profile.borderName ~= "None" and db.profile.borderOffset or 0
+			if db.profile.icon and db.profile.detachedIcon then
+				border:SetPoint("TOPLEFT", bar.candyBarBar, "TOPLEFT", -borderOffset, borderOffset)
+				border:SetPoint("BOTTOMRIGHT", bar.candyBarBar, "BOTTOMRIGHT", borderOffset, -borderOffset)
+				local iconBorder = bar.candyBarIconFrameBackdrop
+				iconBorder:ClearAllPoints()
+				if db.profile.alignIcon == "LEFT" then
+					iconBorder:SetPoint("TOPLEFT", bar, "TOPLEFT", -db.profile.iconOffset - borderOffset, borderOffset)
+					iconBorder:SetPoint("BOTTOMRIGHT", bar, "BOTTOMLEFT", -db.profile.iconOffset + iconWidth + borderOffset, -borderOffset)
+				else
+					iconBorder:SetPoint("TOPLEFT", bar, "TOPRIGHT", db.profile.iconOffset - iconWidth - borderOffset, borderOffset)
+					iconBorder:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", db.profile.iconOffset + borderOffset, -borderOffset)
+				end
+				iconBorder:Show()
+				iconBorder:SetBackdrop(backdropTbl)
+				if db.profile.backgroundName ~= "None" then
+					iconBorder:SetBackdropColor(db.profile.backgroundColor[1], db.profile.backgroundColor[2], db.profile.backgroundColor[3], db.profile.backgroundColor[4])
+				end
+				if db.profile.borderName ~= "None" then
+					iconBorder:SetBackdropBorderColor(db.profile.borderColor[1], db.profile.borderColor[2], db.profile.borderColor[3], db.profile.borderColor[4])
+				end
+			else
+				bar.candyBarIconFrameBackdrop:ClearBackdrop()
+				bar.candyBarIconFrameBackdrop:Hide()
+				border:SetPoint("TOPLEFT", bar, "TOPLEFT", -borderOffset, borderOffset)
+				border:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", borderOffset, -borderOffset)
+			end
+			border:Show()
+			border:SetBackdrop(backdropTbl)
+			if db.profile.backgroundName ~= "None" then
+				border:SetBackdropColor(db.profile.backgroundColor[1], db.profile.backgroundColor[2], db.profile.backgroundColor[3], db.profile.backgroundColor[4])
+			end
+			if db.profile.borderName ~= "None" then
+				border:SetBackdropBorderColor(db.profile.borderColor[1], db.profile.borderColor[2], db.profile.borderColor[3], db.profile.borderColor[4])
+			end
+		else
+			bar.candyBarBackdrop:ClearBackdrop()
+			bar.candyBarBackdrop:Hide()
+			bar.candyBarIconFrameBackdrop:ClearBackdrop()
+			bar.candyBarIconFrameBackdrop:Hide()
+		end
+
+		return iconWidth
+	end
+
+	function UpdateProfile()
+		ValidateMainSettings()
+		if IsLoggedIn() then
+			ValidateMediaSettings()
+			ValidateAnchorFrame()
+		end
+		RebuildStyleCache()
+
+		frame:SetSize(db.profile.width, db.profile.height)
+		UpdateMover()
+		RefixPosition()
+
+		for bar in next, activeBars do
+			bar:SetSize(db.profile.width, db.profile.height)
+			bar:SetTexture(barTexture)
+			bar:SetFont(barFont, db.profile.fontSize, barFontFlags)
+			if not bar.paused then
+				bar:SetFill(db.profile.fill)
+			end
+			bar:SetLabelVisibility(db.profile.text)
+			bar.candyBarLabel:SetJustifyH(db.profile.alignText)
+			if not bar.paused then
+				bar:SetTimeVisibility(db.profile.timeText)
+				bar:SetDecimalsThreshold(db.profile.timeDecimals)
+			end
+			bar.candyBarDuration:SetJustifyH(db.profile.alignTime)
+			bar:SetIconVisibility(db.profile.icon)
+			bar:SetIconPosition(db.profile.alignIcon)
+			local colorid = bar:Get("capping:colorid")
+			local color = colorid and db.profile[colorid]
+			if color then
+				bar:SetColor(color[1], color[2], color[3], color[4])
+			end
+			bar:SetTextColor(db.profile.colorText[1], db.profile.colorText[2], db.profile.colorText[3], db.profile.colorText[4])
+			bar:SetShadowColor(db.profile.colorTextShadow[1], db.profile.colorTextShadow[2], db.profile.colorTextShadow[3], db.profile.colorTextShadow[4])
+
+			local iconWidth = ApplyBarLayout(bar)
+
+			-- For SetJustifyH to update, it requires a SetText with different text.
+			-- So we store the value, reset the text, and set it again.
+			local labelText = bar:GetLabel()
+			bar.candyBarLabel:ClearText()
+			bar:SetLabel(labelText)
+			if bar.paused then
+				local durationText = bar.candyBarDuration:GetText()
+				if durationText and durationText ~= "" then
+					bar.candyBarDuration:ClearText()
+					bar.candyBarDuration:SetText(durationText)
+				end
+			end
+
+			local baseTexCoord = bar:Get("capping:icontexcoord")
+			bar.candyBarIconFrame:SetTexCoord(GetIconTexCoord(iconWidth, db.profile.height, baseTexCoord))
+		end
+
+		if not db.profile.queueBars then
+			for bar in next, activeBars do
+				if bar:Get("capping:queueid") and bar:Get("capping:colorid") == "colorQueue" then
+					activeBars[bar] = nil
+					bar:Stop()
+				end
+			end
+		end
+
+		frame.UpdateBarClickState()
+		frame.RearrangeBars()
+	end
+	frame.UpdateProfile = UpdateProfile
+
+	db = LibStub("AceDB-3.0"):New("CappingSettings", defaults, true)
+	frame.db = db
+	do
+		local function OnProfileUpdate()
+			UpdateProfile()
+			NotifyOptions()
+		end
+		db.RegisterCallback(frame, "OnProfileChanged", OnProfileUpdate)
+		db.RegisterCallback(frame, "OnProfileCopied", OnProfileUpdate)
+		db.RegisterCallback(frame, "OnProfileReset", OnProfileUpdate)
+	end
+
+	ValidateMainSettings()
+	RebuildStyleCache()
+end
+
+--------------------------------------------------------------------------------
 -- API
+--
 do
 	local API = {}
 	local public = {}
@@ -77,7 +711,9 @@ do
 				if not custom then
 					local timeLeft = bar.durationBinding:GetFormattedText()
 					if not timeLeft or timeLeft == "" then return end
-					if not timeLeft:find("[:%.]") then timeLeft = "0:"..timeLeft end
+					if not timeLeft:find("[:%.]") then
+						timeLeft = #timeLeft == 1 and "0:0"..timeLeft or "0:"..timeLeft
+					end
 					local label = bar:GetLabel()
 					local englishName = bar:Get("capping:englishname")
 					if englishName and englishName ~= label then
@@ -141,7 +777,7 @@ do
 							bar:SetPoint("BOTTOMLEFT", lastBar, "TOPLEFT", 0, spacing)
 							bar:SetPoint("BOTTOMRIGHT", lastBar, "TOPRIGHT", 0, spacing)
 						else -- Growing from the anchor
-							bar:SetPoint("BOTTOM", frame, "TOP")
+							bar:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT")
 						end
 						lastBar = bar
 					else
@@ -149,7 +785,7 @@ do
 							bar:SetPoint("TOPLEFT", lastBar, "BOTTOMLEFT", 0, -spacing)
 							bar:SetPoint("TOPRIGHT", lastBar, "BOTTOMRIGHT", 0, -spacing)
 						else -- Growing from the anchor
-							bar:SetPoint("TOP", frame, "BOTTOM")
+							bar:SetPoint("TOPLEFT", frame, "TOPLEFT")
 						end
 						lastBar = bar
 					end
@@ -159,47 +795,53 @@ do
 		end
 
 		function API:StartBar(name, remaining, icon, colorid, priority, maxBarTime)
-			self:StopBar(name)
-			local bar = candy:New(media:Fetch("statusbar", db.profile.barTexture), db.profile.width, db.profile.height)
+			for bar in next, activeBars do
+				if bar:GetLabel() == name then
+					activeBars[bar] = nil
+					bar:Stop()
+				end
+			end
+			local bar = candy:New(barTexture, db.profile.width, db.profile.height)
 			activeBars[bar] = true
 
 			bar:Set("capping:colorid", colorid)
 			if priority then
 				bar:Set("capping:priority", priority)
 			end
+			local iconTex, baseTexCoord
+			if type(icon) == "table" then
+				iconTex = icon[1]
+				baseTexCoord = {icon[2], icon[3], icon[4], icon[5]}
+				bar:Set("capping:icontexcoord", baseTexCoord)
+			else
+				iconTex = icon
+			end
 
 			bar:SetParent(frame)
-			bar:SetLabel(name)
+			bar:SetFrameLevel(100)
+			bar:SetDuration(remaining)
+			bar:SetFont(barFont, db.profile.fontSize, barFontFlags)
+			local barColor = db.profile[colorid]
+			bar:SetColor(barColor[1], barColor[2], barColor[3], barColor[4])
+			bar:SetBackgroundColor(0, 0, 0, 0)
+			bar:SetTextColor(db.profile.colorText[1], db.profile.colorText[2], db.profile.colorText[3], db.profile.colorText[4])
+			bar:SetShadowColor(db.profile.colorTextShadow[1], db.profile.colorTextShadow[2], db.profile.colorTextShadow[3], db.profile.colorTextShadow[4])
 			bar.candyBarLabel:SetJustifyH(db.profile.alignText)
 			bar.candyBarDuration:SetJustifyH(db.profile.alignTime)
-			bar:SetDuration(remaining)
-			bar:SetColor(unpack(db.profile[colorid]))
-			bar.candyBarBackground:SetVertexColor(unpack(db.profile.colorBarBackground))
-			bar:SetTextColor(unpack(db.profile.colorText))
-			bar:SetIconVisibility(db.profile.icon)
-			if type(icon) == "table" then
-				bar:SetIcon(icon[1], icon[2], icon[3], icon[4], icon[5])
-			else
-				bar:SetIcon(icon)
-			end
-			bar:SetIconPosition(db.profile.alignIcon)
+			bar:SetLabelVisibility(db.profile.text)
 			bar:SetTimeVisibility(db.profile.timeText)
+			bar:SetDecimalsThreshold(db.profile.timeDecimals)
+			bar:SetIconVisibility(db.profile.icon)
+			bar:SetIconPosition(db.profile.alignIcon)
 			bar:SetFill(db.profile.fill)
-			local flags = nil
-			if db.profile.monochrome and db.profile.outline ~= "NONE" then
-				flags = "MONOCHROME," .. db.profile.outline
-			elseif db.profile.monochrome then
-				flags = "MONOCHROME"
-			elseif db.profile.outline ~= "NONE" then
-				flags = db.profile.outline
-			end
-			bar.candyBarLabel:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
-			bar.candyBarDuration:SetFont(media:Fetch("font", db.profile.font), db.profile.fontSize, flags)
 			bar:SetScript("OnMouseUp", BarOnClick)
 			local clickEnabled = IsClickModifierDown()
 			bar:EnableMouse(clickEnabled)
 			EnsureModifierEvent()
 			bar:Start(maxBarTime)
+			local iconWidth = ApplyBarLayout(bar)
+			bar:SetLabel(name)
+			bar:SetIcon(iconTex, GetIconTexCoord(iconWidth, db.profile.height, baseTexCoord))
 			RearrangeBars()
 			return bar
 		end
@@ -209,11 +851,18 @@ do
 			local dirty = nil
 			for bar in next, activeBars do
 				if bar:GetLabel() == text then
+					activeBars[bar] = nil
 					bar:Stop()
 					dirty = true
 				end
 			end
-			if dirty then RearrangeBars() end
+			if dirty then
+				if next(activeBars) then
+					RearrangeBars()
+				else
+					UnregisterModifierEvent()
+				end
+			end
 		end
 		public.StopBar = API.StopBar
 		CappingAPI = public
@@ -222,36 +871,55 @@ do
 			local dirty = nil
 			for bar in next, activeBars do
 				if bar:Get(data) == value then
+					activeBars[bar] = nil
 					bar:Stop()
 					dirty = true
 				end
 			end
-			if dirty then RearrangeBars() end
+			if dirty then
+				if next(activeBars) then
+					RearrangeBars()
+				else
+					UnregisterModifierEvent()
+				end
+			end
 		end
 
 		function API:StopBarContainingData(data)
 			local dirty = nil
 			for bar in next, activeBars do
 				if bar:Get(data) then
+					activeBars[bar] = nil
 					bar:Stop()
 					dirty = true
 				end
 			end
-			if dirty then RearrangeBars() end
+			if dirty then
+				if next(activeBars) then
+					RearrangeBars()
+				else
+					UnregisterModifierEvent()
+				end
+			end
 		end
 
 		candy.RegisterCallback(API, "LibCandyBar_Stop", function(_, bar)
 			if activeBars[bar] then
 				activeBars[bar] = nil
-				RearrangeBars()
-				UnregisterModifierEvent()
+				if next(activeBars) then
+					RearrangeBars()
+				else
+					UnregisterModifierEvent()
+				end
 			end
 		end)
-	end
 
-	function API:StopAllBars()
-		for bar in next, activeBars do
-			bar:Stop()
+		function API:StopAllBars()
+			for bar in next, activeBars do
+				activeBars[bar] = nil
+				bar:Stop()
+			end
+			UnregisterModifierEvent()
 		end
 	end
 
@@ -513,6 +1181,23 @@ do
 						end
 						prevText = txt
 					end
+				else -- Draw or neither faction has bases
+					if aTicksToWin < 10000 then
+						local timeToWin = aTicksToWin * timeBetweenEachTick
+						local txt = format(L.finalScore, maxscore, maxscore)
+						if txt ~= prevText or timeToWin ~= prevTimeToWin then
+							prevTimeToWin = timeToWin
+							curMod:StopBar(prevText)
+							if timeToWin > 0 then
+								curMod:StartBar(txt, timeToWin-0.5, 136001, "colorOther") -- 136001 = Interface/Icons/spell_misc_hellifrepvpcombatmorale
+							end
+							prevText = txt
+						end
+					elseif prevText ~= "" then
+						prevTimeToWin = 0
+						curMod:StopBar(prevText)
+						prevText = ""
+					end
 				end
 			end
 		end
@@ -653,6 +1338,22 @@ do
 						end
 						prevText = txt
 						prevfinalHScore = finalHScore
+					end
+				else -- Draw or neither faction has bases
+					if ATimeRemain < 10000 then
+						local txt = format(L.finalScore, maxscore, maxscore)
+						if basesChanged or txt ~= prevText then
+							curMod:StopBar(prevText)
+							if ATimeRemain > 0 then
+								curMod:StartBar(txt, ATimeRemain, 136001, "colorOther") -- 136001 = Interface/Icons/spell_misc_hellifrepvpcombatmorale
+							end
+							prevText = txt
+							prevfinalAScore, prevfinalHScore = maxscore, maxscore
+						end
+					elseif prevText ~= "" then
+						curMod:StopBar(prevText)
+						prevText = ""
+						prevfinalAScore, prevfinalHScore = 0, 0
 					end
 				end
 			end
@@ -980,81 +1681,21 @@ do
 	end
 end
 
--- CORE
+--------------------------------------------------------------------------------
+-- Core
+--
+
 core = mod:NewMod()
-function core:ADDON_LOADED(addon)
-	if addon == addonName then
-		self:UnregisterEvent("ADDON_LOADED")
-		-- saved variables database setup
-		local defaults = {
-			profile = {
-				lock = false,
-				position = {"CENTER", "CENTER", 0, 0},
-				fontSize = 10,
-				barTexture = "Blizzard Raid Bar",
-				outline = "NONE",
-				monochrome = false,
-				font = media:GetDefault("font"),
-				width = 200,
-				height = 20,
-				icon = true,
-				timeText = true,
-				fill = false,
-				growUp = false,
-				spacing = 0,
-				alignText = "LEFT",
-				alignTime = "RIGHT",
-				alignIcon = "LEFT",
-				colorText = {1,1,1,1},
-				colorAlliance = {0,0,1,1},
-				colorHorde = {1,0,0,1},
-				colorQueue = {0.6,0.6,0.6,1},
-				colorOther = {1,1,0,1},
-				colorBarBackground = {0,0,0,0.75},
-				queueBars = true,
-				useMasterForQueue = true,
-				barOnShift = "SAY",
-				barOnControl = "INSTANCE_CHAT",
-				barOnAlt = "NONE",
-				autoTurnIn = true,
-			},
-		}
-		db = LibStub("AceDB-3.0"):New("CappingSettings", defaults, true)
-		frame.db = db
-		do
-			local rl = function() ReloadUI() end
-			db.RegisterCallback(self, "OnProfileChanged", rl)
-			db.RegisterCallback(self, "OnProfileCopied", rl)
-			db.RegisterCallback(self, "OnProfileReset", rl)
-		end
-
-		frame:ClearAllPoints()
-		frame:SetPoint(db.profile.position[1], UIParent, db.profile.position[2], db.profile.position[3], db.profile.position[4])
-		local bg = frame:CreateTexture()
-		bg:SetAllPoints(frame)
-		bg:SetColorTexture(0, 1, 0, 0.3)
-		frame.bg = bg
-		local header = frame:CreateFontString(nil, "OVERLAY", "TextStatusBarText")
-		header:SetAllPoints(frame)
-		header:SetText(addon)
-		frame.header = header
-
-		if db.profile.lock then
-			frame:EnableMouse(false)
-			frame:SetMovable(false)
-			frame.bg:Hide()
-			frame.header:Hide()
-		end
-
-		-- Fix flag carriers for some people
-		C_CVar.SetCVar("showArenaEnemyCastbar", "1")
-		C_CVar.SetCVar("showArenaEnemyFrames", "1")
-		C_CVar.SetCVar("showArenaEnemyPets", "1")
-
-		self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	end
+function core:PLAYER_LOGIN()
+	self:UnregisterEvent("PLAYER_LOGIN")
+	UpdateProfile()
+	-- Fix flag carriers for some people
+	C_CVar.SetCVar("showArenaEnemyCastbar", "1")
+	C_CVar.SetCVar("showArenaEnemyFrames", "1")
+	C_CVar.SetCVar("showArenaEnemyPets", "1")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 end
-core:RegisterEvent("ADDON_LOADED")
+core:RegisterEvent("PLAYER_LOGIN")
 
 do
 	local prevZone = nil
@@ -1087,42 +1728,67 @@ function core:Test(locale)
 end
 frame.Test = core.Test
 
--- OPTIONS
+--------------------------------------------------------------------------------
+-- Options
+--
+
 do
-	frame:SetPoint("CENTER", UIParent, "CENTER")
-	frame:SetWidth(180)
-	frame:SetHeight(15)
-	frame:SetMovable(true)
-	frame:EnableMouse(true)
-	frame:RegisterForDrag("LeftButton")
+	frame:SetSize(db.profile.width, db.profile.height)
 	frame:SetClampedToScreen(true)
 	frame:Show()
+
+	local mover = CreateFrame("Frame", nil, frame)
+	mover:SetHeight(15)
+	mover:EnableMouse(true)
+	mover:RegisterForDrag("LeftButton")
+	frame.mover = mover
+
+	local bg = mover:CreateTexture()
+	bg:SetAllPoints(mover)
+	bg:SetColorTexture(0, 1, 0, 0.3)
+	local header = mover:CreateFontString(nil, "OVERLAY", "TextStatusBarText")
+	header:SetAllPoints(mover)
+	header:SetText(addonName)
+
+	UpdateMover()
+	RefixPosition()
+
 	local tooltip = CreateFrame("GameTooltip", "CappingTooltip", UIParent, "GameTooltipTemplate")
-	frame:SetScript("OnEnter", function(f)
+	mover:SetScript("OnEnter", function(f)
 		tooltip:ClearLines()
-		tooltip:SetOwner(f, db.profile.growUp and "ANCHOR_TOP" or "ANCHOR_BOTTOM")
+		tooltip:SetOwner(f, db.profile.growUp and "ANCHOR_BOTTOM" or "ANCHOR_TOP")
 		tooltip:AddLine(L.anchorTooltip, 0.2, 1, 0.2, 1)
 		tooltip:AddLine(L.anchorTooltipNote, 1, 1, 1, 1)
 		tooltip:Show()
 	end)
-	frame:SetScript("OnLeave", function() tooltip:Hide() end)
-	frame:SetScript("OnDragStart", function(f) f:StartMoving() end)
-	frame:SetScript("OnDragStop", function(f)
-		f:StopMovingOrSizing()
-		local a, _, b, c, d = f:GetPoint()
-		db.profile.position[1] = a
-		db.profile.position[2] = b
-		db.profile.position[3] = c
-		db.profile.position[4] = d
+	mover:SetScript("OnLeave", function() tooltip:Hide() end)
+	mover:SetScript("OnHide", function() tooltip:Hide() end)
+	mover:SetScript("OnDragStart", function()
+		if db.profile.position[5] == defaults.profile.position[5] then
+			frame:StartMoving()
+		end
+	end)
+	mover:SetScript("OnDragStop", function()
+		if db.profile.position[5] == defaults.profile.position[5] then
+			frame:StopMovingOrSizing()
+			local point, _, relPoint, x, y = frame:GetPoint()
+			x = math.floor(x+0.5)
+			y = math.floor(y+0.5)
+			db.profile.position = {point, relPoint, x, y, defaults.profile.position[5]}
+			RefixPosition()
+			NotifyOptions()
+		end
 	end)
 	local function openOpts()
 		C_AddOns.EnableAddOn("Capping_Options") -- Make sure it wasn't left disabled for whatever reason
 		C_AddOns.LoadAddOn("Capping_Options")
-		LibStub("AceConfigDialog-3.0"):Open(addonName)
+		if frame.OpenOptions then
+			frame.OpenOptions()
+		end
 	end
 	SlashCmdList.Capping = openOpts
 	SLASH_Capping1 = "/capping"
-	frame:SetScript("OnMouseUp", function(_, btn)
+	mover:SetScript("OnMouseUp", function(_, btn)
 		if btn == "RightButton" then
 			openOpts()
 		end

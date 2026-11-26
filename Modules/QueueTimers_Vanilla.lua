@@ -11,16 +11,24 @@ Enum.StartTimerType.ChallengeModeCountdown = 1
 Enum.StartTimerType.PlayerCountdown = 2
 Enum.StartTimerType.PlunderstormCountdown = 3
 ]]
-function mod:START_TIMER(timerType, timeSeconds)
+function mod:START_TIMER(timerType, timeSeconds, totalTime)
 	if timerType ~= 0 then return end
 
 	for i = 1, #TimerTracker.timerList do
-		TimerTracker.timerList[i].bar:Hide() -- Hide the Blizz start timer
+		local timer = TimerTracker.timerList[i]
+		if timer.type == 0 then
+			timer.bar:Hide() -- Hide the Blizz start timer
+		end
+	end
+
+	if timeSeconds <= 0 then
+		self:StopBar(L.battleBegins)
+		return
 	end
 
 	local bar = self:GetBar(L.battleBegins)
 	if not bar or timeSeconds >= 45 or timeSeconds > bar:GetRemainingTime()+1 or timeSeconds < bar:GetRemainingTime()-1 then -- Don't restart bars for subtle changes +/- 1s
-		self:StartBar(L.battleBegins, timeSeconds, 136106, "colorOther") -- 136106 = Interface/Icons/Spell_nature_timestop
+		self:StartBar(L.battleBegins, timeSeconds, 136106, "colorOther", nil, totalTime) -- 136106 = Interface/Icons/Spell_nature_timestop
 	end
 end
 mod:RegisterEvent("START_TIMER")

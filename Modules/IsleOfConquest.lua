@@ -145,12 +145,14 @@ do
 	--	initGateBars()
 	--end
 
-	local me = UnitName("player").. "-" ..GetRealmName()
+	local me = UnitName("player")
+	local Ambiguate = Ambiguate
 	local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
 	local GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
-	local GetSpellName = C_Spell and C_Spell.GetSpellName or GetSpellInfo
+	local GetSpellName = C_Spell.GetSpellName
 	function mod:CHAT_MSG_ADDON(prefix, msg, channel, sender)
 		if prefix == "Capping" and channel == "INSTANCE_CHAT" then
+			sender = Ambiguate(sender, "none")
 			if msg == "gr" and sender ~= me then -- gate request
 				if hasData then -- Joined a late game, don't send data
 					if timer then timer:Cancel() end
@@ -236,7 +238,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 end
 
 do
-	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
+	--local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 	function mod:EnterZone()
 		lowestAllianceHp, lowestHordeHp = baseGateHealth, baseGateHealth
 		hordeGates = {
@@ -255,7 +257,7 @@ do
 		--C_ChatInfo.RegisterAddonMessagePrefix("Capping")
 		--self:RegisterEvent("CHAT_MSG_ADDON")
 		--self:RegisterEvent("CHAT_MSG_MONSTER_YELL")
-		RequestBattlefieldScoreData()
+		--RequestBattlefieldScoreData()
 		--self:Timer(1, function() RequestBattlefieldScoreData() end)
 		--self:Timer(2, IoCSyncRequest)
 	end

@@ -8,7 +8,7 @@ end
 do
 	local UnitGUID, strsplit, GetNumGossipActiveQuests = UnitGUID, strsplit, C_GossipInfo.GetNumActiveQuests
 	local tonumber, GetGossipOptions = tonumber, C_GossipInfo.GetOptions
-	local GetItemCount = C_Item and C_Item.GetItemCount or GetItemCount -- XXX 10.2.6
+	local GetItemCount = C_Item.GetItemCount
 	local blockedIds = {
 		[30907] = true, -- alliance
 		[30908] = true, -- alliance
@@ -227,9 +227,11 @@ do
 			end
 		end
 
-		local me = UnitName("player").. "-" ..GetRealmName()
+		local me = UnitName("player")
+		local Ambiguate = Ambiguate
 		function mod:CHAT_MSG_ADDON(prefix, msg, channel, sender)
 			if prefix == "Capping" and channel == "INSTANCE_CHAT" then
+				sender = Ambiguate(sender, "none")
 				if msg == "tr" and sender ~= me then -- timer request
 					if hasData then -- Joined a late game, don't send data
 						if timer then timer:Cancel() end

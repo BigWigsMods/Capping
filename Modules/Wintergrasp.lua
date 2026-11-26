@@ -367,9 +367,11 @@ do
 		end
 	end
 
-	local me = UnitName("player").. "-" ..GetRealmName()
+	local me = UnitName("player")
+	local Ambiguate = Ambiguate
 	function mod:CHAT_MSG_ADDON(prefix, msg, channel, sender)
 		if prefix == "Capping" and channel == "INSTANCE_CHAT" then
+			sender = Ambiguate(sender, "none")
 			if msg == "twr" and sender ~= me then -- gate request
 				if hasData then -- Joined a late game, don't send data
 					if timer then timer:Cancel() end
@@ -441,7 +443,7 @@ do
 end
 
 do
-	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
+	--local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 	function mod:EnterZone()
 		wallTextures = {}
 		onDemandTrackers = {}
@@ -459,7 +461,7 @@ do
 			["308013"] = attackerTowerHealth, -- Winter's Edge Tower (Mid)
 			["307935"] = attackerTowerHealth, -- Flamewatch Tower (East)
 		}
-		RequestBattlefieldScoreData()
+		--RequestBattlefieldScoreData()
 		--self:Timer(1, function() RequestBattlefieldScoreData() end)
 		--self:Timer(2, WGSyncRequest)
 		--C_ChatInfo.RegisterAddonMessagePrefix("Capping")

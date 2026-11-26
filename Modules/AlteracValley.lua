@@ -278,9 +278,11 @@ do
 			end
 		end
 
-		local me = UnitName("player").. "-" ..GetRealmName()
+		local me = UnitName("player")
+		local Ambiguate = Ambiguate
 		function mod:CHAT_MSG_ADDON(prefix, msg, channel, sender)
 			if prefix == "Capping" and channel == "INSTANCE_CHAT" then
+				sender = Ambiguate(sender, "none")
 				if msg == "tr" and sender ~= me then -- timer request
 					if hasData then -- Joined a late game, don't send data
 						if timer then timer:Cancel() end
@@ -300,7 +302,7 @@ do
 end
 
 do
-	local RequestBattlefieldScoreData = RequestBattlefieldScoreData
+	--local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 	local poiEnglishNames = {
 		-- Alterac Valley (map 30) - Alliance Bunkers
 		[1353] = "Dun Baldar North Bunker", -- Alliance conflict
@@ -390,7 +392,7 @@ do
 		self:RegisterEvent("GOSSIP_SHOW")
 		self:RegisterEvent("QUEST_PROGRESS")
 		self:RegisterEvent("QUEST_COMPLETE")
-		RequestBattlefieldScoreData()
+		--RequestBattlefieldScoreData()
 		--self:Timer(1, function() RequestBattlefieldScoreData() end)
 		--self:Timer(2, AVSyncRequest)
 	end
