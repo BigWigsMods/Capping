@@ -8,6 +8,7 @@ local frame = CreateFrame("Frame", "CappingFrame", UIParent)
 local L = mod.L
 mod.isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 --mod.isRetail = GetGameType() == "standard" -- XXX 12.1.7
+mod.isForever = not mod.isRetail
 
 local format, type = string.format, type
 local db, core

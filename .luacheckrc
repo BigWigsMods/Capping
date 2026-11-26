@@ -49,6 +49,7 @@ globals = {
 	"GetNumBattlegroundTypes",
 	"GetNumQuestRewards",
 	"GetQuestReward",
+	"GetRealZoneText",
 	"GetTime",
 	"InCombatLockdown",
 	"IsAltKeyDown",
