@@ -61,5 +61,6 @@ Modules\Wintergrasp.lua [AllowLoadGameType standard]
 Modules\SlayersRise.lua [AllowLoadGameType standard]
 Modules\TempleOfKotmogu.lua [AllowLoadGameType standard]
 Modules\WarsongGulchTwinPeaks.lua
+Modules\DarkspearIslands.lua [ExcludeLoadGameType standard, classic][AllowLoadGameType camelot]
 
 modules.xml

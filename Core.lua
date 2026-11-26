@@ -1225,7 +1225,9 @@ do
 		local function UpdatePredictor()
 			if aIncrease ~= prevAIncrease or hIncrease ~= prevHIncrease or timeBetweenEachTick ~= prevTick then
 				if aIncrease > 65 or hIncrease > 65 or aIncrease < 0 or hIncrease < 0 then -- Scores can reduce in DG
-					curMod:StopBar(prevText) -- >65 increase means captured a flag/cart in EotS/DG
+					-- >65 increase means captured a flag/cart in EotS/DG
+					-- Darkspear Islands (WoW Forever): flag caps award +75 (1 base), +85 (2 bases), +100 (3 bases), scaling like EotS
+					curMod:StopBar(prevText)
 					prevAIncrease, prevHIncrease = -1, -1
 					return
 				end
@@ -1279,8 +1281,13 @@ do
 		local GetDoubleStateIconRowVisualizationInfo = C_UIWidgetManager.GetDoubleStateIconRowVisualizationInfo
 		local ceil, floor = math.ceil, math.floor
 		local function ScorePredictor(widgetInfo)
-			 -- 1671 is used for most BGs with score predictors, but Deep Gorge uses 2074, Deephaul Ravine uses 5153, and Temple of Kotmogu uses 1689
-			if widgetInfo and (widgetInfo.widgetID == 1671 or widgetInfo.widgetID == 2074 or widgetInfo.widgetID == 5153 or widgetInfo.widgetID == 1689) then
+			if widgetInfo and (
+				widgetInfo.widgetID == 1671 or -- Most BGs (Arathi Basin, Eye of the Storm, Battle for Gilneas)
+				widgetInfo.widgetID == 2074 or -- Deepwind Gorge
+				widgetInfo.widgetID == 5153 or -- Deephaul Ravine
+				widgetInfo.widgetID == 1689 or -- Temple of Kotmogu
+				widgetInfo.widgetID == 7467 -- Darkspear Islands (WoW Forever)
+			) then
 				local dataTbl = GetDoubleStatusBarWidgetVisualizationInfo(widgetInfo.widgetID)
 				if not dataTbl or not dataTbl.leftBarMax then return end
 				if prevTime == 0 then
