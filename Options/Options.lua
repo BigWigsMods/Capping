@@ -98,7 +98,7 @@ do
 				type = "execute",
 				name = L.test,
 				order = 0.2,
-				width = 1.5,
+				width = 1,
 				func = function()
 					cap:Test(L)
 				end,
@@ -108,7 +108,15 @@ do
 				name = L.lock,
 				desc = L.lockDesc,
 				order = 0.4,
-				width = 1.5,
+				width = 1,
+			},
+			discord = {
+				type = "input",
+				get = function() return "discord.gg/gtDxWKvXE8" end,
+				set = function() end,
+				name = "Discord",
+				order = 0.6,
+				width = 1,
 			},
 			general = {
 				name = L.general,
