@@ -1,9 +1,13 @@
 
-local mod, L, cap, isRetail
+local mod, L, cap, isRetail, isForever, buffMod
 do
 	local _, core = ...
 	mod, L, cap = core:NewMod()
 	isRetail = core.isRetail
+	isForever = core.isForever
+	if isForever then
+		buffMod = core:NewMod()
+	end
 end
 
 do
@@ -391,11 +395,131 @@ do
 		[6437] = "Frostwolf Relief Hut", -- Horde conflict
 		[6438] = "Frostwolf Relief Hut", -- Alliance conflict
 	}
+	local StartBossBuffTracker, StopBossBuffTracker
+	if isForever then
+		local GetActiveMatchState = C_PvP.GetActiveMatchState
+		local GetActiveMatchDuration = C_PvP.GetActiveMatchDuration
+		local GetAreaPOIForMap = C_AreaPoiInfo.GetAreaPOIForMap
+		local GetBestMapForUnit = C_Map.GetBestMapForUnit
+		local GetSpellTexture = C_Spell.GetSpellTexture
+		local UnitFactionGroup = UnitFactionGroup
+		local format = string.format
+
+		local allianceDestroyedBunkers = {
+			[1352] = true, -- Dun Baldar North Bunker (Destroyed)
+			[1355] = true, -- Dun Baldar South Bunker (Destroyed)
+			[1380] = true, -- Icewing Bunker (Destroyed)
+			[1389] = true, -- Stonehearth Bunker (Destroyed)
+		}
+		local hordeDestroyedTowers = {
+			[1362] = true, -- East Frostwolf Tower (Destroyed)
+			[1377] = true, -- Iceblood Tower (Destroyed)
+			[1405] = true, -- Tower Point (Destroyed)
+			[1528] = true, -- West Frostwolf Tower (Destroyed)
+		}
+
+		local isNpcBuffsTranslated = L.npcBuffs ~= "NPC Buffs x%d"
+		local enemyDestroyedPOIs = nil
+		local buffColor = nil
+		local buffIcon = nil
+		local buffStarted = false
+		local currentStacks = nil
+
+		local function GetRemainingStacks()
+			local curMapID = GetBestMapForUnit("player")
+			if not curMapID then return 4 end
+			local destroyed = 0
+			local pois = GetAreaPOIForMap(curMapID)
+			for i = 1, #pois do
+				if enemyDestroyedPOIs[pois[i]] then
+					destroyed = destroyed + 1
+				end
+			end
+			return destroyed < 4 and (4 - destroyed) or 0
+		end
+
+		local function UpdateBuffStacks()
+			local bar = mod:GetBarByData("capping:avbuff", true)
+			if not bar then
+				buffMod:UnregisterEvent("AREA_POIS_UPDATED")
+				return
+			end
+			local stacks = GetRemainingStacks()
+			if stacks == 0 then
+				currentStacks = 0
+				mod:StopBarByData("capping:avbuff", true)
+				buffMod:UnregisterEvent("AREA_POIS_UPDATED")
+			elseif stacks ~= currentStacks then
+				currentStacks = stacks
+				local label = format(L.npcBuffs, stacks)
+				bar:SetLabel(label)
+				if isNpcBuffsTranslated then
+					local englishLabel = format("NPC Buffs x%d", stacks)
+					bar:Set("capping:englishname", englishLabel)
+				end
+			end
+		end
+
+		local function CheckMatchState()
+			local state = GetActiveMatchState()
+			if state == 3 then -- Enum.PvPMatchState.Engaged
+				if not buffStarted then
+					buffStarted = true
+					local remaining = 1200 - GetActiveMatchDuration()
+					local stacks = GetRemainingStacks()
+					currentStacks = stacks
+					if remaining > 0 and stacks > 0 then
+						local label = format(L.npcBuffs, stacks)
+						local bar = mod:StartBar(label, remaining, buffIcon, buffColor, nil, 1200)
+						bar:Set("capping:avbuff", true)
+						if isNpcBuffsTranslated then
+							local englishLabel = format("NPC Buffs x%d", stacks)
+							bar:Set("capping:englishname", englishLabel)
+						end
+						buffMod:RegisterEvent("AREA_POIS_UPDATED", UpdateBuffStacks)
+					end
+				end
+			elseif state == 0 or state >= 4 then -- 0 = Inactive, 4 = PostRound, 5 = Complete
+				mod:StopBarByData("capping:avbuff", true)
+				buffMod:UnregisterEvent("AREA_POIS_UPDATED")
+			end
+		end
+
+		function StartBossBuffTracker()
+			buffStarted = false
+			currentStacks = nil
+			if UnitFactionGroup("player") == "Horde" then
+				enemyDestroyedPOIs = allianceDestroyedBunkers
+				buffColor = "colorAlliance"
+				buffIcon = GetSpellTexture(1334174) -- Might of the Alliance
+			else
+				enemyDestroyedPOIs = hordeDestroyedTowers
+				buffColor = "colorHorde"
+				buffIcon = GetSpellTexture(1334175) -- Might of the Horde
+			end
+			buffMod:RegisterEvent("PVP_MATCH_STATE_CHANGED", CheckMatchState)
+			CheckMatchState()
+		end
+
+		function StopBossBuffTracker()
+			buffMod:UnregisterEvent("PVP_MATCH_STATE_CHANGED")
+			buffMod:UnregisterEvent("AREA_POIS_UPDATED")
+			enemyDestroyedPOIs = nil
+			buffColor = nil
+			buffIcon = nil
+			buffStarted = false
+			currentStacks = nil
+		end
+	end
+
 	function mod:EnterZone(id)
 		if id == 2197 then
 			self:StartFlagCaptures(241, nil, poiEnglishNames) -- Korrak's Revenge (WoW 15th)
 		else
 			self:StartFlagCaptures(isRetail and 242 or 300, nil, poiEnglishNames) -- 300 on Forever
+			if isForever and id == 30 then
+				StartBossBuffTracker()
+			end
 		end
 		--self:SetupHealthCheck("11946", L.hordeBoss, "Horde Boss", 236452, "colorAlliance") -- Interface/Icons/Achievement_Character_Orc_Male
 		--self:SetupHealthCheck("11948", L.allianceBoss, "Alliance Boss", 236444, "colorHorde") -- Interface/Icons/Achievement_Character_Dwarf_Male
@@ -411,15 +535,18 @@ do
 		--self:Timer(1, function() RequestBattlefieldScoreData() end)
 		--self:Timer(2, AVSyncRequest)
 	end
-end
 
-function mod:ExitZone()
-	self:UnregisterEvent("GOSSIP_SHOW")
-	self:UnregisterEvent("QUEST_PROGRESS")
-	self:UnregisterEvent("QUEST_COMPLETE")
-	--self:UnregisterEvent("CHAT_MSG_ADDON")
-	self:StopFlagCaptures()
-	--self:StopHealthCheck()
+	function mod:ExitZone()
+		if isForever then
+			StopBossBuffTracker()
+		end
+		self:UnregisterEvent("GOSSIP_SHOW")
+		self:UnregisterEvent("QUEST_PROGRESS")
+		self:UnregisterEvent("QUEST_COMPLETE")
+		--self:UnregisterEvent("CHAT_MSG_ADDON")
+		self:StopFlagCaptures()
+		--self:StopHealthCheck()
+	end
 end
 
 mod:RegisterZone(30)

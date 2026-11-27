@@ -25,6 +25,7 @@ L.galvangar = "Galvangar"
 L.balinda = "Balinda"
 L.ivus = "Ivus" -- Ivus el Señor del Bosque
 L.lokholar = "Lokholar" -- Lokholar el Señor del Hielo
+--L.npcBuffs = "NPC Buffs x%d"
 L.handIn = "|cFF33FF99Capping|r: Entregando objetos de misión automáticamente."
 L.anchorTooltip = "|cffeda55fClic derecho|r para acceder a las opciones"
 L.anchorTooltipNote = "Abre las opciones y bloquea las barras para esconder este ancla móvil."

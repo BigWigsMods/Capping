@@ -25,6 +25,7 @@ L.galvangar = "Гальвангар" -- Капитан Гальвангар <К�
 L.balinda = "Балинда" -- Капитан Балинда Каменный Очаг <Капитан клана Грозовой Вершины>
 L.ivus = "Ивус" -- Ивус Лесной Властелин
 L.lokholar = "Локолар" -- Локолар Владыка Льда
+--L.npcBuffs = "NPC Buffs x%d"
 L.handIn = "|cFF33FF99Capping|r: Автоматическая сдача квестовых предметов." -- проверить на проде // spellcheck on live
 L.anchorTooltip = "|cffeda55fПравый клик|r открыть настройки"
 --L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."

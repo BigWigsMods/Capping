@@ -25,6 +25,7 @@ L.east = "Est"
 --L.balinda = "Balinda"
 L.ivus = "Ivus" -- Ivus il Signore della Foresta
 L.lokholar = "Lokholar" -- Lokholar il Signore del Ghiaccio
+--L.npcBuffs = "NPC Buffs x%d"
 --L.handIn = "|cFF33FF99Capping|r: Automatically handing in quest items."
 L.anchorTooltip = "|cffeda55fClic-Destro|r per aprire le Opzioni"
 --L.anchorTooltipNote = "Open the options and lock the bars to hide this moving anchor."

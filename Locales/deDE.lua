@@ -25,6 +25,7 @@ L.galvangar = "Galvangar" -- Hauptmann Galvangar
 L.balinda = "Balinda" -- Hauptmann Balinda Steinbruch
 L.ivus = "Ivus" -- Ivus der Waldlord
 L.lokholar = "Lokholar" -- Lokholar der Eislord
+--L.npcBuffs = "NPC Buffs x%d"
 L.handIn = "|cFF33FF99Capping|r: Gebe Quest-Gegenstände automatisch ab."
 L.anchorTooltip = "|cffeda55fRechtsklick|r, um auf die Optionen zuzugreifen"
 L.anchorTooltipNote = "Öffne die Optionen und sperre die Balken, um diesen beweglichen Anker auszublenden."

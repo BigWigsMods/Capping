@@ -25,6 +25,7 @@ L.galvangar = "Galvangar" -- Capitaine Galvangar
 L.balinda = "Balinda" -- Capitaine Balinda Gîtepierre
 L.ivus = "Ivus" -- Ivus le Seigneur de la forêt
 L.lokholar = "Lokholar" -- Lokholar le Seigneur des glaces
+--L.npcBuffs = "NPC Buffs x%d"
 L.handIn = "|cFF33FF99Capping|r: Remise automatique des objets de quête."
 L.anchorTooltip = "|cffeda55fClic droit|r pour accéder aux options."
 L.anchorTooltipNote = "Ouvre les options et verrouille les barres afin de cacher l'ancre à déplacer."
